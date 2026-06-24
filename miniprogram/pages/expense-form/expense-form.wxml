@@ -1,5 +1,5 @@
 <view class="page form-page" wx:if="{{trip}}">
-  <view class="form-title">新增消费</view>
+  <view class="form-title">{{formTitle}}</view>
   <view class="form-subtitle">{{trip.name}} · {{trip.destination}}</view>
 
   <view class="form-card panel">
@@ -9,6 +9,6 @@
       <view class="picker-field">分类：{{category}}</view>
     </picker>
     <input class="field" placeholder="付款人" value="{{paidBy}}" bindinput="onPaidByInput" />
-    <button class="primary-button" bindtap="saveExpense">保存消费</button>
+    <button class="primary-button" bindtap="saveExpense">{{saveLabel}}</button>
   </view>
 </view>

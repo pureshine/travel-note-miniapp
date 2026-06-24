@@ -5,7 +5,13 @@
       <view class="cover-title">{{trip.name}}</view>
       <view class="cover-date">{{trip.startDate}} - {{trip.endDate}}</view>
     </view>
-    <view class="cover-badge">{{trip.schedules.length}} 项</view>
+    <view class="cover-side">
+      <view class="cover-badge">{{trip.schedules.length}} 项</view>
+      <view class="cover-actions">
+        <button class="cover-action" bindtap="editTrip">编辑</button>
+        <button class="cover-action danger" bindtap="deleteCurrentTrip">删除</button>
+      </view>
+    </view>
   </view>
 
   <view class="module-grid">
@@ -42,8 +48,19 @@
     <view wx:for="{{trip.schedules}}" wx:key="id" class="timeline-row">
       <view class="time">{{item.time}}</view>
       <view class="timeline-content">
-        <view class="schedule-title">{{item.title}}</view>
-        <view class="schedule-place">{{item.place}}</view>
+        <view class="schedule-actions">
+          <button class="swipe-action edit" catchtap="editSchedule" data-id="{{item.id}}">编辑</button>
+          <button class="swipe-action danger" catchtap="deleteScheduleItem" data-id="{{item.id}}">删除</button>
+        </view>
+        <view
+          class="schedule-swipe {{openScheduleId === item.id ? 'open' : ''}}"
+          bindtouchstart="onScheduleTouchStart"
+          bindtouchmove="onScheduleTouchMove"
+          data-id="{{item.id}}"
+        >
+          <view class="schedule-title">{{item.title}}</view>
+          <view class="schedule-place">{{item.place}}</view>
+        </view>
       </view>
     </view>
     <view wx:if="{{trip.schedules.length === 0}}" class="empty">还没有日程，先加一个出发安排吧</view>

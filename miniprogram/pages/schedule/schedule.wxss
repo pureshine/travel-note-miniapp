@@ -220,12 +220,55 @@
   background: #3b82f6;
 }
 
-.event {
+.event-wrap {
+  position: relative;
   min-width: 0;
+  overflow: hidden;
+  border-radius: 28rpx;
+}
+
+.event {
+  position: relative;
+  z-index: 1;
   padding: 28rpx 30rpx;
   border-radius: 28rpx;
   background: #ffffff;
   box-shadow: 0 18rpx 44rpx rgba(45, 68, 102, 0.06);
+  transition: transform 0.18s ease;
+}
+
+.event.open {
+  transform: translateX(-220rpx);
+}
+
+.event-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 110rpx);
+  width: 220rpx;
+  overflow: hidden;
+  border-radius: 0 28rpx 28rpx 0;
+}
+
+.swipe-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 24rpx;
+  font-weight: 850;
+}
+
+.swipe-action.edit {
+  background: #3b82f6;
+}
+
+.swipe-action.danger {
+  background: #dc2626;
 }
 
 .event-head {

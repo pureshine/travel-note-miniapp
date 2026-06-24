@@ -5,6 +5,8 @@ Page({
     data: {
         tripId: "",
         trip: undefined,
+        scheduleTouchStartX: 0,
+        openScheduleId: "",
         scheduleTitle: "",
         scheduleTime: "09:00",
         schedulePlace: ""
@@ -56,6 +58,61 @@ Page({
             trip,
             scheduleTitle: "",
             schedulePlace: ""
+        });
+    },
+    editTrip() {
+        wx.navigateTo({ url: `/pages/trip-form/trip-form?id=${this.data.tripId}` });
+    },
+    deleteCurrentTrip() {
+        if (!this.data.trip)
+            return;
+        wx.showModal({
+            title: "删除旅行计划",
+            content: `确定删除“${this.data.trip.name}”吗？相关日程、备忘和消费也会删除。`,
+            confirmText: "删除",
+            confirmColor: "#dc2626",
+            success: (result) => {
+                if (!result.confirm)
+                    return;
+                (0, trip_store_1.deleteTrip)(this.data.tripId);
+                wx.redirectTo({ url: "/pages/trips/trips" });
+            }
+        });
+    },
+    onScheduleTouchStart(event) {
+        this.setData({
+            scheduleTouchStartX: event.changedTouches[0].clientX,
+            openScheduleId: this.data.openScheduleId === event.currentTarget.dataset.id ? this.data.openScheduleId : ""
+        });
+    },
+    onScheduleTouchMove(event) {
+        const distance = this.data.scheduleTouchStartX - event.changedTouches[0].clientX;
+        const scheduleId = event.currentTarget.dataset.id;
+        if (distance > 40) {
+            this.setData({ openScheduleId: scheduleId });
+        }
+        else if (distance < -20 && this.data.openScheduleId === scheduleId) {
+            this.setData({ openScheduleId: "" });
+        }
+    },
+    editSchedule(event) {
+        wx.navigateTo({ url: `/pages/schedule-form/schedule-form?tripId=${this.data.tripId}&scheduleId=${event.currentTarget.dataset.id}` });
+    },
+    deleteScheduleItem(event) {
+        const schedule = this.data.trip?.schedules.find((item) => item.id === event.currentTarget.dataset.id);
+        if (!schedule)
+            return;
+        wx.showModal({
+            title: "删除日程",
+            content: `确定删除“${schedule.title}”吗？`,
+            confirmText: "删除",
+            confirmColor: "#dc2626",
+            success: (result) => {
+                if (!result.confirm)
+                    return;
+                const trip = (0, trip_store_1.deleteSchedule)(this.data.tripId, schedule.id);
+                this.setData({ trip, openScheduleId: "" });
+            }
         });
     },
     goChecklist() {

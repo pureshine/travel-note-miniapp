@@ -1,5 +1,5 @@
 <view class="page form-page" wx:if="{{trip}}">
-  <view class="form-title">新增备忘</view>
+  <view class="form-title">{{formTitle}}</view>
   <view class="form-subtitle">{{trip.name}} · {{trip.destination}}</view>
 
   <view class="form-card panel">
@@ -7,7 +7,7 @@
     <picker mode="selector" range="{{categories}}" bindchange="onCategoryChange">
       <view class="picker-field">分类：{{category}}</view>
     </picker>
-    <textarea class="field textarea" placeholder="写下具体事项、截止时间或提醒" value="{{content}}" bindinput="onContentInput" />
-    <button class="primary-button" bindtap="saveNote">保存备忘</button>
+    <textarea class="field textarea" placeholder="写下具体事项、截止时间或提醒（选填）" value="{{content}}" bindinput="onContentInput" />
+    <button class="primary-button" bindtap="saveNote">{{saveLabel}}</button>
   </view>
 </view>

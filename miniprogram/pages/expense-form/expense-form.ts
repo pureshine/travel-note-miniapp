@@ -1,10 +1,14 @@
-import { addExpense, getTrip } from "../../services/trip-store";
+import { addExpense, getTrip, updateExpense } from "../../services/trip-store";
 import { ExpenseCategory, Trip } from "../../types/trip";
 
 Page({
   data: {
     tripId: "",
+    expenseId: "",
+    isEditing: false,
     trip: undefined as Trip | undefined,
+    formTitle: "新增消费",
+    saveLabel: "保存消费",
     title: "",
     amount: "",
     category: "餐饮" as ExpenseCategory,
@@ -12,12 +16,23 @@ Page({
     categories: ["餐饮", "交通", "住宿", "购物", "门票", "其他"] as ExpenseCategory[]
   },
 
-  onLoad(options: { tripId?: string }) {
+  onLoad(options: { tripId?: string; expenseId?: string }) {
     if (!options.tripId) return;
+    const trip = getTrip(options.tripId);
+    const expense = trip?.expenses.find((item) => item.id === options.expenseId);
     this.setData({
       tripId: options.tripId,
-      trip: getTrip(options.tripId)
+      expenseId: options.expenseId || "",
+      isEditing: Boolean(expense),
+      trip,
+      formTitle: expense ? "编辑消费" : "新增消费",
+      saveLabel: expense ? "保存修改" : "保存消费",
+      title: expense ? expense.title : "",
+      amount: expense ? String(expense.amount) : "",
+      category: expense ? expense.category : this.data.category,
+      paidBy: expense ? expense.paidBy : this.data.paidBy
     });
+    if (expense) wx.setNavigationBarTitle({ title: "编辑消费" });
   },
 
   onTitleInput(event: { detail: { value: string } }) {
@@ -44,7 +59,11 @@ Page({
       wx.showToast({ title: "填写消费和金额", icon: "none" });
       return;
     }
-    addExpense(this.data.tripId, title, amount, this.data.category, this.data.paidBy || "我");
+    if (this.data.isEditing) {
+      updateExpense(this.data.tripId, this.data.expenseId, { title, amount, category: this.data.category, paidBy: this.data.paidBy || "我" });
+    } else {
+      addExpense(this.data.tripId, title, amount, this.data.category, this.data.paidBy || "我");
+    }
     wx.navigateBack();
   }
 });

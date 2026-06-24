@@ -7,6 +7,16 @@
     <button class="memo-count" bindtap="goNoteForm">+</button>
   </view>
 
+  <view class="plan-switch panel">
+    <picker mode="selector" range="{{tripNames}}" value="{{activeTripIndex}}" bindchange="onTripChange">
+      <view class="plan-picker">
+        <view class="plan-label">当前计划</view>
+        <view class="plan-name">{{trip.name}}</view>
+        <view class="plan-date">{{trip.startDate}} - {{trip.endDate}}</view>
+      </view>
+    </picker>
+  </view>
+
   <scroll-view class="filter-scroll" scroll-x>
     <view class="filter-row">
       <button
@@ -23,13 +33,24 @@
 
   <view class="note-list">
     <view wx:for="{{filteredNotes}}" wx:key="id" class="note-card panel {{item.done ? 'done' : ''}}">
-      <view class="note-top" bindtap="toggleItem" data-id="{{item.id}}">
-        <view class="check-dot">{{item.done ? "✓" : ""}}</view>
-        <view class="note-main">
-          <view class="note-title">{{item.title}}</view>
-          <view class="note-content">{{item.content}}</view>
+      <view class="note-actions">
+        <button class="note-action edit" catchtap="editNoteItem" data-id="{{item.id}}">编辑</button>
+        <button class="note-action danger" catchtap="deleteNoteItem" data-id="{{item.id}}">删除</button>
+      </view>
+      <view
+        class="note-swipe {{openNoteId === item.id ? 'open' : ''}}"
+        bindtouchstart="onNoteTouchStart"
+        bindtouchmove="onNoteTouchMove"
+        data-id="{{item.id}}"
+      >
+        <view class="note-top" bindtap="toggleItem" data-id="{{item.id}}">
+          <view class="check-dot">{{item.done ? "✓" : ""}}</view>
+          <view class="note-main">
+            <view class="note-title">{{item.title}}</view>
+            <view wx:if="{{item.content}}" class="note-content">{{item.content}}</view>
+          </view>
+          <view class="note-tag">{{item.category}}</view>
         </view>
-        <view class="note-tag">{{item.category}}</view>
       </view>
     </view>
     <view wx:if="{{filteredNotes.length === 0}}" class="empty panel">还没有备忘</view>

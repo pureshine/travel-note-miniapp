@@ -73,8 +73,35 @@
   font-size: 24rpx;
 }
 
+.trip-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 14rpx;
+  flex: 0 0 auto;
+}
+
 .trip-count {
   color: #167c70;
   font-size: 24rpx;
   font-weight: 700;
+}
+
+.trip-actions {
+  display: flex;
+  gap: 12rpx;
+}
+
+.text-action {
+  padding: 10rpx 14rpx;
+  border-radius: 12rpx;
+  background: #eef5ff;
+  color: #3b82f6;
+  font-size: 22rpx;
+  font-weight: 750;
+}
+
+.text-action.danger {
+  background: #fef2f2;
+  color: #dc2626;
 }

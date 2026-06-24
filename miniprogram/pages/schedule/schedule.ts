@@ -1,4 +1,4 @@
-import { getDefaultTrip, listTrips, setActiveTripId } from "../../services/trip-store";
+import { deleteSchedule, getDefaultTrip, listTrips, setActiveTripId } from "../../services/trip-store";
 import { ScheduleItem, Trip } from "../../types/trip";
 
 type ScheduleStatus = "已完成" | "进行中" | "待进行";
@@ -10,6 +10,8 @@ Page({
     trips: [] as Trip[],
     tripNames: [] as string[],
     activeTripIndex: 0,
+    scheduleTouchStartX: 0,
+    openScheduleId: "",
     schedules: [] as ScheduleView[]
   },
 
@@ -44,6 +46,46 @@ Page({
   goScheduleForm() {
     if (!this.data.trip) return;
     wx.navigateTo({ url: `/pages/schedule-form/schedule-form?tripId=${this.data.trip.id}` });
+  },
+
+  onScheduleTouchStart(event: { changedTouches: Array<{ clientX: number }>; currentTarget: { dataset: { id: string } } }) {
+    this.setData({
+      scheduleTouchStartX: event.changedTouches[0].clientX,
+      openScheduleId: this.data.openScheduleId === event.currentTarget.dataset.id ? this.data.openScheduleId : ""
+    });
+  },
+
+  onScheduleTouchMove(event: { changedTouches: Array<{ clientX: number }>; currentTarget: { dataset: { id: string } } }) {
+    const distance = this.data.scheduleTouchStartX - event.changedTouches[0].clientX;
+    const scheduleId = event.currentTarget.dataset.id;
+    if (distance > 40) {
+      this.setData({ openScheduleId: scheduleId });
+    } else if (distance < -20 && this.data.openScheduleId === scheduleId) {
+      this.setData({ openScheduleId: "" });
+    }
+  },
+
+  editSchedule(event: { currentTarget: { dataset: { id: string } } }) {
+    if (!this.data.trip) return;
+    wx.navigateTo({ url: `/pages/schedule-form/schedule-form?tripId=${this.data.trip.id}&scheduleId=${event.currentTarget.dataset.id}` });
+  },
+
+  deleteScheduleItem(event: { currentTarget: { dataset: { id: string } } }) {
+    if (!this.data.trip) return;
+    const schedule = this.data.trip.schedules.find((item) => item.id === event.currentTarget.dataset.id);
+    if (!schedule) return;
+    wx.showModal({
+      title: "删除日程",
+      content: `确定删除“${schedule.title}”吗？`,
+      confirmText: "删除",
+      confirmColor: "#dc2626",
+      success: (result) => {
+        if (!result.confirm || !this.data.trip) return;
+        deleteSchedule(this.data.trip.id, schedule.id);
+        this.setData({ openScheduleId: "" });
+        this.loadTrip();
+      }
+    });
   },
 
   toScheduleViews(items: ScheduleItem[]): ScheduleView[] {

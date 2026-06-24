@@ -1,3 +1,35 @@
+.plan-switch {
+  padding: 22rpx 26rpx;
+  margin-bottom: 22rpx;
+}
+
+.plan-picker {
+  min-width: 0;
+}
+
+.plan-label {
+  color: #98a6ba;
+  font-size: 23rpx;
+  font-weight: 700;
+}
+
+.plan-name {
+  margin-top: 6rpx;
+  overflow: hidden;
+  color: #101828;
+  font-size: 31rpx;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.plan-date {
+  margin-top: 8rpx;
+  color: #98a6ba;
+  font-size: 24rpx;
+  line-height: 1.35;
+}
+
 .summary {
   padding: 34rpx;
   margin-bottom: 22rpx;
@@ -47,12 +79,31 @@
 }
 
 .expense-row {
+  position: relative;
+  overflow: hidden;
+  min-height: 104rpx;
+  border-bottom: 1rpx solid #edf2ef;
+}
+
+.expense-swipe {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 24rpx;
   min-height: 104rpx;
-  border-bottom: 1rpx solid #edf2ef;
+  background: #ffffff;
+  transition: transform 0.18s ease;
+}
+
+.expense-swipe.open {
+  transform: translateX(-220rpx);
+}
+
+.expense-main {
+  flex: 1;
+  min-width: 0;
 }
 
 .expense-row:last-child {
@@ -75,4 +126,40 @@
   color: #172521;
   font-size: 32rpx;
   font-weight: 850;
+}
+
+.expense-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12rpx;
+}
+
+.expense-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 110rpx);
+  width: 220rpx;
+  overflow: hidden;
+}
+
+.expense-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 24rpx;
+  font-weight: 800;
+}
+
+.expense-action.edit {
+  background: #3b82f6;
+}
+
+.expense-action.danger {
+  background: #dc2626;
 }

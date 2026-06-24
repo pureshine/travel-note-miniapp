@@ -7,6 +7,8 @@ Page({
         trips: [],
         tripNames: [],
         activeTripIndex: 0,
+        scheduleTouchStartX: 0,
+        openScheduleId: "",
         schedules: []
     },
     onShow() {
@@ -38,6 +40,47 @@ Page({
         if (!this.data.trip)
             return;
         wx.navigateTo({ url: `/pages/schedule-form/schedule-form?tripId=${this.data.trip.id}` });
+    },
+    onScheduleTouchStart(event) {
+        this.setData({
+            scheduleTouchStartX: event.changedTouches[0].clientX,
+            openScheduleId: this.data.openScheduleId === event.currentTarget.dataset.id ? this.data.openScheduleId : ""
+        });
+    },
+    onScheduleTouchMove(event) {
+        const distance = this.data.scheduleTouchStartX - event.changedTouches[0].clientX;
+        const scheduleId = event.currentTarget.dataset.id;
+        if (distance > 40) {
+            this.setData({ openScheduleId: scheduleId });
+        }
+        else if (distance < -20 && this.data.openScheduleId === scheduleId) {
+            this.setData({ openScheduleId: "" });
+        }
+    },
+    editSchedule(event) {
+        if (!this.data.trip)
+            return;
+        wx.navigateTo({ url: `/pages/schedule-form/schedule-form?tripId=${this.data.trip.id}&scheduleId=${event.currentTarget.dataset.id}` });
+    },
+    deleteScheduleItem(event) {
+        if (!this.data.trip)
+            return;
+        const schedule = this.data.trip.schedules.find((item) => item.id === event.currentTarget.dataset.id);
+        if (!schedule)
+            return;
+        wx.showModal({
+            title: "删除日程",
+            content: `确定删除“${schedule.title}”吗？`,
+            confirmText: "删除",
+            confirmColor: "#dc2626",
+            success: (result) => {
+                if (!result.confirm || !this.data.trip)
+                    return;
+                (0, trip_store_1.deleteSchedule)(this.data.trip.id, schedule.id);
+                this.setData({ openScheduleId: "" });
+                this.loadTrip();
+            }
+        });
     },
     toScheduleViews(items) {
         return items.map((item) => {

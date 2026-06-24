@@ -14,7 +14,13 @@
         <view class="trip-name">{{item.name}}</view>
         <view class="trip-meta">{{item.destination}} · {{item.startDate}} - {{item.endDate}}</view>
       </view>
-      <view class="trip-count">{{item.expenses.length}} 笔</view>
+      <view class="trip-side">
+        <view class="trip-count">{{item.expenses.length}} 笔</view>
+        <view class="trip-actions">
+          <button class="text-action" catchtap="editTrip" data-id="{{item.id}}">编辑</button>
+          <button class="text-action danger" catchtap="deleteTrip" data-id="{{item.id}}">删除</button>
+        </view>
+      </view>
     </view>
   </view>
 </view>

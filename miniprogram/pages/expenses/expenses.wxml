@@ -1,4 +1,14 @@
 <view class="page" wx:if="{{trip}}">
+  <view class="plan-switch panel">
+    <picker mode="selector" range="{{tripNames}}" value="{{activeTripIndex}}" bindchange="onTripChange">
+      <view class="plan-picker">
+        <view class="plan-label">当前计划</view>
+        <view class="plan-name">{{trip.name}}</view>
+        <view class="plan-date">{{trip.destination}} · {{trip.startDate}} - {{trip.endDate}}</view>
+      </view>
+    </picker>
+  </view>
+
   <view class="summary panel">
     <text class="summary-label">当前旅行花费</text>
     <view class="summary-value">¥{{total}}</view>
@@ -22,11 +32,24 @@
   </view>
   <view class="list panel">
     <view wx:for="{{trip.expenses}}" wx:key="id" class="expense-row">
-      <view>
-        <view class="expense-title">{{item.title}}</view>
-        <view class="expense-meta">{{item.category}} · {{item.paidBy}}</view>
+      <view class="expense-actions">
+        <button class="expense-action edit" catchtap="editExpense" data-id="{{item.id}}">编辑</button>
+        <button class="expense-action danger" catchtap="deleteExpense" data-id="{{item.id}}">删除</button>
       </view>
-      <view class="expense-amount">¥{{item.amount}}</view>
+      <view
+        class="expense-swipe {{openExpenseId === item.id ? 'open' : ''}}"
+        bindtouchstart="onExpenseTouchStart"
+        bindtouchmove="onExpenseTouchMove"
+        data-id="{{item.id}}"
+      >
+        <view class="expense-main">
+          <view class="expense-title">{{item.title}}</view>
+          <view class="expense-meta">{{item.category}} · {{item.paidBy}}</view>
+        </view>
+        <view class="expense-side">
+          <view class="expense-amount">¥{{item.amount}}</view>
+        </view>
+      </view>
     </view>
     <view wx:if="{{trip.expenses.length === 0}}" class="empty">还没有消费记录</view>
   </view>

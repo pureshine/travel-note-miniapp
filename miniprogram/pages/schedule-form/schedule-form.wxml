@@ -1,5 +1,5 @@
 <view class="page form-page">
-  <view class="form-title">新增日程</view>
+  <view class="form-title">{{formTitle}}</view>
   <view class="form-subtitle">{{trip.name}} · {{trip.destination}}</view>
 
   <view class="form-card panel">
@@ -21,6 +21,6 @@
     <scroll-view wx:if="{{images.length > 0}}" class="image-row" scroll-x>
       <image wx:for="{{images}}" wx:key="*this" class="preview-image" src="{{item}}" mode="aspectFill" />
     </scroll-view>
-    <button class="primary-button" bindtap="saveSchedule">保存日程</button>
+    <button class="primary-button" bindtap="saveSchedule">{{saveLabel}}</button>
   </view>
 </view>

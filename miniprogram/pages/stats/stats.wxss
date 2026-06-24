@@ -2,6 +2,38 @@
   background: #f6f9fd;
 }
 
+.plan-switch {
+  padding: 22rpx 26rpx;
+  margin-bottom: 22rpx;
+}
+
+.plan-picker {
+  min-width: 0;
+}
+
+.plan-label {
+  color: #98a6ba;
+  font-size: 23rpx;
+  font-weight: 700;
+}
+
+.plan-name {
+  margin-top: 6rpx;
+  overflow: hidden;
+  color: #101828;
+  font-size: 31rpx;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.plan-date {
+  margin-top: 8rpx;
+  color: #98a6ba;
+  font-size: 24rpx;
+  line-height: 1.35;
+}
+
 .budget-card {
   padding: 32rpx;
 }
@@ -172,8 +204,21 @@
 }
 
 .recent-row {
-  padding: 26rpx 0;
+  position: relative;
+  overflow: hidden;
   border-bottom: 1rpx solid #eef2f7;
+}
+
+.recent-swipe {
+  position: relative;
+  z-index: 1;
+  padding: 26rpx 0;
+  background: #ffffff;
+  transition: transform 0.18s ease;
+}
+
+.recent-swipe.open {
+  transform: translateX(-220rpx);
 }
 
 .recent-row:last-child {
@@ -181,7 +226,43 @@
 }
 
 .recent-meta {
-  margin-top: 8rpx;
   color: #98a6ba;
   font-size: 24rpx;
+}
+
+.recent-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18rpx;
+  margin-top: 8rpx;
+}
+
+.recent-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 110rpx);
+  width: 220rpx;
+  overflow: hidden;
+}
+
+.recent-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 24rpx;
+  font-weight: 800;
+}
+
+.recent-action.edit {
+  background: #3b82f6;
+}
+
+.recent-action.danger {
+  background: #dc2626;
 }

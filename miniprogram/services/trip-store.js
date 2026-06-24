@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getNoteCategories = exports.getScheduleCategories = exports.setActiveTripId = exports.getDefaultTrip = exports.resetDemoData = exports.getExpenseByCategory = exports.getSummary = exports.addExpense = exports.toggleNoteItem = exports.addNote = exports.toggleChecklistItem = exports.addChecklistItem = exports.addSchedule = exports.createTrip = exports.getTrip = exports.listTrips = void 0;
+exports.getNoteCategories = exports.getScheduleCategories = exports.setActiveTripId = exports.getDefaultTrip = exports.resetDemoData = exports.getExpenseByCategory = exports.getSummary = exports.deleteExpense = exports.updateExpense = exports.addExpense = exports.deleteNote = exports.toggleNoteItem = exports.updateNote = exports.addNote = exports.toggleChecklistItem = exports.addChecklistItem = exports.deleteSchedule = exports.updateSchedule = exports.addSchedule = exports.deleteTrip = exports.updateTripInfo = exports.createTrip = exports.getTrip = exports.listTrips = void 0;
 const id_1 = require("../utils/id");
 const date_1 = require("../utils/date");
 const STORAGE_KEY = "travel-note-trips";
@@ -60,7 +60,7 @@ function seedTrips() {
 }
 function readTrips() {
     const stored = wx.getStorageSync(STORAGE_KEY);
-    if (Array.isArray(stored) && stored.length > 0)
+    if (Array.isArray(stored))
         return stored;
     const seeded = seedTrips();
     wx.setStorageSync(STORAGE_KEY, seeded);
@@ -106,6 +106,29 @@ function createTrip(input) {
     return trip;
 }
 exports.createTrip = createTrip;
+function updateTripInfo(tripId, input) {
+    return updateTrip(tripId, (trip) => ({
+        ...trip,
+        name: input.name,
+        destination: input.destination,
+        startDate: input.startDate,
+        endDate: input.endDate
+    }));
+}
+exports.updateTripInfo = updateTripInfo;
+function deleteTrip(tripId) {
+    const trips = readTrips().filter((trip) => trip.id !== tripId);
+    writeTrips(trips);
+    const nextTrip = trips[0];
+    if (nextTrip) {
+        setActiveTripId(nextTrip.id);
+    }
+    else {
+        wx.removeStorageSync(ACTIVE_TRIP_KEY);
+    }
+    return nextTrip;
+}
+exports.deleteTrip = deleteTrip;
 function addSchedule(tripId, item) {
     return updateTrip(tripId, (trip) => ({
         ...trip,
@@ -113,6 +136,20 @@ function addSchedule(tripId, item) {
     }));
 }
 exports.addSchedule = addSchedule;
+function updateSchedule(tripId, scheduleId, input) {
+    return updateTrip(tripId, (trip) => ({
+        ...trip,
+        schedules: trip.schedules.map((item) => (item.id === scheduleId ? { ...input, id: item.id } : item)).sort(compareSchedule)
+    }));
+}
+exports.updateSchedule = updateSchedule;
+function deleteSchedule(tripId, scheduleId) {
+    return updateTrip(tripId, (trip) => ({
+        ...trip,
+        schedules: trip.schedules.filter((item) => item.id !== scheduleId)
+    }));
+}
+exports.deleteSchedule = deleteSchedule;
 function addChecklistItem(tripId, title) {
     return updateTrip(tripId, (trip) => ({
         ...trip,
@@ -134,6 +171,20 @@ function addNote(tripId, title, content, category = "事项") {
     }));
 }
 exports.addNote = addNote;
+function updateNote(tripId, noteId, input) {
+    return updateTrip(tripId, (trip) => ({
+        ...trip,
+        notes: trip.notes.map((item) => item.id === noteId
+            ? {
+                ...item,
+                title: input.title,
+                content: input.content,
+                category: input.category
+            }
+            : item)
+    }));
+}
+exports.updateNote = updateNote;
 function toggleNoteItem(tripId, itemId) {
     return updateTrip(tripId, (trip) => ({
         ...trip,
@@ -141,6 +192,13 @@ function toggleNoteItem(tripId, itemId) {
     }));
 }
 exports.toggleNoteItem = toggleNoteItem;
+function deleteNote(tripId, itemId) {
+    return updateTrip(tripId, (trip) => ({
+        ...trip,
+        notes: trip.notes.filter((item) => item.id !== itemId)
+    }));
+}
+exports.deleteNote = deleteNote;
 function addExpense(tripId, title, amount, category, paidBy) {
     return updateTrip(tripId, (trip) => ({
         ...trip,
@@ -148,6 +206,28 @@ function addExpense(tripId, title, amount, category, paidBy) {
     }));
 }
 exports.addExpense = addExpense;
+function updateExpense(tripId, expenseId, input) {
+    return updateTrip(tripId, (trip) => ({
+        ...trip,
+        expenses: trip.expenses.map((item) => item.id === expenseId
+            ? {
+                ...item,
+                title: input.title,
+                amount: input.amount,
+                category: input.category,
+                paidBy: input.paidBy
+            }
+            : item)
+    }));
+}
+exports.updateExpense = updateExpense;
+function deleteExpense(tripId, expenseId) {
+    return updateTrip(tripId, (trip) => ({
+        ...trip,
+        expenses: trip.expenses.filter((item) => item.id !== expenseId)
+    }));
+}
+exports.deleteExpense = deleteExpense;
 function getSummary() {
     const trips = listTrips();
     const expenses = trips.flatMap((trip) => trip.expenses);

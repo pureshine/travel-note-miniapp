@@ -1,4 +1,14 @@
 <view class="page stats-page">
+  <view class="plan-switch panel" wx:if="{{trip}}">
+    <picker mode="selector" range="{{tripNames}}" value="{{activeTripIndex}}" bindchange="onTripChange">
+      <view class="plan-picker">
+        <view class="plan-label">当前计划</view>
+        <view class="plan-name">{{trip.name}}</view>
+        <view class="plan-date">{{trip.destination}} · {{trip.startDate}} - {{trip.endDate}}</view>
+      </view>
+    </picker>
+  </view>
+
   <view class="budget-card panel">
     <view class="budget-row">
       <view>
@@ -48,11 +58,25 @@
   </view>
   <view class="recent-list panel">
     <view wx:for="{{recentExpenses}}" wx:key="id" class="recent-row">
-      <view class="category-head">
-        <text>{{item.title}}</text>
-        <text>¥{{item.amount}}</text>
+      <view class="recent-actions">
+        <button class="recent-action edit" catchtap="editExpense" data-id="{{item.id}}">编辑</button>
+        <button class="recent-action danger" catchtap="deleteExpense" data-id="{{item.id}}">删除</button>
       </view>
-      <view class="recent-meta">{{item.category}} · {{item.paidBy}}</view>
+      <view
+        class="recent-swipe {{openExpenseId === item.id ? 'open' : ''}}"
+        bindtouchstart="onExpenseTouchStart"
+        bindtouchmove="onExpenseTouchMove"
+        data-id="{{item.id}}"
+      >
+        <view class="category-head">
+          <text>{{item.title}}</text>
+          <text>¥{{item.amount}}</text>
+        </view>
+        <view class="recent-bottom">
+          <view class="recent-meta">{{item.category}} · {{item.paidBy}}</view>
+        </view>
+      </view>
     </view>
+    <view wx:if="{{recentExpenses.length === 0}}" class="empty">还没有消费记录</view>
   </view>
 </view>

@@ -25,6 +25,38 @@
   font-weight: 850;
 }
 
+.plan-switch {
+  padding: 22rpx 26rpx;
+  margin-bottom: 22rpx;
+}
+
+.plan-picker {
+  min-width: 0;
+}
+
+.plan-label {
+  color: #98a6ba;
+  font-size: 23rpx;
+  font-weight: 700;
+}
+
+.plan-name {
+  margin-top: 6rpx;
+  overflow: hidden;
+  color: #101828;
+  font-size: 31rpx;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.plan-date {
+  margin-top: 8rpx;
+  color: #98a6ba;
+  font-size: 24rpx;
+  line-height: 1.35;
+}
+
 .filter-scroll {
   width: 100%;
   margin-bottom: 22rpx;
@@ -81,7 +113,52 @@
 }
 
 .note-card {
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+}
+
+.note-swipe {
+  position: relative;
+  z-index: 1;
   padding: 30rpx;
+  border-radius: 28rpx;
+  background: #ffffff;
+  transition: transform 0.18s ease;
+}
+
+.note-swipe.open {
+  transform: translateX(-220rpx);
+}
+
+.note-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 110rpx);
+  width: 220rpx;
+  overflow: hidden;
+  border-radius: 0 28rpx 28rpx 0;
+}
+
+.note-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 24rpx;
+  font-weight: 850;
+}
+
+.note-action.edit {
+  background: #3b82f6;
+}
+
+.note-action.danger {
+  background: #dc2626;
 }
 
 .note-top {

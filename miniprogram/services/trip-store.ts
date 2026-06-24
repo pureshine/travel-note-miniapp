@@ -71,7 +71,7 @@ function seedTrips(): Trip[] {
 
 function readTrips(): Trip[] {
   const stored = wx.getStorageSync<Trip[]>(STORAGE_KEY);
-  if (Array.isArray(stored) && stored.length > 0) return stored;
+  if (Array.isArray(stored)) return stored;
   const seeded = seedTrips();
   wx.setStorageSync(STORAGE_KEY, seeded);
   return seeded;
@@ -119,10 +119,49 @@ export function createTrip(input?: { name?: string; destination?: string; startD
   return trip;
 }
 
+export function updateTripInfo(
+  tripId: string,
+  input: { name: string; destination: string; startDate: string; endDate: string }
+): Trip | undefined {
+  return updateTrip(tripId, (trip) => ({
+    ...trip,
+    name: input.name,
+    destination: input.destination,
+    startDate: input.startDate,
+    endDate: input.endDate
+  }));
+}
+
+export function deleteTrip(tripId: string): Trip | undefined {
+  const trips = readTrips().filter((trip) => trip.id !== tripId);
+  writeTrips(trips);
+  const nextTrip = trips[0];
+  if (nextTrip) {
+    setActiveTripId(nextTrip.id);
+  } else {
+    wx.removeStorageSync(ACTIVE_TRIP_KEY);
+  }
+  return nextTrip;
+}
+
 export function addSchedule(tripId: string, item: Omit<ScheduleItem, "id">): Trip | undefined {
   return updateTrip(tripId, (trip) => ({
     ...trip,
     schedules: [{ ...item, id: createId("schedule") }, ...trip.schedules].sort(compareSchedule)
+  }));
+}
+
+export function updateSchedule(tripId: string, scheduleId: string, input: Omit<ScheduleItem, "id">): Trip | undefined {
+  return updateTrip(tripId, (trip) => ({
+    ...trip,
+    schedules: trip.schedules.map((item: ScheduleItem) => (item.id === scheduleId ? { ...input, id: item.id } : item)).sort(compareSchedule)
+  }));
+}
+
+export function deleteSchedule(tripId: string, scheduleId: string): Trip | undefined {
+  return updateTrip(tripId, (trip) => ({
+    ...trip,
+    schedules: trip.schedules.filter((item: ScheduleItem) => item.id !== scheduleId)
   }));
 }
 
@@ -147,10 +186,37 @@ export function addNote(tripId: string, title: string, content: string, category
   }));
 }
 
+export function updateNote(
+  tripId: string,
+  noteId: string,
+  input: { title: string; content: string; category: NoteCategory }
+): Trip | undefined {
+  return updateTrip(tripId, (trip) => ({
+    ...trip,
+    notes: trip.notes.map((item: NoteItem) =>
+      item.id === noteId
+        ? {
+            ...item,
+            title: input.title,
+            content: input.content,
+            category: input.category
+          }
+        : item
+    )
+  }));
+}
+
 export function toggleNoteItem(tripId: string, itemId: string): Trip | undefined {
   return updateTrip(tripId, (trip) => ({
     ...trip,
     notes: trip.notes.map((item: NoteItem) => (item.id === itemId ? { ...item, done: !item.done } : item))
+  }));
+}
+
+export function deleteNote(tripId: string, itemId: string): Trip | undefined {
+  return updateTrip(tripId, (trip) => ({
+    ...trip,
+    notes: trip.notes.filter((item: NoteItem) => item.id !== itemId)
   }));
 }
 
@@ -164,6 +230,34 @@ export function addExpense(
   return updateTrip(tripId, (trip) => ({
     ...trip,
     expenses: [{ id: createId("expense"), title, amount, category, paidBy, createdAt: Date.now() }, ...trip.expenses]
+  }));
+}
+
+export function updateExpense(
+  tripId: string,
+  expenseId: string,
+  input: { title: string; amount: number; category: ExpenseCategory; paidBy: string }
+): Trip | undefined {
+  return updateTrip(tripId, (trip) => ({
+    ...trip,
+    expenses: trip.expenses.map((item: ExpenseItem) =>
+      item.id === expenseId
+        ? {
+            ...item,
+            title: input.title,
+            amount: input.amount,
+            category: input.category,
+            paidBy: input.paidBy
+          }
+        : item
+    )
+  }));
+}
+
+export function deleteExpense(tripId: string, expenseId: string): Trip | undefined {
+  return updateTrip(tripId, (trip) => ({
+    ...trip,
+    expenses: trip.expenses.filter((item: ExpenseItem) => item.id !== expenseId)
   }));
 }
 

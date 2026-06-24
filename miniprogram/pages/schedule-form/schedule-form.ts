@@ -1,10 +1,14 @@
-import { addSchedule, getScheduleCategories, getTrip } from "../../services/trip-store";
+import { addSchedule, getScheduleCategories, getTrip, updateSchedule } from "../../services/trip-store";
 import { ScheduleCategory, Trip } from "../../types/trip";
 import { today } from "../../utils/date";
 
 Page({
   data: {
     tripId: "",
+    scheduleId: "",
+    isEditing: false,
+    formTitle: "新增日程",
+    saveLabel: "保存日程",
     trip: undefined as Trip | undefined,
     title: "",
     day: today(),
@@ -16,15 +20,26 @@ Page({
     images: [] as string[]
   },
 
-  onLoad(options: { tripId?: string }) {
+  onLoad(options: { tripId?: string; scheduleId?: string }) {
     if (!options.tripId) return;
     const trip = getTrip(options.tripId);
+    const schedule = trip?.schedules.find((item) => item.id === options.scheduleId);
     this.setData({
       tripId: options.tripId,
+      scheduleId: options.scheduleId || "",
+      isEditing: Boolean(schedule),
+      formTitle: schedule ? "编辑日程" : "新增日程",
+      saveLabel: schedule ? "保存修改" : "保存日程",
       trip,
-      day: trip ? trip.startDate : today(),
-      place: trip ? trip.destination : ""
+      title: schedule ? schedule.title : "",
+      day: schedule ? schedule.day : trip ? trip.startDate : today(),
+      time: schedule ? schedule.time : this.data.time,
+      place: schedule ? schedule.place : trip ? trip.destination : "",
+      note: schedule ? schedule.note : "",
+      category: schedule ? schedule.category : this.data.category,
+      images: schedule ? schedule.images : []
     });
+    if (schedule) wx.setNavigationBarTitle({ title: "编辑日程" });
   },
 
   onTitleInput(event: { detail: { value: string } }) {
@@ -71,7 +86,7 @@ Page({
       wx.showToast({ title: "先写日程标题", icon: "none" });
       return;
     }
-    addSchedule(this.data.tripId, {
+    const input = {
       day: this.data.day,
       time: this.data.time,
       category: this.data.category,
@@ -79,7 +94,12 @@ Page({
       place: this.data.place || this.data.trip?.destination || "",
       note: this.data.note,
       images: this.data.images
-    });
+    };
+    if (this.data.isEditing) {
+      updateSchedule(this.data.tripId, this.data.scheduleId, input);
+    } else {
+      addSchedule(this.data.tripId, input);
+    }
     wx.navigateBack();
   }
 });

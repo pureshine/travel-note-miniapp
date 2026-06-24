@@ -18,10 +18,12 @@ declare namespace WechatMiniprogram {
     showModal(options: {
       title: string;
       content: string;
+      confirmText?: string;
       confirmColor?: string;
       success?: (res: { confirm: boolean; cancel: boolean }) => void;
     }): void;
     navigateTo(options: { url: string }): void;
+    redirectTo(options: { url: string }): void;
     navigateBack(options?: { delta?: number }): void;
     switchTab(options: { url: string }): void;
     setNavigationBarTitle(options: { title: string }): void;

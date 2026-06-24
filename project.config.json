@@ -1,7 +1,7 @@
 {
   "appid": "wx0086a0d119e71803",
   "compileType": "miniprogram",
-  "libVersion": "latest",
+  "libVersion": "3.15.2",
   "miniprogramRoot": "miniprogram/",
   "projectname": "travel-note-miniapp",
   "setting": {
@@ -19,7 +19,8 @@
       "ignore": [],
       "disablePlugins": [],
       "outputPath": ""
-    }
+    },
+    "condition": false
   },
   "srcMiniprogramRoot": "miniprogram/",
   "packOptions": {
