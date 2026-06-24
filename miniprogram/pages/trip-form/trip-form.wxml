@@ -1,0 +1,16 @@
+<view class="page form-page">
+  <view class="form-title">新建旅行计划</view>
+  <view class="form-subtitle">比如：厦门三日游，后续日程、备忘和消费都会归到这个计划里。</view>
+
+  <view class="form-card panel">
+    <input class="field" placeholder="旅行名称，如 厦门周末小旅行" value="{{name}}" bindinput="onNameInput" />
+    <input class="field" placeholder="目的地，如 厦门" value="{{destination}}" bindinput="onDestinationInput" />
+    <picker mode="date" value="{{startDate}}" bindchange="onStartDateChange">
+      <view class="picker-field">开始日期：{{startDate}}</view>
+    </picker>
+    <picker mode="date" value="{{endDate}}" bindchange="onEndDateChange">
+      <view class="picker-field">结束日期：{{endDate}}</view>
+    </picker>
+    <button class="primary-button" bindtap="saveTrip">保存旅行</button>
+  </view>
+</view>

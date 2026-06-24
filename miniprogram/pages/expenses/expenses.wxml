@@ -1,0 +1,33 @@
+<view class="page" wx:if="{{trip}}">
+  <view class="summary panel">
+    <text class="summary-label">当前旅行花费</text>
+    <view class="summary-value">¥{{total}}</view>
+    <text class="summary-trip">{{trip.name}}</text>
+  </view>
+
+  <view class="form panel">
+    <input class="field" placeholder="消费名称，比如晚餐、打车" value="{{title}}" bindinput="onTitleInput" />
+    <view class="form-row">
+      <input class="field" type="digit" placeholder="金额" value="{{amount}}" bindinput="onAmountInput" />
+      <picker mode="selector" range="{{categories}}" bindchange="onCategoryChange">
+        <view class="picker-field">{{category}}</view>
+      </picker>
+    </view>
+    <input class="field" placeholder="付款人" value="{{paidBy}}" bindinput="onPaidByInput" />
+    <button class="primary-button" bindtap="addItem">记录消费</button>
+  </view>
+
+  <view class="section-title">
+    <text>明细</text>
+  </view>
+  <view class="list panel">
+    <view wx:for="{{trip.expenses}}" wx:key="id" class="expense-row">
+      <view>
+        <view class="expense-title">{{item.title}}</view>
+        <view class="expense-meta">{{item.category}} · {{item.paidBy}}</view>
+      </view>
+      <view class="expense-amount">¥{{item.amount}}</view>
+    </view>
+    <view wx:if="{{trip.expenses.length === 0}}" class="empty">还没有消费记录</view>
+  </view>
+</view>

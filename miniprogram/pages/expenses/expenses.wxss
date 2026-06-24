@@ -1,0 +1,78 @@
+.summary {
+  padding: 34rpx;
+  margin-bottom: 22rpx;
+  background: linear-gradient(135deg, #17352f, #167c70);
+  color: #ffffff;
+}
+
+.summary-label,
+.summary-trip {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 24rpx;
+}
+
+.summary-value {
+  margin: 12rpx 0;
+  font-size: 56rpx;
+  font-weight: 850;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+  padding: 22rpx;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 220rpx;
+  gap: 18rpx;
+}
+
+.picker-field {
+  display: flex;
+  align-items: center;
+  min-height: 84rpx;
+  padding: 0 24rpx;
+  border: 1rpx solid #dfe8e4;
+  border-radius: 14rpx;
+  background: #fbfdfc;
+  color: #167c70;
+  font-weight: 700;
+}
+
+.list {
+  padding: 8rpx 24rpx;
+}
+
+.expense-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24rpx;
+  min-height: 104rpx;
+  border-bottom: 1rpx solid #edf2ef;
+}
+
+.expense-row:last-child {
+  border-bottom: 0;
+}
+
+.expense-title {
+  color: #172521;
+  font-size: 30rpx;
+  font-weight: 750;
+}
+
+.expense-meta {
+  margin-top: 8rpx;
+  color: #7b8984;
+  font-size: 24rpx;
+}
+
+.expense-amount {
+  color: #172521;
+  font-size: 32rpx;
+  font-weight: 850;
+}

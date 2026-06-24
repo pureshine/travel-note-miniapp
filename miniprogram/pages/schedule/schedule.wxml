@@ -1,0 +1,53 @@
+<view class="page schedule-page" wx:if="{{trip}}">
+  <view class="weather-card panel">
+    <view class="weather-icon">晴</view>
+    <view>
+      <view class="weather-title">晴转多云 · 18°C</view>
+      <view class="weather-sub">{{trip.destination}} · 适合出行</view>
+    </view>
+    <view class="sun-time">
+      <text>日出 06:12</text>
+      <text>日落 18:28</text>
+    </view>
+  </view>
+
+  <view class="plan-bar panel">
+    <picker class="plan-picker" mode="selector" range="{{tripNames}}" value="{{activeTripIndex}}" bindchange="onTripChange">
+      <view>
+        <view class="plan-name">{{trip.name}}</view>
+        <view class="plan-date">{{trip.startDate}} - {{trip.endDate}}</view>
+      </view>
+    </picker>
+    <view class="plan-actions">
+      <button class="mini-button" bindtap="goTripForm">新计划</button>
+      <button class="mini-button primary" bindtap="goScheduleForm">加日程</button>
+    </view>
+  </view>
+
+  <view class="section-title">
+    <text>每日时间轴</text>
+  </view>
+  <view class="timeline panel">
+    <view wx:for="{{schedules}}" wx:key="id" class="timeline-row {{item.active ? 'active' : ''}}">
+      <view class="time-block">
+        <text class="time">{{item.time}}</text>
+        <text class="status {{item.statusClass}}">{{item.status}}</text>
+      </view>
+      <view class="line">
+        <view class="dot"></view>
+      </view>
+      <view class="event">
+        <view class="event-head">
+          <text class="category">{{item.category}}</text>
+          <text class="place">{{item.place}}</text>
+        </view>
+        <view class="event-title">{{item.title}}</view>
+        <view wx:if="{{item.note}}" class="event-note">{{item.note}}</view>
+        <scroll-view wx:if="{{item.images.length > 0}}" class="image-row" scroll-x>
+          <image wx:for="{{item.images}}" wx:key="*this" class="event-image" src="{{item}}" mode="aspectFill" />
+        </scroll-view>
+      </view>
+    </view>
+    <view wx:if="{{schedules.length === 0}}" class="empty">还没有日程安排，先添加一个计划吧</view>
+  </view>
+</view>

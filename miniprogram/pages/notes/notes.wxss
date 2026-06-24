@@ -1,0 +1,145 @@
+.memo-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.title {
+  color: #101828;
+  font-size: 48rpx;
+  font-weight: 850;
+}
+
+.memo-count {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 20rpx;
+  background: #3b82f6;
+  color: #ffffff;
+  font-size: 38rpx;
+  font-weight: 850;
+}
+
+.filter-scroll {
+  width: 100%;
+  margin-bottom: 22rpx;
+  white-space: nowrap;
+}
+
+.filter-row {
+  display: flex;
+  gap: 14rpx;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 104rpx;
+  height: 56rpx;
+  padding: 0 24rpx;
+  border-radius: 20rpx;
+  background: #ffffff;
+  color: #7f8fa5;
+  font-weight: 800;
+}
+
+.filter-chip.active {
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+  padding: 22rpx;
+}
+
+.picker-field {
+  display: flex;
+  align-items: center;
+  min-height: 84rpx;
+  padding: 0 24rpx;
+  border: 1rpx solid #dfe8e4;
+  border-radius: 20rpx;
+  background: #f8fbff;
+  color: #3b82f6;
+  font-weight: 800;
+}
+
+.note-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+  margin-top: 24rpx;
+}
+
+.note-card {
+  padding: 30rpx;
+}
+
+.note-top {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+}
+
+.check-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42rpx;
+  height: 42rpx;
+  border: 4rpx solid #cbd7e6;
+  border-radius: 14rpx;
+  color: #ffffff;
+  font-size: 26rpx;
+  font-weight: 800;
+}
+
+.note-title {
+  color: #101828;
+  font-size: 32rpx;
+  font-weight: 800;
+}
+
+.note-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.note-content {
+  margin-top: 8rpx;
+  color: #98a6ba;
+  font-size: 26rpx;
+  line-height: 1.6;
+}
+
+.note-tag {
+  padding: 9rpx 16rpx;
+  border-radius: 16rpx;
+  background: #f1f5f9;
+  color: #8ea0b8;
+  font-size: 23rpx;
+  font-weight: 800;
+}
+
+.note-card.done {
+  opacity: 0.58;
+}
+
+.note-card.done .check-dot {
+  border-color: #3b82f6;
+  background: #3b82f6;
+}
+
+.note-card.done .note-title,
+.note-card.done .note-content {
+  color: #8a9691;
+}

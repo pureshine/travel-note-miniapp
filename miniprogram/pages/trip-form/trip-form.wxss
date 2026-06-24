@@ -1,0 +1,36 @@
+.form-page {
+  background: #f6f9fd;
+}
+
+.form-title {
+  color: #101828;
+  font-size: 46rpx;
+  font-weight: 850;
+}
+
+.form-subtitle {
+  margin-top: 12rpx;
+  color: #98a6ba;
+  font-size: 26rpx;
+  line-height: 1.55;
+}
+
+.form-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+  padding: 24rpx;
+  margin-top: 28rpx;
+}
+
+.picker-field {
+  display: flex;
+  align-items: center;
+  min-height: 84rpx;
+  padding: 0 24rpx;
+  border: 1rpx solid #dfe8e4;
+  border-radius: 20rpx;
+  background: #f8fbff;
+  color: #3b82f6;
+  font-weight: 800;
+}

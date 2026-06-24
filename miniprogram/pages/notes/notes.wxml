@@ -1,0 +1,37 @@
+<view class="page" wx:if="{{trip}}">
+  <view class="memo-title-row">
+    <view>
+      <view class="title">备忘</view>
+      <view class="muted">{{trip.name}} · 勾选完成事项</view>
+    </view>
+    <button class="memo-count" bindtap="goNoteForm">+</button>
+  </view>
+
+  <scroll-view class="filter-scroll" scroll-x>
+    <view class="filter-row">
+      <button
+        wx:for="{{filters}}"
+        wx:key="*this"
+        class="filter-chip {{selectedFilter === item ? 'active' : ''}}"
+        data-value="{{item}}"
+        bindtap="selectFilter"
+      >
+        {{item}}
+      </button>
+    </view>
+  </scroll-view>
+
+  <view class="note-list">
+    <view wx:for="{{filteredNotes}}" wx:key="id" class="note-card panel {{item.done ? 'done' : ''}}">
+      <view class="note-top" bindtap="toggleItem" data-id="{{item.id}}">
+        <view class="check-dot">{{item.done ? "✓" : ""}}</view>
+        <view class="note-main">
+          <view class="note-title">{{item.title}}</view>
+          <view class="note-content">{{item.content}}</view>
+        </view>
+        <view class="note-tag">{{item.category}}</view>
+      </view>
+    </view>
+    <view wx:if="{{filteredNotes.length === 0}}" class="empty panel">还没有备忘</view>
+  </view>
+</view>

@@ -1,0 +1,138 @@
+.home-page {
+  background: linear-gradient(180deg, #eef8f5 0%, #f7faf8 42%);
+}
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 24rpx;
+  min-height: 300rpx;
+  padding: 42rpx 34rpx;
+  border-radius: 24rpx;
+  background: linear-gradient(135deg, #17352f 0%, #167c70 58%, #d4b16a 100%);
+  color: #ffffff;
+  box-shadow: 0 24rpx 60rpx rgba(22, 124, 112, 0.2);
+}
+
+.eyebrow {
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 22rpx;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.hero-title {
+  margin-top: 18rpx;
+  font-size: 58rpx;
+  font-weight: 800;
+}
+
+.hero-subtitle {
+  max-width: 430rpx;
+  margin-top: 18rpx;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 26rpx;
+  line-height: 1.55;
+}
+
+.hero-action {
+  flex: 0 0 128rpx;
+  height: 88rpx;
+  align-self: flex-start;
+  border-radius: 16rpx;
+  background: rgba(255, 255, 255, 0.94);
+  color: #167c70;
+  font-weight: 800;
+}
+
+.trip-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  min-height: 132rpx;
+  padding: 24rpx;
+  margin-top: 22rpx;
+}
+
+.trip-name {
+  color: #172521;
+  font-size: 32rpx;
+  font-weight: 800;
+}
+
+.trip-date {
+  margin-top: 12rpx;
+  color: #7b8984;
+  font-size: 24rpx;
+}
+
+.strip-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 96rpx;
+  height: 64rpx;
+  border-radius: 999rpx;
+  background: #eef8f5;
+  color: #167c70;
+  font-size: 24rpx;
+  font-weight: 700;
+}
+
+.module-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.module-card {
+  display: block;
+  min-height: 210rpx;
+  padding: 30rpx;
+  text-align: left;
+}
+
+.module-card.schedule {
+  background: linear-gradient(135deg, #ffffff 0%, #eef8f5 100%);
+}
+
+.module-card.memo {
+  background: linear-gradient(135deg, #ffffff 0%, #f5f8ff 100%);
+}
+
+.module-card.expense {
+  background: linear-gradient(135deg, #ffffff 0%, #fff8ed 100%);
+}
+
+.module-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18rpx;
+}
+
+.module-index {
+  color: #96a39e;
+  font-size: 24rpx;
+  font-weight: 800;
+}
+
+.module-metric {
+  color: #167c70;
+  font-size: 28rpx;
+  font-weight: 850;
+}
+
+.module-title {
+  color: #172521;
+  font-size: 38rpx;
+  font-weight: 850;
+}
+
+.module-desc {
+  margin-top: 14rpx;
+  color: #60706a;
+  font-size: 26rpx;
+  line-height: 1.55;
+}

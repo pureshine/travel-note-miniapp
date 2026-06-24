@@ -1,0 +1,58 @@
+<view class="page stats-page">
+  <view class="budget-card panel">
+    <view class="budget-row">
+      <view>
+        <view class="budget-label">本次总支出</view>
+        <view class="budget-total">¥{{expenseTotal}}</view>
+      </view>
+      <view class="budget-side">
+        <text>预算 ¥{{budget}}</text>
+        <text>剩余 ¥{{remaining}}</text>
+      </view>
+    </view>
+    <view class="budget-track">
+      <view class="budget-progress" style="width: {{budgetPercent}}%;"></view>
+    </view>
+  </view>
+
+  <view class="quick-expense panel" bindtap="goExpenseForm">
+    <view class="plus">+</view>
+    <view class="quick-main">
+      <view class="quick-placeholder">记录一笔消费...</view>
+      <view class="quick-amount">¥ 0</view>
+    </view>
+    <button class="record-button" catchtap="goExpenseForm">记</button>
+  </view>
+
+  <view class="section-title">
+    <text>消费分类</text>
+  </view>
+  <view class="category-list panel">
+    <view wx:for="{{categories}}" wx:key="category" class="category-row">
+      <view class="category-icon {{item.category}}">{{item.category}}</view>
+      <view class="category-main">
+        <view class="category-head">
+          <text>{{item.category}}</text>
+          <text>¥{{item.amount}}</text>
+        </view>
+        <view class="bar">
+          <view class="bar-inner" style="width: {{item.percent}}%;"></view>
+        </view>
+        <view class="category-meta">占比 {{item.percent}}%</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section-title">
+    <text>最近消费</text>
+  </view>
+  <view class="recent-list panel">
+    <view wx:for="{{recentExpenses}}" wx:key="id" class="recent-row">
+      <view class="category-head">
+        <text>{{item.title}}</text>
+        <text>¥{{item.amount}}</text>
+      </view>
+      <view class="recent-meta">{{item.category}} · {{item.paidBy}}</view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,80 @@
+.top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28rpx;
+}
+
+.title {
+  color: #172521;
+  font-size: 46rpx;
+  font-weight: 800;
+}
+
+.add-button {
+  width: 92rpx;
+  height: 92rpx;
+  border-radius: 50%;
+  background: #167c70;
+  color: #ffffff;
+  font-size: 46rpx;
+  font-weight: 300;
+}
+
+.trip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+}
+
+.trip-row {
+  display: flex;
+  align-items: center;
+  gap: 22rpx;
+  min-height: 132rpx;
+  padding: 22rpx;
+}
+
+.trip-accent {
+  width: 12rpx;
+  height: 82rpx;
+  border-radius: 999rpx;
+}
+
+.trip-accent.mint {
+  background: #167c70;
+}
+
+.trip-accent.sky {
+  background: #4d8fb8;
+}
+
+.trip-accent.sunrise {
+  background: #d4a649;
+}
+
+.trip-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.trip-name {
+  overflow: hidden;
+  color: #172521;
+  font-size: 32rpx;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trip-meta {
+  margin-top: 10rpx;
+  color: #7b8984;
+  font-size: 24rpx;
+}
+
+.trip-count {
+  color: #167c70;
+  font-size: 24rpx;
+  font-weight: 700;
+}

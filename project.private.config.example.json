@@ -1,0 +1,9 @@
+{
+  "appid": "",
+  "projectname": "travel-note-miniapp",
+  "setting": {
+    "useCompilerPlugins": [
+      "typescript"
+    ]
+  }
+}

@@ -1,0 +1,137 @@
+.detail-page {
+  background: linear-gradient(180deg, #f0f7f4 0%, #f7faf8 36%);
+}
+
+.cover {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  min-height: 230rpx;
+  padding: 34rpx;
+  overflow: hidden;
+}
+
+.cover.mint {
+  background: linear-gradient(135deg, #ffffff 0%, #effaf6 100%);
+}
+
+.cover.sky {
+  background: linear-gradient(135deg, #ffffff 0%, #eef8ff 100%);
+}
+
+.cover.sunrise {
+  background: linear-gradient(135deg, #ffffff 0%, #fff6e6 100%);
+}
+
+.cover-destination {
+  color: #167c70;
+  font-size: 26rpx;
+  font-weight: 800;
+}
+
+.cover-title {
+  margin-top: 16rpx;
+  color: #172521;
+  font-size: 46rpx;
+  font-weight: 850;
+}
+
+.cover-date {
+  margin-top: 14rpx;
+  color: #7b8984;
+  font-size: 24rpx;
+}
+
+.cover-badge {
+  min-width: 96rpx;
+  padding: 18rpx 20rpx;
+  border-radius: 999rpx;
+  background: #167c70;
+  color: #ffffff;
+  text-align: center;
+  font-size: 24rpx;
+  font-weight: 700;
+}
+
+.module-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16rpx;
+  margin-top: 20rpx;
+}
+
+.module {
+  min-height: 144rpx;
+  padding: 24rpx 12rpx;
+  text-align: center;
+}
+
+.module-value {
+  display: block;
+  color: #172521;
+  font-size: 38rpx;
+  font-weight: 850;
+}
+
+.module-label {
+  display: block;
+  margin-top: 10rpx;
+  color: #7b8984;
+  font-size: 24rpx;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+  padding: 22rpx;
+}
+
+.form-row {
+  display: flex;
+  gap: 18rpx;
+}
+
+.small-field {
+  width: 190rpx;
+  flex: 0 0 190rpx;
+}
+
+.timeline {
+  padding: 8rpx 24rpx;
+}
+
+.timeline-row {
+  display: flex;
+  gap: 22rpx;
+  padding: 26rpx 0;
+  border-bottom: 1rpx solid #edf2ef;
+}
+
+.timeline-row:last-child {
+  border-bottom: 0;
+}
+
+.time {
+  width: 92rpx;
+  color: #167c70;
+  font-size: 26rpx;
+  font-weight: 800;
+}
+
+.timeline-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.schedule-title {
+  color: #172521;
+  font-size: 30rpx;
+  font-weight: 750;
+}
+
+.schedule-place {
+  margin-top: 8rpx;
+  color: #7b8984;
+  font-size: 24rpx;
+}

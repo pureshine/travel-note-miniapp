@@ -1,0 +1,19 @@
+<view class="page" wx:if="{{trip}}">
+  <view class="header">
+    <view class="title">出行清单</view>
+    <view class="muted">{{trip.name}}</view>
+  </view>
+
+  <view class="form panel">
+    <input class="field" placeholder="添加证件、衣物、药品或待办" value="{{title}}" bindinput="onInput" />
+    <button class="primary-button" bindtap="addItem">添加到清单</button>
+  </view>
+
+  <view class="list panel">
+    <view wx:for="{{trip.checklist}}" wx:key="id" class="check-row {{item.done ? 'done' : ''}}" bindtap="toggleItem" data-id="{{item.id}}">
+      <view class="check-dot">{{item.done ? "✓" : ""}}</view>
+      <text>{{item.title}}</text>
+    </view>
+    <view wx:if="{{trip.checklist.length === 0}}" class="empty">清单还是空的</view>
+  </view>
+</view>

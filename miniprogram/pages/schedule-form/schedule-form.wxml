@@ -1,0 +1,26 @@
+<view class="page form-page">
+  <view class="form-title">新增日程</view>
+  <view class="form-subtitle">{{trip.name}} · {{trip.destination}}</view>
+
+  <view class="form-card panel">
+    <input class="field" placeholder="几点去做什么" value="{{title}}" bindinput="onTitleInput" />
+    <view class="form-grid">
+      <picker mode="date" value="{{day}}" bindchange="onDayChange">
+        <view class="picker-field">{{day}}</view>
+      </picker>
+      <picker mode="time" value="{{time}}" bindchange="onTimeChange">
+        <view class="picker-field">{{time}}</view>
+      </picker>
+    </view>
+    <picker mode="selector" range="{{categories}}" bindchange="onCategoryChange">
+      <view class="picker-field">类型：{{category}}</view>
+    </picker>
+    <input class="field" placeholder="地点，如 鼓浪屿 / 厦门北站" value="{{place}}" bindinput="onPlaceInput" />
+    <textarea class="field textarea" placeholder="补充交通、住宿、门票或注意事项" value="{{note}}" bindinput="onNoteInput" />
+    <button class="ghost-button" bindtap="chooseImages">上传图片</button>
+    <scroll-view wx:if="{{images.length > 0}}" class="image-row" scroll-x>
+      <image wx:for="{{images}}" wx:key="*this" class="preview-image" src="{{item}}" mode="aspectFill" />
+    </scroll-view>
+    <button class="primary-button" bindtap="saveSchedule">保存日程</button>
+  </view>
+</view>

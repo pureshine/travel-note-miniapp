@@ -1,0 +1,14 @@
+{
+  "name": "travel-note-miniapp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "旅小记微信小程序：旅行日程、清单、备忘和消费统计。",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "format:check": "node scripts/check-format.js"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  }
+}

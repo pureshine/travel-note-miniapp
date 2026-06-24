@@ -1,0 +1,51 @@
+<view class="page detail-page" wx:if="{{trip}}">
+  <view class="cover panel {{trip.coverTone}}">
+    <view>
+      <view class="cover-destination">{{trip.destination}}</view>
+      <view class="cover-title">{{trip.name}}</view>
+      <view class="cover-date">{{trip.startDate}} - {{trip.endDate}}</view>
+    </view>
+    <view class="cover-badge">{{trip.schedules.length}} 项</view>
+  </view>
+
+  <view class="module-grid">
+    <button class="module panel" bindtap="goChecklist">
+      <text class="module-value">{{trip.checklist.length}}</text>
+      <text class="module-label">清单</text>
+    </button>
+    <button class="module panel" bindtap="goExpenses">
+      <text class="module-value">{{trip.expenses.length}}</text>
+      <text class="module-label">消费</text>
+    </button>
+    <button class="module panel" bindtap="goNotes">
+      <text class="module-value">{{trip.notes.length}}</text>
+      <text class="module-label">备忘</text>
+    </button>
+  </view>
+
+  <view class="section-title">
+    <text>添加日程</text>
+  </view>
+  <view class="form panel">
+    <input class="field" placeholder="比如：去机场、入住酒店、逛夜市" value="{{scheduleTitle}}" bindinput="onScheduleTitleInput" />
+    <view class="form-row">
+      <input class="field small-field" placeholder="时间" value="{{scheduleTime}}" bindinput="onScheduleTimeInput" />
+      <input class="field" placeholder="地点" value="{{schedulePlace}}" bindinput="onSchedulePlaceInput" />
+    </view>
+    <button class="primary-button" bindtap="addScheduleItem">加入日程</button>
+  </view>
+
+  <view class="section-title">
+    <text>日程安排</text>
+  </view>
+  <view class="timeline panel">
+    <view wx:for="{{trip.schedules}}" wx:key="id" class="timeline-row">
+      <view class="time">{{item.time}}</view>
+      <view class="timeline-content">
+        <view class="schedule-title">{{item.title}}</view>
+        <view class="schedule-place">{{item.place}}</view>
+      </view>
+    </view>
+    <view wx:if="{{trip.schedules.length === 0}}" class="empty">还没有日程，先加一个出发安排吧</view>
+  </view>
+</view>

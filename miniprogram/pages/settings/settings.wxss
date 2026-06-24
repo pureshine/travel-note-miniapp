@@ -1,0 +1,71 @@
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 22rpx;
+  padding: 30rpx;
+}
+
+.brand-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 22rpx;
+  background: #167c70;
+  color: #ffffff;
+  font-size: 42rpx;
+  font-weight: 850;
+}
+
+.brand-title {
+  color: #172521;
+  font-size: 36rpx;
+  font-weight: 850;
+}
+
+.settings-list {
+  overflow: hidden;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 124rpx;
+  padding: 24rpx;
+  text-align: left;
+}
+
+.settings-title {
+  color: #172521;
+  font-size: 30rpx;
+  font-weight: 800;
+}
+
+.settings-desc {
+  margin-top: 8rpx;
+  color: #7b8984;
+  font-size: 24rpx;
+}
+
+.settings-arrow {
+  color: #a7b3af;
+  font-size: 44rpx;
+}
+
+.roadmap {
+  padding: 10rpx 24rpx;
+}
+
+.roadmap-item {
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #edf2ef;
+  color: #24332f;
+  font-size: 28rpx;
+}
+
+.roadmap-item:last-child {
+  border-bottom: 0;
+}

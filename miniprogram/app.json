@@ -1,0 +1,52 @@
+{
+  "pages": [
+    "pages/schedule/schedule",
+    "pages/notes/notes",
+    "pages/stats/stats",
+    "pages/trip-form/trip-form",
+    "pages/schedule-form/schedule-form",
+    "pages/note-form/note-form",
+    "pages/expense-form/expense-form",
+    "pages/index/index",
+    "pages/trips/trips",
+    "pages/trip-detail/trip-detail",
+    "pages/checklist/checklist",
+    "pages/expenses/expenses",
+    "pages/settings/settings"
+  ],
+  "window": {
+    "navigationBarTitleText": "旅小记",
+    "navigationBarBackgroundColor": "#F6F9FD",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#F6F9FD",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "color": "#94A3B8",
+    "selectedColor": "#3B82F6",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/schedule/schedule",
+        "text": "日程",
+        "iconPath": "assets/tabbar/schedule-normal.png",
+        "selectedIconPath": "assets/tabbar/schedule-active.png"
+      },
+      {
+        "pagePath": "pages/notes/notes",
+        "text": "备忘",
+        "iconPath": "assets/tabbar/notes-normal.png",
+        "selectedIconPath": "assets/tabbar/notes-active.png"
+      },
+      {
+        "pagePath": "pages/stats/stats",
+        "text": "消费",
+        "iconPath": "assets/tabbar/expense-normal.png",
+        "selectedIconPath": "assets/tabbar/expense-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}
