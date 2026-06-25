@@ -1,4 +1,4 @@
-<view class="page form-page">
+<view class="page form-page" wx:if="{{trip}}">
   <view class="form-title">{{formTitle}}</view>
   <view class="form-subtitle">{{trip.name}} · {{trip.destination}}</view>
 
@@ -17,10 +17,13 @@
     </picker>
     <input class="field" placeholder="地点，如 鼓浪屿 / 厦门北站" value="{{place}}" bindinput="onPlaceInput" />
     <textarea class="field textarea" placeholder="补充交通、住宿、门票或注意事项" value="{{note}}" bindinput="onNoteInput" />
-    <button class="ghost-button" bindtap="chooseImages">上传图片</button>
-    <scroll-view wx:if="{{images.length > 0}}" class="image-row" scroll-x>
+    <scroll-view class="image-row" scroll-x>
       <image wx:for="{{images}}" wx:key="*this" class="preview-image" src="{{item}}" mode="aspectFill" />
+      <button wx:if="{{images.length < 3}}" class="upload-card {{images.length === 0 ? 'wide' : ''}}" bindtap="chooseImages">
+        <text class="upload-plus">+</text>
+        <text>{{uploadingImages ? "上传中" : "上传图片"}}</text>
+      </button>
     </scroll-view>
-    <button class="primary-button" bindtap="saveSchedule">{{saveLabel}}</button>
+    <button class="primary-button" loading="{{saving}}" disabled="{{saving || uploadingImages}}" bindtap="saveSchedule">{{saveLabel}}</button>
   </view>
 </view>

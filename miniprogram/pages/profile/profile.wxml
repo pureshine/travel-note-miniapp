@@ -1,0 +1,97 @@
+<view class="page profile-page">
+  <view class="profile-hero">
+    <view class="hero-topline" bindtap="openProfileEdit">
+      <view wx:if="{{loggedIn}}" class="avatar-button">
+        <image wx:if="{{avatarUrl}}" class="avatar-image" src="{{avatarUrl}}" mode="aspectFill" />
+        <text wx:else>逃</text>
+      </view>
+      <view wx:else class="brand-mark">逃</view>
+      <view class="hero-copy">
+        <view wx:if="{{loggedIn}}" class="profile-name">{{nickname}}</view>
+        <view wx:else class="profile-name">临时出逃</view>
+        <view wx:if="{{loggedIn}}" class="profile-subtitle">个人资料</view>
+      </view>
+      <view wx:if="{{loggedIn}}" class="profile-arrow">›</view>
+    </view>
+    <view wx:if="{{!loggedIn}}" class="login-actions">
+      <button class="login-button" loading="{{syncing}}" bindtap="loginWithWechat">微信一键登录</button>
+    </view>
+  </view>
+
+  <view class="overview-grid">
+    <view class="mini-card">
+      <view class="mini-value">{{tripCount}}</view>
+      <view class="mini-label">旅行</view>
+    </view>
+    <view class="mini-card">
+      <view class="mini-value">¥{{expenseTotal}}</view>
+      <view class="mini-label">已记录</view>
+    </view>
+    <view class="mini-card wide">
+      <view class="mini-value sync-time">{{lastSyncText}}</view>
+      <view class="mini-label">最近同步</view>
+    </view>
+  </view>
+
+  <view class="sync-card panel">
+    <view class="card-head">
+      <view>
+        <view class="sync-title">共享旅行</view>
+        <view class="sync-desc">{{currentTripName}}</view>
+      </view>
+      <view class="sync-badge">
+        <image class="sync-badge-cat" src="/assets/illustrations/cat-travel-sticker.png" mode="aspectFit" />
+      </view>
+    </view>
+    <view class="sync-tip" bindtap="copySyncTip">{{syncTip}}</view>
+
+    <view class="invite-strip">
+      <view class="invite-icon">↗</view>
+      <view class="invite-copy">
+        <view class="invite-title">邀请好友一起记录</view>
+        <view class="invite-desc">{{inviteStatus}}</view>
+      </view>
+    </view>
+    <view wx:if="{{memberNamesText}}" class="member-row">
+      <text class="member-label">同行</text>
+      <text class="member-names">{{memberNamesText}}</text>
+    </view>
+
+    <button class="soft-action full" loading="{{syncing}}" bindtap="createInvite">生成好友邀请</button>
+    <button wx:if="{{inviteCode}}" class="share-action" open-type="share">分享给好友</button>
+  </view>
+
+  <view class="tool-grid">
+    <view class="tool-card panel">
+      <view class="tool-icon">☁</view>
+      <view class="tool-title">账号数据</view>
+      <view class="tool-desc">换手机后登录微信即可恢复</view>
+    </view>
+    <view class="tool-card panel">
+      <view class="tool-icon">✦</view>
+      <view class="tool-title">同行共享</view>
+      <view class="tool-desc">好友加入后维护同一份旅行</view>
+    </view>
+  </view>
+
+  <view wx:if="{{showProfileSetup}}" class="profile-mask">
+    <view class="profile-sheet">
+      <view class="sheet-title">设置显示名字</view>
+      <view class="sheet-subtitle">好友共享和记录人都会显示这个名字</view>
+      <button class="setup-avatar" open-type="chooseAvatar" bindchooseavatar="onSetupChooseAvatar">
+        <image wx:if="{{draftAvatarUrl}}" class="setup-avatar-image" src="{{draftAvatarUrl}}" mode="aspectFill" />
+        <text wx:else>选头像</text>
+      </button>
+      <input
+        class="setup-nickname"
+        type="text"
+        value="{{draftNickname}}"
+        bindinput="onSetupNicknameInput"
+        bindblur="onSetupNicknameBlur"
+        placeholder="比如 小陈、阿圆、Pureshine"
+      />
+      <button class="setup-save" bindtap="saveProfileSetup">保存资料</button>
+      <button class="setup-skip" bindtap="skipProfileSetup">稍后再说</button>
+    </view>
+  </view>
+</view>

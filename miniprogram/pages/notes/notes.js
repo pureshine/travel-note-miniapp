@@ -117,8 +117,11 @@ Page({
         });
     },
     filterNotes(notes, selectedFilter) {
-        if (selectedFilter === "全部")
-            return notes;
-        return notes.filter((item) => item.category === selectedFilter);
+        const filtered = selectedFilter === "全部" ? notes : notes.filter((item) => item.category === selectedFilter);
+        return [...filtered].sort((a, b) => {
+            if (a.done !== b.done)
+                return a.done ? 1 : -1;
+            return b.createdAt - a.createdAt;
+        });
     }
 });

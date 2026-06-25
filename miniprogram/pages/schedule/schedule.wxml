@@ -1,61 +1,72 @@
 <view class="page schedule-page" wx:if="{{trip}}">
-  <view class="weather-card panel">
-    <view class="weather-icon">晴</view>
-    <view>
-      <view class="weather-title">晴转多云 · 18°C</view>
-      <view class="weather-sub">{{trip.destination}} · 适合出行</view>
+  <view class="tip-card panel">
+    <view class="tip-icon">
+      <image class="tip-icon-cat" src="/assets/illustrations/cat-travel-sticker.png" mode="aspectFit" />
     </view>
-    <view class="sun-time">
-      <text>日出 06:12</text>
-      <text>日落 18:28</text>
+    <view>
+      <view class="tip-title">{{travelTip.title}}</view>
+      <view class="tip-sub">{{travelTip.subtitle}}</view>
+    </view>
+    <view class="tip-meta">
+      <text>{{travelTip.metaTop}}</text>
+      <text>{{travelTip.metaBottom}}</text>
     </view>
   </view>
 
-  <view class="plan-bar panel">
-    <picker class="plan-picker" mode="selector" range="{{tripNames}}" value="{{activeTripIndex}}" bindchange="onTripChange">
-      <view>
-        <view class="plan-name">{{trip.name}}</view>
-        <view class="plan-date">{{trip.startDate}} - {{trip.endDate}}</view>
-      </view>
-    </picker>
-    <view class="plan-actions">
-      <button class="mini-button" bindtap="goTripForm">新计划</button>
-      <button class="mini-button primary" bindtap="goScheduleForm">加日程</button>
+  <view class="plan-card panel">
+    <view class="plan-main">
+      <picker class="plan-picker" mode="selector" range="{{tripOptions}}" value="{{activeTripIndex}}" bindchange="onTripChange">
+        <view class="plan-pill">
+          <view class="plan-dot {{tripStatusClass}}"></view>
+          <view class="plan-copy">
+            <view class="plan-label">当前计划</view>
+            <view class="plan-name">{{trip.name}}</view>
+          </view>
+          <view class="status-pill {{tripStatusClass}}">{{tripStatus}}</view>
+          <view class="plan-change">▾</view>
+        </view>
+      </picker>
+      <button class="plan-menu" bindtap="manageTrip">操作</button>
     </view>
+    <button class="quick-add" bindtap="goScheduleForm">+ 添加日程</button>
   </view>
 
   <view class="section-title">
-    <text>每日时间轴</text>
+    <text>行程时间轴</text>
   </view>
   <view class="timeline panel">
-    <view wx:for="{{schedules}}" wx:key="id" class="timeline-row {{item.active ? 'active' : ''}}">
-      <view class="time-block">
-        <text class="time">{{item.time}}</text>
-        <text class="status {{item.statusClass}}">{{item.status}}</text>
-      </view>
-      <view class="line">
-        <view class="dot"></view>
-      </view>
-      <view class="event-wrap">
-        <view class="event-actions">
-          <button class="swipe-action edit" catchtap="editSchedule" data-id="{{item.id}}">编辑</button>
-          <button class="swipe-action danger" catchtap="deleteScheduleItem" data-id="{{item.id}}">删除</button>
+    <view wx:for="{{scheduleGroups}}" wx:for-item="group" wx:key="year" class="year-group">
+      <view class="year-label">{{group.year}}</view>
+      <view wx:for="{{group.items}}" wx:for-item="item" wx:key="id" class="timeline-row {{item.active ? 'active' : ''}}">
+        <view class="time-block">
+          <text class="day">{{item.monthDay}}</text>
+          <text class="time">{{item.time}}</text>
+          <text class="status {{item.statusClass}}">{{item.status}}</text>
         </view>
-        <view
-          class="event {{openScheduleId === item.id ? 'open' : ''}}"
-          bindtouchstart="onScheduleTouchStart"
-          bindtouchmove="onScheduleTouchMove"
-          data-id="{{item.id}}"
-        >
-          <view class="event-head">
-            <text class="category">{{item.category}}</text>
-            <text class="place">{{item.place}}</text>
+        <view class="line">
+          <view class="dot"></view>
+        </view>
+        <view class="event-wrap">
+          <view class="event-actions">
+            <button class="swipe-action edit" catchtap="editSchedule" data-id="{{item.id}}">编辑</button>
+            <button class="swipe-action danger" catchtap="deleteScheduleItem" data-id="{{item.id}}">删除</button>
           </view>
-          <view class="event-title">{{item.title}}</view>
-          <view wx:if="{{item.note}}" class="event-note">{{item.note}}</view>
-          <scroll-view wx:if="{{item.images.length > 0}}" class="image-row" scroll-x>
-            <image wx:for="{{item.images}}" wx:key="*this" class="event-image" src="{{item}}" mode="aspectFill" />
-          </scroll-view>
+          <view
+            class="event {{openScheduleId === item.id ? 'open' : ''}}"
+            bindtouchstart="onScheduleTouchStart"
+            bindtouchmove="onScheduleTouchMove"
+            data-id="{{item.id}}"
+          >
+            <view class="event-head">
+              <text class="category">{{item.category}}</text>
+              <text class="place">{{item.place}}</text>
+            </view>
+            <view class="event-title">{{item.title}}</view>
+            <view wx:if="{{item.note}}" class="event-note">{{item.note}}</view>
+            <scroll-view wx:if="{{item.images.length > 0}}" class="image-row" scroll-x>
+              <image wx:for="{{item.images}}" wx:key="*this" class="event-image" src="{{item}}" mode="aspectFill" />
+            </scroll-view>
+          </view>
         </view>
       </view>
     </view>

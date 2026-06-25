@@ -1,16 +1,16 @@
 .form-page {
-  background: #f6f9fd;
+  background: #fff8ef;
 }
 
 .form-title {
-  color: #101828;
+  color: #2f2f2a;
   font-size: 46rpx;
   font-weight: 850;
 }
 
 .form-subtitle {
   margin-top: 12rpx;
-  color: #98a6ba;
+  color: #a79a8b;
   font-size: 26rpx;
 }
 
@@ -30,6 +30,6 @@
   border: 1rpx solid #dfe8e4;
   border-radius: 20rpx;
   background: #f8fbff;
-  color: #3b82f6;
+  color: #e66d35;
   font-weight: 800;
 }

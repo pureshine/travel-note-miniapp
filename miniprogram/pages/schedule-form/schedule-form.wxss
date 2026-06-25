@@ -1,16 +1,16 @@
 .form-page {
-  background: #f6f9fd;
+  background: #fff8ef;
 }
 
 .form-title {
-  color: #101828;
+  color: #2f2f2a;
   font-size: 46rpx;
   font-weight: 850;
 }
 
 .form-subtitle {
   margin-top: 12rpx;
-  color: #98a6ba;
+  color: #a79a8b;
   font-size: 26rpx;
 }
 
@@ -33,10 +33,10 @@
   align-items: center;
   min-height: 84rpx;
   padding: 0 24rpx;
-  border: 1rpx solid #dfe8e4;
-  border-radius: 20rpx;
-  background: #f8fbff;
-  color: #3b82f6;
+  border: 2rpx solid #f0dfca;
+  border-radius: 26rpx;
+  background: #fffaf3;
+  color: #e66d35;
   font-weight: 800;
 }
 
@@ -50,6 +50,33 @@
   width: 180rpx;
   height: 120rpx;
   margin-right: 14rpx;
-  border-radius: 18rpx;
-  background: #eef2f7;
+  border-radius: 24rpx;
+  background: #f4eee6;
+  vertical-align: top;
+}
+
+.upload-card {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 180rpx;
+  height: 120rpx;
+  border: 2rpx dashed #e9c7a5;
+  border-radius: 24rpx;
+  background: #fffaf3;
+  color: #e66d35;
+  font-size: 22rpx;
+  font-weight: 800;
+  vertical-align: top;
+}
+
+.upload-card.wide {
+  width: 100%;
+}
+
+.upload-plus {
+  font-size: 42rpx;
+  line-height: 1;
+  margin-bottom: 6rpx;
 }

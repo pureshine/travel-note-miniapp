@@ -11,6 +11,6 @@
     <picker mode="date" value="{{endDate}}" bindchange="onEndDateChange">
       <view class="picker-field">结束日期：{{endDate}}</view>
     </picker>
-    <button class="primary-button" bindtap="saveTrip">{{saveLabel}}</button>
+    <button class="primary-button" loading="{{saving}}" disabled="{{saving}}" bindtap="saveTrip">{{saveLabel}}</button>
   </view>
 </view>

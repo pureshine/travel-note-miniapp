@@ -2,9 +2,12 @@
   <view class="plan-switch panel" wx:if="{{trip}}">
     <picker mode="selector" range="{{tripNames}}" value="{{activeTripIndex}}" bindchange="onTripChange">
       <view class="plan-picker">
-        <view class="plan-label">当前计划</view>
-        <view class="plan-name">{{trip.name}}</view>
-        <view class="plan-date">{{trip.destination}} · {{trip.startDate}} - {{trip.endDate}}</view>
+        <view class="plan-dot"></view>
+        <view class="plan-copy">
+          <view class="plan-label">当前计划</view>
+          <view class="plan-name">{{trip.name}}</view>
+        </view>
+        <view class="plan-change">切换 ▾</view>
       </view>
     </picker>
   </view>
@@ -26,57 +29,45 @@
   </view>
 
   <view class="quick-expense panel" bindtap="goExpenseForm">
-    <view class="plus">+</view>
+    <view class="quick-icon">
+      <image class="quick-paw" src="/assets/illustrations/cat-paw-icon.png" mode="aspectFit" />
+    </view>
     <view class="quick-main">
-      <view class="quick-placeholder">记录一笔消费...</view>
-      <view class="quick-amount">¥ 0</view>
+      <view class="quick-title">记录一笔消费</view>
+      <view class="quick-subtitle">餐饮、交通、住宿都可以快速记下</view>
     </view>
-    <button class="record-button" catchtap="goExpenseForm">记</button>
-  </view>
-
-  <view class="section-title">
-    <text>消费分类</text>
-  </view>
-  <view class="category-list panel">
-    <view wx:for="{{categories}}" wx:key="category" class="category-row">
-      <view class="category-icon {{item.category}}">{{item.category}}</view>
-      <view class="category-main">
-        <view class="category-head">
-          <text>{{item.category}}</text>
-          <text>¥{{item.amount}}</text>
-        </view>
-        <view class="bar">
-          <view class="bar-inner" style="width: {{item.percent}}%;"></view>
-        </view>
-        <view class="category-meta">占比 {{item.percent}}%</view>
-      </view>
-    </view>
+    <button class="record-button" catchtap="goExpenseForm">新增</button>
   </view>
 
   <view class="section-title">
     <text>最近消费</text>
   </view>
-  <view class="recent-list panel">
-    <view wx:for="{{recentExpenses}}" wx:key="id" class="recent-row">
-      <view class="recent-actions">
-        <button class="recent-action edit" catchtap="editExpense" data-id="{{item.id}}">编辑</button>
-        <button class="recent-action danger" catchtap="deleteExpense" data-id="{{item.id}}">删除</button>
+  <view class="recent-list">
+    <view wx:for="{{recentExpenses}}" wx:key="id" class="recent-card panel">
+      <view class="recent-icon">{{item.category}}</view>
+      <view class="recent-main">
+        <view class="recent-title">{{item.title}}</view>
+        <view class="recent-meta">{{item.category}} · {{item.paidBy}}</view>
       </view>
-      <view
-        class="recent-swipe {{openExpenseId === item.id ? 'open' : ''}}"
-        bindtouchstart="onExpenseTouchStart"
-        bindtouchmove="onExpenseTouchMove"
-        data-id="{{item.id}}"
-      >
-        <view class="category-head">
-          <text>{{item.title}}</text>
-          <text>¥{{item.amount}}</text>
-        </view>
-        <view class="recent-bottom">
-          <view class="recent-meta">{{item.category}} · {{item.paidBy}}</view>
-        </view>
+      <view class="recent-amount">¥{{item.amount}}</view>
+      <view class="recent-tools">
+        <button class="tool-button" catchtap="editExpense" data-id="{{item.id}}">改</button>
+        <button class="tool-button danger" catchtap="deleteExpense" data-id="{{item.id}}">删</button>
       </view>
     </view>
-    <view wx:if="{{recentExpenses.length === 0}}" class="empty">还没有消费记录</view>
+    <view wx:if="{{recentExpenses.length === 0}}" class="empty panel">还没有消费记录</view>
+  </view>
+
+  <view class="section-title">
+    <text>分类概览</text>
+  </view>
+  <view class="category-grid">
+    <view wx:for="{{categories}}" wx:key="category" class="category-chip panel">
+      <view class="chip-head">
+        <text>{{item.category}}</text>
+        <text>{{item.percent}}%</text>
+      </view>
+      <view class="chip-amount">¥{{item.amount}}</view>
+    </view>
   </view>
 </view>

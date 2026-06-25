@@ -1,6 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const trip_store_1 = require("../../services/trip-store");
+const cloud_sync_1 = require("../../services/cloud-sync");
+function getDefaultPaidBy() {
+    return (0, cloud_sync_1.getSavedProfile)()?.nickname?.trim() || "我";
+}
 Page({
     data: {
         tripId: "",
@@ -38,6 +42,7 @@ Page({
             trips,
             tripNames: trips.map((item) => item.name),
             activeTripIndex: Math.max(trips.findIndex((item) => item.id === tripId), 0),
+            paidBy: this.data.paidBy.trim() || getDefaultPaidBy(),
             total: trip ? trip.expenses.reduce((sum, item) => sum + item.amount, 0) : 0
         });
     },
@@ -69,7 +74,7 @@ Page({
             wx.showToast({ title: "填写消费和金额", icon: "none" });
             return;
         }
-        (0, trip_store_1.addExpense)(this.data.tripId, title, amount, this.data.category, this.data.paidBy || "我");
+        (0, trip_store_1.addExpense)(this.data.tripId, title, amount, this.data.category, this.data.paidBy.trim() || getDefaultPaidBy());
         this.setData({ title: "", amount: "" });
         this.loadTrip(this.data.tripId);
     },

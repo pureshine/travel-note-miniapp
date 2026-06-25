@@ -8,6 +8,6 @@
       <view class="picker-field">分类：{{category}}</view>
     </picker>
     <textarea class="field textarea" placeholder="写下具体事项、截止时间或提醒（选填）" value="{{content}}" bindinput="onContentInput" />
-    <button class="primary-button" bindtap="saveNote">{{saveLabel}}</button>
+    <button class="primary-button" loading="{{saving}}" disabled="{{saving}}" bindtap="saveNote">{{saveLabel}}</button>
   </view>
 </view>

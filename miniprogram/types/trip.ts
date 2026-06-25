@@ -48,6 +48,7 @@ export interface Trip {
   checklist: ChecklistItem[];
   notes: NoteItem[];
   expenses: ExpenseItem[];
+  sharedMembers?: TripMember[];
 }
 
 export interface TripSummary {
@@ -55,4 +56,11 @@ export interface TripSummary {
   expenseTotal: number;
   checklistDone: number;
   checklistTotal: number;
+}
+
+export interface TripMember {
+  openid: string;
+  nickname: string;
+  avatarUrl?: string;
+  updatedAt?: number;
 }

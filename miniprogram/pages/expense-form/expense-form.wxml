@@ -9,6 +9,6 @@
       <view class="picker-field">分类：{{category}}</view>
     </picker>
     <input class="field" placeholder="付款人" value="{{paidBy}}" bindinput="onPaidByInput" />
-    <button class="primary-button" bindtap="saveExpense">{{saveLabel}}</button>
+    <button class="primary-button" loading="{{saving}}" disabled="{{saving}}" bindtap="saveExpense">{{saveLabel}}</button>
   </view>
 </view>

@@ -12,12 +12,18 @@ Page({
     title: "",
     content: "",
     category: "证件" as NoteCategory,
-    categories: getNoteCategories()
+    categories: getNoteCategories(),
+    saving: false
   },
 
   onLoad(options: { tripId?: string; noteId?: string }) {
     if (!options.tripId) return;
     const trip = getTrip(options.tripId);
+    if (!trip) {
+      wx.showToast({ title: "旅行不存在", icon: "none" });
+      wx.navigateBack();
+      return;
+    }
     const note = trip?.notes.find((item) => item.id === options.noteId);
     this.setData({
       tripId: options.tripId,
@@ -47,12 +53,14 @@ Page({
   },
 
   saveNote() {
+    if (this.data.saving) return;
     const title = this.data.title.trim();
     const content = this.data.content.trim();
     if (!title) {
       wx.showToast({ title: "标题要写", icon: "none" });
       return;
     }
+    this.setData({ saving: true });
     if (this.data.isEditing) {
       updateNote(this.data.tripId, this.data.noteId, { title, content, category: this.data.category });
     } else {

@@ -1,5 +1,10 @@
 import { addExpense, deleteExpense as removeExpense, getDefaultTrip, getTrip, listTrips, setActiveTripId } from "../../services/trip-store";
+import { getSavedProfile } from "../../services/cloud-sync";
 import { ExpenseCategory, Trip } from "../../types/trip";
+
+function getDefaultPaidBy(): string {
+  return getSavedProfile()?.nickname?.trim() || "我";
+}
 
 Page({
   data: {
@@ -41,6 +46,7 @@ Page({
       trips,
       tripNames: trips.map((item) => item.name),
       activeTripIndex: Math.max(trips.findIndex((item) => item.id === tripId), 0),
+      paidBy: this.data.paidBy.trim() || getDefaultPaidBy(),
       total: trip ? trip.expenses.reduce((sum, item) => sum + item.amount, 0) : 0
     });
   },
@@ -77,7 +83,7 @@ Page({
       wx.showToast({ title: "填写消费和金额", icon: "none" });
       return;
     }
-    addExpense(this.data.tripId, title, amount, this.data.category, this.data.paidBy || "我");
+    addExpense(this.data.tripId, title, amount, this.data.category, this.data.paidBy.trim() || getDefaultPaidBy());
     this.setData({ title: "", amount: "" });
     this.loadTrip(this.data.tripId);
   },

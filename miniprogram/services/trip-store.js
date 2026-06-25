@@ -1,10 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getNoteCategories = exports.getScheduleCategories = exports.setActiveTripId = exports.getDefaultTrip = exports.resetDemoData = exports.getExpenseByCategory = exports.getSummary = exports.deleteExpense = exports.updateExpense = exports.addExpense = exports.deleteNote = exports.toggleNoteItem = exports.updateNote = exports.addNote = exports.toggleChecklistItem = exports.addChecklistItem = exports.deleteSchedule = exports.updateSchedule = exports.addSchedule = exports.deleteTrip = exports.updateTripInfo = exports.createTrip = exports.getTrip = exports.listTrips = void 0;
+exports.getNoteCategories = exports.getScheduleCategories = exports.setActiveTripId = exports.getDefaultTrip = exports.importTripsFromSync = exports.exportTripsForSync = exports.resetDemoData = exports.getExpenseByCategory = exports.getSummary = exports.deleteExpense = exports.updateExpense = exports.addExpense = exports.deleteNote = exports.toggleNoteItem = exports.updateNote = exports.addNote = exports.toggleChecklistItem = exports.addChecklistItem = exports.deleteSchedule = exports.updateSchedule = exports.addSchedule = exports.deleteTrip = exports.updateTripInfo = exports.createTrip = exports.getTrip = exports.listTrips = void 0;
 const id_1 = require("../utils/id");
 const date_1 = require("../utils/date");
 const STORAGE_KEY = "travel-note-trips";
 const ACTIVE_TRIP_KEY = "travel-note-active-trip-id";
+const PROFILE_KEY = "travel-note-profile";
+let autoSyncTimer;
 function seedTrips() {
     return [
         {
@@ -51,10 +53,7 @@ function seedTrips() {
                     createdAt: 1783699200000
                 }
             ],
-            expenses: [
-                { id: "expense_seed_1", title: "动车票", amount: 286, category: "交通", paidBy: "我", createdAt: 1783699200000 },
-                { id: "expense_seed_2", title: "酒店预付", amount: 520, category: "住宿", paidBy: "我", createdAt: 1783699200000 }
-            ]
+            expenses: []
         }
     ];
 }
@@ -66,9 +65,54 @@ function readTrips() {
     wx.setStorageSync(STORAGE_KEY, seeded);
     return seeded;
 }
-function writeTrips(trips) {
+function writeTrips(trips, options) {
     wx.setStorageSync(STORAGE_KEY, trips);
+    if (!options?.skipAutoSync)
+        scheduleAutoSync(trips.map(normalizeTrip));
     return trips;
+}
+function scheduleAutoSync(trips) {
+    const profile = wx.getStorageSync(PROFILE_KEY);
+    if (!profile?.loggedIn || !profile.openid || profile.previewMode || !wx.cloud)
+        return;
+    if (autoSyncTimer)
+        clearTimeout(autoSyncTimer);
+    autoSyncTimer = setTimeout(() => {
+        wx.cloud?.callFunction({
+            name: "syncTrips",
+            data: {
+                action: "upload",
+                trips,
+                memberProfile: getSyncMemberProfile(profile)
+            },
+            success: (res) => {
+                const result = res.result;
+                const latestProfile = wx.getStorageSync(PROFILE_KEY);
+                if (!latestProfile?.loggedIn)
+                    return;
+                wx.setStorageSync(PROFILE_KEY, {
+                    ...latestProfile,
+                    lastSyncAt: result.updatedAt || Date.now()
+                });
+            },
+            fail: (error) => {
+                const latestProfile = wx.getStorageSync(PROFILE_KEY);
+                if (!latestProfile?.loggedIn)
+                    return;
+                wx.setStorageSync(PROFILE_KEY, {
+                    ...latestProfile,
+                    lastAutoSyncFailedAt: Date.now(),
+                    lastAutoSyncError: error.errMsg || "自动同步失败"
+                });
+            }
+        });
+    }, 1600);
+}
+function getSyncMemberProfile(profile) {
+    return {
+        nickname: profile.nickname?.trim() || "未设置名字",
+        avatarUrl: profile.avatarUrl || ""
+    };
 }
 function updateTrip(tripId, updater) {
     const trips = readTrips();
@@ -253,6 +297,23 @@ function resetDemoData() {
     writeTrips(seedTrips());
 }
 exports.resetDemoData = resetDemoData;
+function exportTripsForSync() {
+    return listTrips();
+}
+exports.exportTripsForSync = exportTripsForSync;
+function importTripsFromSync(trips) {
+    const normalizedTrips = trips.map(normalizeTrip);
+    writeTrips(normalizedTrips, { skipAutoSync: true });
+    const firstTrip = normalizedTrips[0];
+    if (firstTrip) {
+        setActiveTripId(firstTrip.id);
+    }
+    else {
+        wx.removeStorageSync(ACTIVE_TRIP_KEY);
+    }
+    return normalizedTrips;
+}
+exports.importTripsFromSync = importTripsFromSync;
 function getDefaultTrip() {
     const activeTripId = wx.getStorageSync(ACTIVE_TRIP_KEY);
     const trips = listTrips();
@@ -288,7 +349,8 @@ function normalizeTrip(trip) {
             ...item,
             category: item.category || "事项",
             done: Boolean(item.done)
-        }))
+        })),
+        sharedMembers: Array.isArray(trip.sharedMembers) ? trip.sharedMembers : []
     };
 }
 function compareSchedule(a, b) {

@@ -1,5 +1,10 @@
 import { addExpense, getTrip, updateExpense } from "../../services/trip-store";
+import { getSavedProfile } from "../../services/cloud-sync";
 import { ExpenseCategory, Trip } from "../../types/trip";
+
+function getDefaultPaidBy(): string {
+  return getSavedProfile()?.nickname?.trim() || "我";
+}
 
 Page({
   data: {
@@ -13,12 +18,18 @@ Page({
     amount: "",
     category: "餐饮" as ExpenseCategory,
     paidBy: "我",
-    categories: ["餐饮", "交通", "住宿", "购物", "门票", "其他"] as ExpenseCategory[]
+    categories: ["餐饮", "交通", "住宿", "购物", "门票", "其他"] as ExpenseCategory[],
+    saving: false
   },
 
   onLoad(options: { tripId?: string; expenseId?: string }) {
     if (!options.tripId) return;
     const trip = getTrip(options.tripId);
+    if (!trip) {
+      wx.showToast({ title: "旅行不存在", icon: "none" });
+      wx.navigateBack();
+      return;
+    }
     const expense = trip?.expenses.find((item) => item.id === options.expenseId);
     this.setData({
       tripId: options.tripId,
@@ -30,7 +41,7 @@ Page({
       title: expense ? expense.title : "",
       amount: expense ? String(expense.amount) : "",
       category: expense ? expense.category : this.data.category,
-      paidBy: expense ? expense.paidBy : this.data.paidBy
+      paidBy: expense ? expense.paidBy : getDefaultPaidBy()
     });
     if (expense) wx.setNavigationBarTitle({ title: "编辑消费" });
   },
@@ -53,16 +64,19 @@ Page({
   },
 
   saveExpense() {
+    if (this.data.saving) return;
     const title = this.data.title.trim();
     const amount = Number(this.data.amount);
     if (!title || !Number.isFinite(amount) || amount <= 0) {
       wx.showToast({ title: "填写消费和金额", icon: "none" });
       return;
     }
+    this.setData({ saving: true });
+    const paidBy = this.data.paidBy.trim() || getDefaultPaidBy();
     if (this.data.isEditing) {
-      updateExpense(this.data.tripId, this.data.expenseId, { title, amount, category: this.data.category, paidBy: this.data.paidBy || "我" });
+      updateExpense(this.data.tripId, this.data.expenseId, { title, amount, category: this.data.category, paidBy });
     } else {
-      addExpense(this.data.tripId, title, amount, this.data.category, this.data.paidBy || "我");
+      addExpense(this.data.tripId, title, amount, this.data.category, paidBy);
     }
     wx.navigateBack();
   }

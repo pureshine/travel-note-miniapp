@@ -2,17 +2,26 @@
   <view class="memo-title-row">
     <view>
       <view class="title">备忘</view>
-      <view class="muted">{{trip.name}} · 勾选完成事项</view>
+      <view class="muted">{{trip.name}}</view>
     </view>
-    <button class="memo-count" bindtap="goNoteForm">+</button>
+    <view class="memo-actions">
+      <button class="memo-add" bindtap="goNoteForm">
+        <image class="memo-cat" src="/assets/illustrations/cat-travel-sticker.png" mode="aspectFit" />
+        <text class="memo-add-text">写备忘</text>
+        <image class="memo-paw" src="/assets/illustrations/cat-paw-icon.png" mode="aspectFit" />
+      </button>
+    </view>
   </view>
 
   <view class="plan-switch panel">
     <picker mode="selector" range="{{tripNames}}" value="{{activeTripIndex}}" bindchange="onTripChange">
       <view class="plan-picker">
-        <view class="plan-label">当前计划</view>
-        <view class="plan-name">{{trip.name}}</view>
-        <view class="plan-date">{{trip.startDate}} - {{trip.endDate}}</view>
+        <view class="plan-dot"></view>
+        <view class="plan-copy">
+          <view class="plan-label">当前计划</view>
+          <view class="plan-name">{{trip.name}}</view>
+        </view>
+        <view class="plan-change">切换 ▾</view>
       </view>
     </picker>
   </view>
@@ -53,6 +62,9 @@
         </view>
       </view>
     </view>
-    <view wx:if="{{filteredNotes.length === 0}}" class="empty panel">还没有备忘</view>
+    <view wx:if="{{filteredNotes.length === 0}}" class="empty panel">
+      <image class="empty-cat" src="/assets/illustrations/cat-paw-icon.png" mode="aspectFit" />
+      <view>还没有备忘</view>
+    </view>
   </view>
 </view>

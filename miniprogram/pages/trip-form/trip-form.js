@@ -12,7 +12,8 @@ Page({
         name: "",
         destination: "",
         startDate: (0, date_1.today)(),
-        endDate: (0, date_1.today)()
+        endDate: (0, date_1.today)(),
+        saving: false
     },
     onLoad(options) {
         if (!options.id)
@@ -46,12 +47,15 @@ Page({
         this.setData({ endDate: event.detail.value });
     },
     saveTrip() {
+        if (this.data.saving)
+            return;
         const destination = this.data.destination.trim();
         const name = this.data.name.trim() || `${destination || "新的"}旅行`;
         if (!destination) {
             wx.showToast({ title: "先写目的地", icon: "none" });
             return;
         }
+        this.setData({ saving: true });
         const input = {
             name,
             destination,

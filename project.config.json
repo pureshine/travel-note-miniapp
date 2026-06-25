@@ -1,6 +1,7 @@
 {
-  "appid": "wx0086a0d119e71803",
+  "appid": "wx8b7bfdb468062726",
   "compileType": "miniprogram",
+  "cloudfunctionRoot": "cloudfunctions/",
   "libVersion": "3.15.2",
   "miniprogramRoot": "miniprogram/",
   "projectname": "travel-note-miniapp",
@@ -24,7 +25,12 @@
   },
   "srcMiniprogramRoot": "miniprogram/",
   "packOptions": {
-    "ignore": [],
+    "ignore": [
+      {
+        "value": "miniprogram/assets/brand",
+        "type": "folder"
+      }
+    ],
     "include": []
   },
   "condition": {},

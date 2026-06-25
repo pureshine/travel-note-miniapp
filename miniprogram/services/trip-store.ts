@@ -14,6 +14,23 @@ import { today } from "../utils/date";
 
 const STORAGE_KEY = "travel-note-trips";
 const ACTIVE_TRIP_KEY = "travel-note-active-trip-id";
+const PROFILE_KEY = "travel-note-profile";
+let autoSyncTimer: number | undefined;
+
+interface StoredProfile {
+  loggedIn: boolean;
+  openid: string;
+  nickname: string;
+  avatarUrl?: string;
+  loginAt: number;
+  lastSyncAt?: number;
+  previewMode?: boolean;
+}
+
+interface SyncMemberProfile {
+  nickname: string;
+  avatarUrl?: string;
+}
 
 function seedTrips(): Trip[] {
   return [
@@ -61,10 +78,7 @@ function seedTrips(): Trip[] {
           createdAt: 1783699200000
         }
       ],
-      expenses: [
-        { id: "expense_seed_1", title: "动车票", amount: 286, category: "交通", paidBy: "我", createdAt: 1783699200000 },
-        { id: "expense_seed_2", title: "酒店预付", amount: 520, category: "住宿", paidBy: "我", createdAt: 1783699200000 }
-      ]
+      expenses: []
     }
   ];
 }
@@ -77,9 +91,52 @@ function readTrips(): Trip[] {
   return seeded;
 }
 
-function writeTrips(trips: Trip[]): Trip[] {
+function writeTrips(trips: Trip[], options?: { skipAutoSync?: boolean }): Trip[] {
   wx.setStorageSync(STORAGE_KEY, trips);
+  if (!options?.skipAutoSync) scheduleAutoSync(trips.map(normalizeTrip));
   return trips;
+}
+
+function scheduleAutoSync(trips: Trip[]): void {
+  const profile = wx.getStorageSync<StoredProfile>(PROFILE_KEY);
+  if (!profile?.loggedIn || !profile.openid || profile.previewMode || !wx.cloud) return;
+
+  if (autoSyncTimer) clearTimeout(autoSyncTimer);
+  autoSyncTimer = setTimeout(() => {
+    wx.cloud?.callFunction({
+      name: "syncTrips",
+      data: {
+        action: "upload",
+        trips,
+        memberProfile: getSyncMemberProfile(profile)
+      },
+      success: (res) => {
+        const result = res.result as { updatedAt?: number };
+        const latestProfile = wx.getStorageSync<StoredProfile>(PROFILE_KEY);
+        if (!latestProfile?.loggedIn) return;
+        wx.setStorageSync(PROFILE_KEY, {
+          ...latestProfile,
+          lastSyncAt: result.updatedAt || Date.now()
+        });
+      },
+      fail: (error) => {
+        const latestProfile = wx.getStorageSync<StoredProfile>(PROFILE_KEY);
+        if (!latestProfile?.loggedIn) return;
+        wx.setStorageSync(PROFILE_KEY, {
+          ...latestProfile,
+          lastAutoSyncFailedAt: Date.now(),
+          lastAutoSyncError: error.errMsg || "自动同步失败"
+        });
+      }
+    });
+  }, 1600) as unknown as number;
+}
+
+function getSyncMemberProfile(profile: StoredProfile): SyncMemberProfile {
+  return {
+    nickname: profile.nickname?.trim() || "未设置名字",
+    avatarUrl: profile.avatarUrl || ""
+  };
 }
 
 function updateTrip(tripId: string, updater: (trip: Trip) => Trip): Trip | undefined {
@@ -287,6 +344,22 @@ export function resetDemoData(): void {
   writeTrips(seedTrips());
 }
 
+export function exportTripsForSync(): Trip[] {
+  return listTrips();
+}
+
+export function importTripsFromSync(trips: Trip[]): Trip[] {
+  const normalizedTrips = trips.map(normalizeTrip);
+  writeTrips(normalizedTrips, { skipAutoSync: true });
+  const firstTrip = normalizedTrips[0];
+  if (firstTrip) {
+    setActiveTripId(firstTrip.id);
+  } else {
+    wx.removeStorageSync(ACTIVE_TRIP_KEY);
+  }
+  return normalizedTrips;
+}
+
 export function getDefaultTrip(): Trip {
   const activeTripId = wx.getStorageSync<string>(ACTIVE_TRIP_KEY);
   const trips = listTrips();
@@ -320,7 +393,8 @@ function normalizeTrip(trip: Trip): Trip {
       ...item,
       category: item.category || "事项",
       done: Boolean(item.done)
-    }))
+    })),
+    sharedMembers: Array.isArray(trip.sharedMembers) ? trip.sharedMembers : []
   };
 }
 

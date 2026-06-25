@@ -100,12 +100,15 @@ Page({
 
 function getCategories(expenses: ExpenseItem[], total: number): Array<{ category: ExpenseCategory; amount: number; percent: number }> {
   const categories: ExpenseCategory[] = ["餐饮", "交通", "住宿", "购物", "门票", "其他"];
-  return categories.map((category) => {
+  let usedPercent = 0;
+  return categories.map((category, index) => {
     const amount = expenses.filter((item) => item.category === category).reduce((sum, item) => sum + item.amount, 0);
+    const percent = total > 0 ? (index === categories.length - 1 ? Math.max(100 - usedPercent, 0) : Math.round((amount / total) * 100)) : 0;
+    usedPercent += percent;
     return {
       category,
       amount,
-      percent: total > 0 ? Math.round((amount / total) * 100) : 0
+      percent
     };
   });
 }

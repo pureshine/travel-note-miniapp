@@ -5,24 +5,40 @@ Page({
     data: {
         trip: undefined,
         trips: [],
-        tripNames: [],
+        tripOptions: [],
         activeTripIndex: 0,
+        tripStatus: "待出发",
+        tripStatusClass: "upcoming",
         scheduleTouchStartX: 0,
         openScheduleId: "",
-        schedules: []
+        schedules: [],
+        scheduleGroups: [],
+        travelTip: {
+            icon: "逃",
+            title: "准备出逃",
+            subtitle: "先添加一个旅行计划",
+            metaTop: "0 项",
+            metaBottom: "待规划"
+        }
     },
     onShow() {
         this.loadTrip();
     },
     loadTrip() {
-        const trip = (0, trip_store_1.getDefaultTrip)();
         const trips = (0, trip_store_1.listTrips)();
+        const trip = (0, trip_store_1.getDefaultTrip)();
+        const schedules = this.toScheduleViews(trip.schedules);
+        const tripStatus = getTripStatus(trip);
         this.setData({
             trip,
             trips,
-            tripNames: trips.map((item) => item.name),
+            tripOptions: trips.map((item) => formatTripOption(item)),
             activeTripIndex: Math.max(trips.findIndex((item) => item.id === trip.id), 0),
-            schedules: this.toScheduleViews(trip.schedules)
+            tripStatus,
+            tripStatusClass: getTripStatusClass(tripStatus),
+            schedules,
+            scheduleGroups: this.groupSchedulesByYear(schedules),
+            travelTip: createTravelTip(trip, schedules.length)
         });
     },
     onTripChange(event) {
@@ -35,6 +51,43 @@ Page({
     },
     goTripForm() {
         wx.navigateTo({ url: "/pages/trip-form/trip-form" });
+    },
+    manageTrip() {
+        const trip = this.data.trip;
+        if (!trip)
+            return;
+        wx.showActionSheet({
+            itemList: ["新建计划", "编辑计划", "删除计划"],
+            alertText: trip.name,
+            success: (res) => {
+                if (res.tapIndex === 0) {
+                    this.goTripForm();
+                    return;
+                }
+                if (res.tapIndex === 1) {
+                    wx.navigateTo({ url: `/pages/trip-form/trip-form?id=${trip.id}` });
+                    return;
+                }
+                if (res.tapIndex === 2)
+                    this.confirmDeleteTrip(trip);
+            }
+        });
+    },
+    confirmDeleteTrip(trip) {
+        const hasOnlyOneTrip = this.data.trips.length <= 1;
+        wx.showModal({
+            title: "删除计划",
+            content: hasOnlyOneTrip ? `确定删除“${trip.name}”吗？删除后会自动创建一个新的空计划。` : `确定删除“${trip.name}”吗？里面的日程、备忘和消费都会一起删除。`,
+            confirmText: "删除",
+            confirmColor: "#dc2626",
+            success: (result) => {
+                if (!result.confirm)
+                    return;
+                (0, trip_store_1.deleteTrip)(trip.id);
+                this.loadTrip();
+                wx.showToast({ title: "已删除", icon: "success" });
+            }
+        });
     },
     goScheduleForm() {
         if (!this.data.trip)
@@ -87,11 +140,24 @@ Page({
             const status = getScheduleStatus(item);
             return {
                 ...item,
+                ...formatScheduleDate(item.day),
                 status,
                 statusClass: getStatusClass(status),
                 active: status === "进行中"
             };
         });
+    },
+    groupSchedulesByYear(items) {
+        const groups = [];
+        items.forEach((item) => {
+            let group = groups.find((entry) => entry.year === item.year);
+            if (!group) {
+                group = { year: item.year, items: [] };
+                groups.push(group);
+            }
+            group.items.push(item);
+        });
+        return groups;
     }
 });
 function getScheduleStatus(item) {
@@ -111,4 +177,36 @@ function getStatusClass(status) {
     if (status === "进行中")
         return "active";
     return "pending";
+}
+function getTripStatus(trip) {
+    const endTime = new Date(`${trip.endDate}T23:59:59`).getTime();
+    if (Number.isNaN(endTime))
+        return "待出发";
+    return Date.now() > endTime ? "已完成" : "待出发";
+}
+function getTripStatusClass(status) {
+    return status === "已完成" ? "done" : "upcoming";
+}
+function formatTripOption(trip) {
+    return `${trip.name} · ${getTripStatus(trip)}`;
+}
+function formatScheduleDate(day) {
+    const parts = day.split("-");
+    if (parts.length !== 3)
+        return { year: "", monthDay: day };
+    return {
+        year: parts[0],
+        monthDay: `${Number(parts[1])}.${Number(parts[2])}`
+    };
+}
+function createTravelTip(trip, scheduleCount) {
+    const destination = trip.destination || "待定目的地";
+    const dateText = trip.startDate === trip.endDate ? trip.startDate : `${trip.startDate} - ${trip.endDate}`;
+    return {
+        icon: "逃",
+        title: `${destination}出逃计划`,
+        subtitle: dateText,
+        metaTop: `${scheduleCount} 项日程`,
+        metaBottom: trip.destination ? "目的地已定" : "轻松规划"
+    };
 }
