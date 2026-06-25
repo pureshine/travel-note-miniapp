@@ -5,6 +5,7 @@
     "pages/stats/stats",
     "pages/profile/profile",
     "pages/profile-edit/profile-edit",
+    "pages/budget-form/budget-form",
     "pages/trip-form/trip-form",
     "pages/schedule-form/schedule-form",
     "pages/note-form/note-form",

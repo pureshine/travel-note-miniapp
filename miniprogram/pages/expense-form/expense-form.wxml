@@ -5,6 +5,9 @@
   <view class="form-card panel">
     <input class="field" placeholder="消费名称，如 一兰拉面" value="{{title}}" bindinput="onTitleInput" />
     <input class="field" type="digit" placeholder="金额" value="{{amount}}" bindinput="onAmountInput" />
+    <picker mode="date" value="{{date}}" bindchange="onDateChange">
+      <view class="picker-field">日期：{{date}}</view>
+    </picker>
     <picker mode="selector" range="{{categories}}" bindchange="onCategoryChange">
       <view class="picker-field">分类：{{category}}</view>
     </picker>

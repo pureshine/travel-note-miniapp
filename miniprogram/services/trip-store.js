@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getNoteCategories = exports.getScheduleCategories = exports.setActiveTripId = exports.getDefaultTrip = exports.importTripsFromSync = exports.exportTripsForSync = exports.resetDemoData = exports.getExpenseByCategory = exports.getSummary = exports.deleteExpense = exports.updateExpense = exports.addExpense = exports.deleteNote = exports.toggleNoteItem = exports.updateNote = exports.addNote = exports.toggleChecklistItem = exports.addChecklistItem = exports.deleteSchedule = exports.updateSchedule = exports.addSchedule = exports.deleteTrip = exports.updateTripInfo = exports.createTrip = exports.getTrip = exports.listTrips = void 0;
+exports.getNoteCategories = exports.getScheduleCategories = exports.setActiveTripId = exports.getDefaultTrip = exports.importTripsFromSync = exports.exportTripsForSync = exports.resetDemoData = exports.getExpenseByCategory = exports.getSummary = exports.deleteExpense = exports.updateExpense = exports.addExpense = exports.deleteNote = exports.toggleNoteItem = exports.updateNote = exports.addNote = exports.toggleChecklistItem = exports.addChecklistItem = exports.deleteSchedule = exports.updateSchedule = exports.addSchedule = exports.deleteTrip = exports.updateTripBudget = exports.updateTripInfo = exports.createTrip = exports.getTrip = exports.listTrips = void 0;
 const id_1 = require("../utils/id");
 const date_1 = require("../utils/date");
 const STORAGE_KEY = "travel-note-trips";
@@ -15,6 +15,7 @@ function seedTrips() {
             destination: "厦门",
             startDate: "2026-07-10",
             endDate: "2026-07-12",
+            budget: 16800,
             coverTone: "mint",
             schedules: [
                 {
@@ -136,6 +137,7 @@ function createTrip(input) {
         destination: input?.destination || "待定目的地",
         startDate: input?.startDate || current,
         endDate: input?.endDate || input?.startDate || current,
+        budget: 16800,
         coverTone: "sky",
         schedules: [],
         checklist: [
@@ -160,6 +162,13 @@ function updateTripInfo(tripId, input) {
     }));
 }
 exports.updateTripInfo = updateTripInfo;
+function updateTripBudget(tripId, budget) {
+    return updateTrip(tripId, (trip) => ({
+        ...trip,
+        budget
+    }));
+}
+exports.updateTripBudget = updateTripBudget;
 function deleteTrip(tripId) {
     const trips = readTrips().filter((trip) => trip.id !== tripId);
     writeTrips(trips);
@@ -243,10 +252,10 @@ function deleteNote(tripId, itemId) {
     }));
 }
 exports.deleteNote = deleteNote;
-function addExpense(tripId, title, amount, category, paidBy) {
+function addExpense(tripId, title, amount, category, paidBy, createdAt = Date.now()) {
     return updateTrip(tripId, (trip) => ({
         ...trip,
-        expenses: [{ id: (0, id_1.createId)("expense"), title, amount, category, paidBy, createdAt: Date.now() }, ...trip.expenses]
+        expenses: [{ id: (0, id_1.createId)("expense"), title, amount, category, paidBy, createdAt }, ...trip.expenses]
     }));
 }
 exports.addExpense = addExpense;
@@ -259,7 +268,8 @@ function updateExpense(tripId, expenseId, input) {
                 title: input.title,
                 amount: input.amount,
                 category: input.category,
-                paidBy: input.paidBy
+                paidBy: input.paidBy,
+                createdAt: input.createdAt || item.createdAt
             }
             : item)
     }));
@@ -340,6 +350,7 @@ exports.getNoteCategories = getNoteCategories;
 function normalizeTrip(trip) {
     return {
         ...trip,
+        budget: typeof trip.budget === "number" && Number.isFinite(trip.budget) ? trip.budget : 16800,
         schedules: trip.schedules.map((item) => ({
             ...item,
             category: item.category || "其他",

@@ -43,6 +43,7 @@ export interface Trip {
   destination: string;
   startDate: string;
   endDate: string;
+  budget?: number;
   coverTone: "mint" | "sky" | "sunrise";
   schedules: ScheduleItem[];
   checklist: ChecklistItem[];

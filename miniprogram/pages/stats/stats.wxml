@@ -12,38 +12,78 @@
     </picker>
   </view>
 
-  <view class="budget-card panel">
-    <view class="budget-row">
+  <view class="ledger-hero panel">
+    <view class="budget-card" bindtap="goBudgetForm">
+      <view class="budget-ring">
+        <view class="ring-value">{{budgetPercent}}%</view>
+      </view>
+      <view class="budget-main">
+        <view class="budget-title">本次预算</view>
+        <view class="budget-sub">支出预算 ¥{{budget}}</view>
+      </view>
+      <view class="budget-side">
+        <text>可用 ¥{{remaining}}</text>
+        <text class="budget-edit">设置</text>
+      </view>
+    </view>
+    <view class="hero-total-row">
       <view>
         <view class="budget-label">本次总支出</view>
         <view class="budget-total">¥{{expenseTotal}}</view>
       </view>
-      <view class="budget-side">
-        <text>预算 ¥{{budget}}</text>
-        <text>剩余 ¥{{remaining}}</text>
-      </view>
-    </view>
-    <view class="budget-track">
-      <view class="budget-progress" style="width: {{budgetPercent}}%;"></view>
+      <button class="hero-add" bindtap="goExpenseForm">+ 记一笔</button>
     </view>
   </view>
 
-  <view class="quick-expense panel" bindtap="goExpenseForm">
-    <view class="quick-icon">
-      <image class="quick-paw" src="/assets/illustrations/cat-paw-icon.png" mode="aspectFit" />
+  <view class="calendar-card panel" bindtouchstart="onCalendarTouchStart" bindtouchend="onCalendarTouchEnd">
+    <view class="calendar-head">
+      <view>
+        <view class="month-control">
+          <button class="month-arrow" bindtap="prevMonth">‹</button>
+          <picker mode="date" fields="month" value="{{calendarMonthValue}}" bindchange="onMonthChange">
+            <view class="calendar-title">{{calendarTitle}} ▾</view>
+          </picker>
+          <button class="month-arrow" bindtap="nextMonth">›</button>
+        </view>
+        <view class="calendar-sub">点选日期查看流水</view>
+      </view>
+      <view class="calendar-total">本日 ¥{{selectedDateExpenseTotal}}</view>
     </view>
-    <view class="quick-main">
-      <view class="quick-title">记录一笔消费</view>
-      <view class="quick-subtitle">餐饮、交通、住宿都可以快速记下</view>
+    <view class="week-row">
+      <text wx:for="{{weekLabels}}" wx:key="*this">{{item}}</text>
     </view>
-    <button class="record-button" catchtap="goExpenseForm">新增</button>
+    <view class="calendar-grid">
+      <view
+        wx:for="{{calendarDays}}"
+        wx:key="dateKey"
+        class="{{item.className}}"
+        data-date="{{item.dateKey}}"
+        bindtap="selectCalendarDay"
+      >
+        <text class="day-number">{{item.day}}</text>
+        <text class="day-amount">{{item.amountText}}</text>
+      </view>
+    </view>
+    <view class="month-trend">
+      <view class="trend-title">近期消费曲线</view>
+      <view class="daily-chart">
+        <view wx:for="{{dailyBars}}" wx:key="label" class="bar-item {{item.active ? 'active' : ''}}">
+          <view class="bar-amount">{{item.amountText}}</view>
+          <view class="bar-track">
+            <view class="bar-fill" style="height: {{item.height}}%;"></view>
+          </view>
+          <view class="bar-label">{{item.label}}</view>
+        </view>
+      </view>
+    </view>
   </view>
 
   <view class="section-title">
-    <text>最近消费</text>
+    <text>{{selectedDateTitle}}流水</text>
+    <text class="section-meta">支出 ¥{{selectedDateExpenseTotal}}</text>
   </view>
   <view class="recent-list">
-    <view wx:for="{{recentExpenses}}" wx:key="id" class="recent-card panel">
+    <view wx:for="{{selectedDateExpenses}}" wx:key="id" class="recent-card panel">
       <view class="recent-icon">{{item.category}}</view>
       <view class="recent-main">
         <view class="recent-title">{{item.title}}</view>
@@ -55,7 +95,7 @@
         <button class="tool-button danger" catchtap="deleteExpense" data-id="{{item.id}}">删</button>
       </view>
     </view>
-    <view wx:if="{{recentExpenses.length === 0}}" class="empty panel">还没有消费记录</view>
+    <view wx:if="{{selectedDateExpenses.length === 0}}" class="empty panel">这天还没有消费记录</view>
   </view>
 
   <view class="section-title">

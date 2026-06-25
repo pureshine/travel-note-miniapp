@@ -1,0 +1,115 @@
+.budget-page {
+  background: #fff8ef;
+}
+
+.form-title {
+  color: #2f2f2a;
+  font-size: 46rpx;
+  font-weight: 900;
+}
+
+.form-subtitle {
+  margin-top: 12rpx;
+  color: #a79a8b;
+  font-size: 26rpx;
+  font-weight: 750;
+}
+
+.budget-card {
+  padding: 34rpx 28rpx;
+  margin-top: 28rpx;
+  background: linear-gradient(135deg, #fffaf3 0%, #fff4e8 58%, #eef8ed 100%);
+}
+
+.paw-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 78rpx;
+  height: 78rpx;
+  border-radius: 26rpx;
+  background: #fff6df;
+}
+
+.paw {
+  width: 48rpx;
+  height: 48rpx;
+}
+
+.budget-label {
+  margin-top: 24rpx;
+  color: #a79a8b;
+  font-size: 24rpx;
+  font-weight: 850;
+}
+
+.budget-input-row {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  margin-top: 10rpx;
+  color: #2f2f2a;
+  font-size: 58rpx;
+  font-weight: 900;
+}
+
+.budget-input {
+  flex: 1;
+  min-width: 0;
+  height: 90rpx;
+  color: #2f2f2a;
+  font-size: 58rpx;
+  font-weight: 900;
+}
+
+.preset-card {
+  padding: 26rpx;
+  margin-top: 24rpx;
+}
+
+.preset-title {
+  color: #2f2f2a;
+  font-size: 30rpx;
+  font-weight: 900;
+}
+
+.preset-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14rpx;
+  margin-top: 20rpx;
+}
+
+.preset-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 64rpx;
+  padding: 0;
+  border-radius: 22rpx;
+  background: #fff4df;
+  color: #d97949;
+  font-size: 23rpx;
+  font-weight: 850;
+  line-height: 64rpx;
+}
+
+.save-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 86rpx;
+  margin-top: 28rpx;
+  border-radius: 30rpx;
+  background: #ff8a4c;
+  color: #ffffff;
+  font-size: 28rpx;
+  font-weight: 900;
+  line-height: 86rpx;
+  box-shadow: 0 14rpx 28rpx rgba(255, 126, 75, 0.18);
+}
+
+.preset-button::after,
+.save-button::after {
+  border: 0;
+}

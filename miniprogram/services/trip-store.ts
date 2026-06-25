@@ -40,6 +40,7 @@ function seedTrips(): Trip[] {
       destination: "厦门",
       startDate: "2026-07-10",
       endDate: "2026-07-12",
+      budget: 16800,
       coverTone: "mint",
       schedules: [
         {
@@ -162,6 +163,7 @@ export function createTrip(input?: { name?: string; destination?: string; startD
     destination: input?.destination || "待定目的地",
     startDate: input?.startDate || current,
     endDate: input?.endDate || input?.startDate || current,
+    budget: 16800,
     coverTone: "sky",
     schedules: [],
     checklist: [
@@ -186,6 +188,13 @@ export function updateTripInfo(
     destination: input.destination,
     startDate: input.startDate,
     endDate: input.endDate
+  }));
+}
+
+export function updateTripBudget(tripId: string, budget: number): Trip | undefined {
+  return updateTrip(tripId, (trip) => ({
+    ...trip,
+    budget
   }));
 }
 
@@ -282,18 +291,19 @@ export function addExpense(
   title: string,
   amount: number,
   category: ExpenseCategory,
-  paidBy: string
+  paidBy: string,
+  createdAt: number = Date.now()
 ): Trip | undefined {
   return updateTrip(tripId, (trip) => ({
     ...trip,
-    expenses: [{ id: createId("expense"), title, amount, category, paidBy, createdAt: Date.now() }, ...trip.expenses]
+    expenses: [{ id: createId("expense"), title, amount, category, paidBy, createdAt }, ...trip.expenses]
   }));
 }
 
 export function updateExpense(
   tripId: string,
   expenseId: string,
-  input: { title: string; amount: number; category: ExpenseCategory; paidBy: string }
+  input: { title: string; amount: number; category: ExpenseCategory; paidBy: string; createdAt?: number }
 ): Trip | undefined {
   return updateTrip(tripId, (trip) => ({
     ...trip,
@@ -304,7 +314,8 @@ export function updateExpense(
             title: input.title,
             amount: input.amount,
             category: input.category,
-            paidBy: input.paidBy
+            paidBy: input.paidBy,
+            createdAt: input.createdAt || item.createdAt
           }
         : item
     )
@@ -384,6 +395,7 @@ export function getNoteCategories(): NoteCategory[] {
 function normalizeTrip(trip: Trip): Trip {
   return {
     ...trip,
+    budget: typeof trip.budget === "number" && Number.isFinite(trip.budget) ? trip.budget : 16800,
     schedules: trip.schedules.map((item) => ({
       ...item,
       category: item.category || "其他",

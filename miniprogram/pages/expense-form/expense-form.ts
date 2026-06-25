@@ -6,6 +6,16 @@ function getDefaultPaidBy(): string {
   return getSavedProfile()?.nickname?.trim() || "我";
 }
 
+function formatDateKey(date: Date): string {
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
+  return `${date.getFullYear()}-${month}-${day}`;
+}
+
+function dateToCreatedAt(date: string): number {
+  return new Date(`${date}T12:00:00`).getTime();
+}
+
 Page({
   data: {
     tripId: "",
@@ -16,13 +26,14 @@ Page({
     saveLabel: "保存消费",
     title: "",
     amount: "",
+    date: formatDateKey(new Date()),
     category: "餐饮" as ExpenseCategory,
     paidBy: "我",
     categories: ["餐饮", "交通", "住宿", "购物", "门票", "其他"] as ExpenseCategory[],
     saving: false
   },
 
-  onLoad(options: { tripId?: string; expenseId?: string }) {
+  onLoad(options: { tripId?: string; expenseId?: string; date?: string }) {
     if (!options.tripId) return;
     const trip = getTrip(options.tripId);
     if (!trip) {
@@ -40,6 +51,7 @@ Page({
       saveLabel: expense ? "保存修改" : "保存消费",
       title: expense ? expense.title : "",
       amount: expense ? String(expense.amount) : "",
+      date: expense ? formatDateKey(new Date(expense.createdAt)) : options.date || formatDateKey(new Date()),
       category: expense ? expense.category : this.data.category,
       paidBy: expense ? expense.paidBy : getDefaultPaidBy()
     });
@@ -58,6 +70,10 @@ Page({
     this.setData({ paidBy: event.detail.value });
   },
 
+  onDateChange(event: { detail: { value: string } }) {
+    this.setData({ date: event.detail.value });
+  },
+
   onCategoryChange(event: { detail: { value: string } }) {
     const index = Number(event.detail.value);
     this.setData({ category: this.data.categories[index] });
@@ -73,10 +89,11 @@ Page({
     }
     this.setData({ saving: true });
     const paidBy = this.data.paidBy.trim() || getDefaultPaidBy();
+    const createdAt = dateToCreatedAt(this.data.date);
     if (this.data.isEditing) {
-      updateExpense(this.data.tripId, this.data.expenseId, { title, amount, category: this.data.category, paidBy });
+      updateExpense(this.data.tripId, this.data.expenseId, { title, amount, category: this.data.category, paidBy, createdAt });
     } else {
-      addExpense(this.data.tripId, title, amount, this.data.category, paidBy);
+      addExpense(this.data.tripId, title, amount, this.data.category, paidBy, createdAt);
     }
     wx.navigateBack();
   }

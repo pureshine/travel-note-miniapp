@@ -1,0 +1,24 @@
+<view class="page budget-page" wx:if="{{trip}}">
+  <view class="form-title">设置预算</view>
+  <view class="form-subtitle">{{trip.name}} · 控制这次出逃花费</view>
+
+  <view class="budget-card panel">
+    <view class="paw-wrap">
+      <image class="paw" src="/assets/illustrations/cat-paw-icon.png" mode="aspectFit" />
+    </view>
+    <view class="budget-label">本次预算</view>
+    <view class="budget-input-row">
+      <text>¥</text>
+      <input class="budget-input" type="digit" value="{{budget}}" bindinput="onBudgetInput" placeholder="输入预算" />
+    </view>
+  </view>
+
+  <view class="preset-card panel">
+    <view class="preset-title">常用预算</view>
+    <view class="preset-grid">
+      <button wx:for="{{presets}}" wx:key="*this" class="preset-button" data-value="{{item}}" bindtap="choosePreset">¥{{item}}</button>
+    </view>
+  </view>
+
+  <button class="save-button" loading="{{saving}}" disabled="{{saving}}" bindtap="saveBudget">保存预算</button>
+</view>
