@@ -67,7 +67,7 @@ button::after {
   justify-content: center;
   min-height: 88rpx;
   border-radius: 28rpx;
-  background: #ff8a4c;
+  background: #f5a524;
   color: #ffffff;
   font-weight: 700;
 }
@@ -77,10 +77,10 @@ button::after {
   align-items: center;
   justify-content: center;
   min-height: 80rpx;
-  border: 2rpx solid rgba(255, 138, 76, 0.26);
+  border: 2rpx solid rgba(245, 165, 36, 0.28);
   border-radius: 28rpx;
-  background: #fff1df;
-  color: #e66d35;
+  background: #fff3cc;
+  color: #bf7a28;
   font-weight: 700;
 }
 

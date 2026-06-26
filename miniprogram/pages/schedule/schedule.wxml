@@ -1,7 +1,7 @@
 <view class="page schedule-page" wx:if="{{trip}}">
   <view class="tip-card panel">
     <view class="tip-icon">
-      <image class="tip-icon-cat" src="/assets/illustrations/cat-travel-sticker.png" mode="aspectFit" />
+      <image class="tip-icon-duck" src="/assets/illustrations/duck-travel-sticker.png" mode="aspectFit" />
     </view>
     <view>
       <view class="tip-title">{{travelTip.title}}</view>

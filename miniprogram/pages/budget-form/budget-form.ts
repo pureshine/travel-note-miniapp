@@ -7,7 +7,7 @@ Page({
     trip: undefined as Trip | undefined,
     budget: "",
     saving: false,
-    presets: [3000, 5000, 8000, 12000, 16800, 30000]
+    presets: [3000, 5000, 8000, 10000, 20000, 30000]
   },
 
   onLoad(options: { tripId?: string }) {
@@ -21,7 +21,7 @@ Page({
     this.setData({
       tripId: trip.id,
       trip,
-      budget: String(trip.budget || 16800)
+      budget: String(trip.budget || 10000)
     });
   },
 

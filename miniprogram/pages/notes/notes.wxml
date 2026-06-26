@@ -6,9 +6,9 @@
     </view>
     <view class="memo-actions">
       <button class="memo-add" bindtap="goNoteForm">
-        <image class="memo-cat" src="/assets/illustrations/cat-travel-sticker.png" mode="aspectFit" />
+        <image class="memo-duck" src="/assets/illustrations/duck-travel-sticker.png" mode="aspectFit" />
         <text class="memo-add-text">写备忘</text>
-        <image class="memo-paw" src="/assets/illustrations/cat-paw-icon.png" mode="aspectFit" />
+        <image class="memo-foot" src="/assets/illustrations/duck-foot-icon.png" mode="aspectFit" />
       </button>
     </view>
   </view>
@@ -63,7 +63,7 @@
       </view>
     </view>
     <view wx:if="{{filteredNotes.length === 0}}" class="empty panel">
-      <image class="empty-cat" src="/assets/illustrations/cat-paw-icon.png" mode="aspectFit" />
+      <image class="empty-duck-foot" src="/assets/illustrations/duck-foot-icon.png" mode="aspectFit" />
       <view>还没有备忘</view>
     </view>
   </view>

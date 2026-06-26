@@ -2,7 +2,7 @@
   <view class="profile-card panel">
     <button class="avatar-picker" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
       <image wx:if="{{avatarUrl}}" class="avatar-image" src="{{avatarUrl}}" mode="aspectFit" />
-      <text wx:else>逃</text>
+      <image wx:else class="avatar-image" src="/assets/illustrations/duck-avatar.png" mode="aspectFit" />
     </button>
     <view class="profile-title">个人资料</view>
     <view class="profile-subtitle">好友共享和记录人会使用这个显示名字</view>

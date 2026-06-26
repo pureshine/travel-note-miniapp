@@ -34,8 +34,8 @@ Page({
     schedules: [] as ScheduleView[],
     scheduleGroups: [] as ScheduleYearGroup[],
     travelTip: {
-      icon: "逃",
-      title: "准备出逃",
+      icon: "鸭",
+      title: "准备冲鸭",
       subtitle: "先添加一个旅行计划",
       metaTop: "0 项",
       metaBottom: "待规划"
@@ -226,8 +226,8 @@ function createTravelTip(trip: Trip, scheduleCount: number): TravelTipView {
   const destination = trip.destination || "待定目的地";
   const dateText = trip.startDate === trip.endDate ? trip.startDate : `${trip.startDate} - ${trip.endDate}`;
   return {
-    icon: "逃",
-    title: `${destination}出逃计划`,
+    icon: "鸭",
+    title: `${destination}冲鸭计划`,
     subtitle: dateText,
     metaTop: `${scheduleCount} 项日程`,
     metaBottom: trip.destination ? "目的地已定" : "轻松规划"

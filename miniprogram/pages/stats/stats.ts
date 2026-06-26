@@ -27,7 +27,7 @@ Page({
     categories: [] as Array<{ category: string; amount: number; percent: number }>,
     expenseCount: 0,
     averageExpense: 0,
-    budget: 16800,
+    budget: 10000,
     remaining: 0,
     budgetPercent: 0,
     expenseTouchStartX: 0,
@@ -56,7 +56,7 @@ Page({
     const expenses = trip.expenses;
     const expenseTotal = expenses.reduce((sum, item) => sum + item.amount, 0);
     const categories = getCategories(expenses, expenseTotal);
-    const budget = trip.budget || 16800;
+    const budget = trip.budget || 10000;
     const selectedDateKey = this.data.selectedDateKey || formatDateKey(new Date());
     const calendarMonth = this.data.calendarMonth || selectedDateKey.slice(0, 7);
     const selectedDateExpenses = getExpensesByDate(expenses, selectedDateKey);

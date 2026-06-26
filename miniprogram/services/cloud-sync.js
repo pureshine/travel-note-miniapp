@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.acceptTripInvite = exports.createTripInvite = exports.syncTripsWithCloud = exports.downloadTripsFromCloud = exports.uploadTripsToCloud = exports.updateSavedProfile = exports.loginByCloud = exports.getSavedProfile = exports.getCloudErrorMessage = void 0;
+exports.acceptTripInvite = exports.createTripInvite = exports.resetMyCloudData = exports.syncTripsWithCloud = exports.downloadTripsFromCloud = exports.uploadTripsToCloud = exports.updateSavedProfile = exports.loginByCloud = exports.getSavedProfile = exports.getCloudErrorMessage = void 0;
 const trip_store_1 = require("./trip-store");
 const PROFILE_KEY = "travel-note-profile";
 function callCloudFunction(name, data) {
@@ -68,6 +68,7 @@ async function uploadTripsToCloud() {
         trips,
         memberProfile: getSyncMemberProfile()
     });
+    (0, trip_store_1.clearDeletedItemIds)();
     updateLastSyncAt(result.updatedAt || Date.now());
     return result;
 }
@@ -88,6 +89,12 @@ async function syncTripsWithCloud() {
     return downloadTripsFromCloud();
 }
 exports.syncTripsWithCloud = syncTripsWithCloud;
+async function resetMyCloudData() {
+    return callCloudFunction("syncTrips", {
+        action: "resetMyData"
+    });
+}
+exports.resetMyCloudData = resetMyCloudData;
 async function createTripInvite(tripId) {
     return callCloudFunction("syncTrips", {
         action: "createInvite",

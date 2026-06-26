@@ -1,8 +1,8 @@
 <view class="page home-page">
   <view class="hero">
     <view>
-      <text class="eyebrow">Travel Kit</text>
-      <view class="hero-title">旅小记</view>
+      <text class="eyebrow">Duck Travel Kit</text>
+      <view class="hero-title">冲鸭去旅行</view>
       <view class="hero-subtitle">日程清单、旅行备忘、消费统计，一次出行的关键信息都放在这里。</view>
     </view>
     <button class="hero-action" bindtap="addTrip">新旅程</button>

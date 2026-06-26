@@ -1,10 +1,10 @@
 <view class="page budget-page" wx:if="{{trip}}">
   <view class="form-title">设置预算</view>
-  <view class="form-subtitle">{{trip.name}} · 控制这次出逃花费</view>
+  <view class="form-subtitle">{{trip.name}} · 控制这次旅行花费</view>
 
   <view class="budget-card panel">
     <view class="paw-wrap">
-      <image class="paw" src="/assets/illustrations/cat-paw-icon.png" mode="aspectFit" />
+      <image class="paw" src="/assets/illustrations/duck-foot-icon.png" mode="aspectFit" />
     </view>
     <view class="budget-label">本次预算</view>
     <view class="budget-input-row">

@@ -29,6 +29,12 @@
   box-shadow: inset 0 -8rpx 0 rgba(255, 138, 76, 0.12);
 }
 
+.brand-duck,
+.avatar-placeholder {
+  width: 90rpx;
+  height: 90rpx;
+}
+
 .avatar-button {
   display: flex;
   flex: 0 0 98rpx;
@@ -217,7 +223,7 @@
   box-shadow: inset 0 -6rpx 0 rgba(255, 181, 108, 0.1);
 }
 
-.sync-badge-cat {
+.sync-badge-duck {
   width: 66rpx;
   height: 66rpx;
 }

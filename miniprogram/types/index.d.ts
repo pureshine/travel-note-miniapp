@@ -65,7 +65,7 @@ declare namespace WechatMiniprogram {
 
   namespace App {
     interface Constructor {
-      <T>(options: T & { globalData: IAppOption["globalData"]; onLaunch?: () => void }): void;
+      <T>(options: T & { globalData: IAppOption["globalData"]; onLaunch?: () => void; onShow?: () => void }): void;
     }
   }
 

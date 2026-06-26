@@ -15,6 +15,9 @@ import { today } from "../utils/date";
 const STORAGE_KEY = "travel-note-trips";
 const ACTIVE_TRIP_KEY = "travel-note-active-trip-id";
 const PROFILE_KEY = "travel-note-profile";
+const DELETED_ITEMS_KEY = "travel-note-deleted-item-ids";
+const DATA_RESET_VERSION_KEY = "travel-note-data-reset-version";
+const CURRENT_DATA_RESET_VERSION = 2;
 let autoSyncTimer: number | undefined;
 
 interface StoredProfile {
@@ -32,59 +35,15 @@ interface SyncMemberProfile {
   avatarUrl?: string;
 }
 
+type SyncItemCollection = "schedules" | "checklist" | "notes" | "expenses";
+type DeletedItems = Record<string, Partial<Record<SyncItemCollection, string[]>>>;
+
 function seedTrips(): Trip[] {
-  return [
-    {
-      id: "trip_seed_1",
-      name: "厦门周末小旅行",
-      destination: "厦门",
-      startDate: "2026-07-10",
-      endDate: "2026-07-12",
-      budget: 16800,
-      coverTone: "mint",
-      schedules: [
-        {
-          id: "schedule_seed_1",
-          day: "2026-07-10",
-          time: "19:20",
-          category: "住宿",
-          title: "抵达酒店办理入住",
-          place: "思明区",
-          note: "提前保存前台电话和附近便利店位置。",
-          images: []
-        },
-        {
-          id: "schedule_seed_2",
-          day: "2026-07-11",
-          time: "09:30",
-          category: "景点",
-          title: "鼓浪屿散步",
-          place: "三丘田码头",
-          note: "船票和证件放在清单最上方。",
-          images: []
-        }
-      ],
-      checklist: [
-        { id: "check_seed_1", title: "身份证", done: true },
-        { id: "check_seed_2", title: "充电器和充电宝", done: false },
-        { id: "check_seed_3", title: "防晒和雨伞", done: false }
-      ],
-      notes: [
-        {
-          id: "note_seed_1",
-          title: "酒店信息",
-          content: "入住时间 15:00 后，地铁站步行约 8 分钟。",
-          category: "预订",
-          done: false,
-          createdAt: 1783699200000
-        }
-      ],
-      expenses: []
-    }
-  ];
+  return [];
 }
 
 function readTrips(): Trip[] {
+  resetLocalDataOnce();
   const stored = wx.getStorageSync<Trip[]>(STORAGE_KEY);
   if (Array.isArray(stored)) return stored;
   const seeded = seedTrips();
@@ -96,6 +55,15 @@ function writeTrips(trips: Trip[], options?: { skipAutoSync?: boolean }): Trip[]
   wx.setStorageSync(STORAGE_KEY, trips);
   if (!options?.skipAutoSync) scheduleAutoSync(trips.map(normalizeTrip));
   return trips;
+}
+
+function resetLocalDataOnce(): void {
+  const resetVersion = wx.getStorageSync<number>(DATA_RESET_VERSION_KEY) || 0;
+  if (resetVersion >= CURRENT_DATA_RESET_VERSION) return;
+  wx.setStorageSync(STORAGE_KEY, []);
+  wx.removeStorageSync(ACTIVE_TRIP_KEY);
+  wx.removeStorageSync(DELETED_ITEMS_KEY);
+  wx.setStorageSync(DATA_RESET_VERSION_KEY, CURRENT_DATA_RESET_VERSION);
 }
 
 function scheduleAutoSync(trips: Trip[]): void {
@@ -115,6 +83,7 @@ function scheduleAutoSync(trips: Trip[]): void {
         const result = res.result as { updatedAt?: number };
         const latestProfile = wx.getStorageSync<StoredProfile>(PROFILE_KEY);
         if (!latestProfile?.loggedIn) return;
+        clearDeletedItemIds();
         wx.setStorageSync(PROFILE_KEY, {
           ...latestProfile,
           lastSyncAt: result.updatedAt || Date.now()
@@ -163,13 +132,10 @@ export function createTrip(input?: { name?: string; destination?: string; startD
     destination: input?.destination || "待定目的地",
     startDate: input?.startDate || current,
     endDate: input?.endDate || input?.startDate || current,
-    budget: 16800,
+    budget: 10000,
     coverTone: "sky",
     schedules: [],
-    checklist: [
-      { id: createId("check"), title: "身份证件", done: false },
-      { id: createId("check"), title: "充电器", done: false }
-    ],
+    checklist: [],
     notes: [],
     expenses: []
   };
@@ -225,6 +191,7 @@ export function updateSchedule(tripId: string, scheduleId: string, input: Omit<S
 }
 
 export function deleteSchedule(tripId: string, scheduleId: string): Trip | undefined {
+  markDeletedItem(tripId, "schedules", scheduleId);
   return updateTrip(tripId, (trip) => ({
     ...trip,
     schedules: trip.schedules.filter((item: ScheduleItem) => item.id !== scheduleId)
@@ -280,6 +247,7 @@ export function toggleNoteItem(tripId: string, itemId: string): Trip | undefined
 }
 
 export function deleteNote(tripId: string, itemId: string): Trip | undefined {
+  markDeletedItem(tripId, "notes", itemId);
   return updateTrip(tripId, (trip) => ({
     ...trip,
     notes: trip.notes.filter((item: NoteItem) => item.id !== itemId)
@@ -323,6 +291,7 @@ export function updateExpense(
 }
 
 export function deleteExpense(tripId: string, expenseId: string): Trip | undefined {
+  markDeletedItem(tripId, "expenses", expenseId);
   return updateTrip(tripId, (trip) => ({
     ...trip,
     expenses: trip.expenses.filter((item: ExpenseItem) => item.id !== expenseId)
@@ -356,19 +325,29 @@ export function resetDemoData(): void {
 }
 
 export function exportTripsForSync(): Trip[] {
-  return listTrips();
+  const deletedItems = readDeletedItemIds();
+  return listTrips().map((trip) => {
+    const syncDeletedIds = deletedItems[trip.id];
+    return syncDeletedIds ? ({ ...trip, syncDeletedIds } as Trip) : trip;
+  });
+}
+
+export function clearDeletedItemIds(): void {
+  wx.removeStorageSync(DELETED_ITEMS_KEY);
 }
 
 export function importTripsFromSync(trips: Trip[]): Trip[] {
   const normalizedTrips = trips.map(normalizeTrip);
-  writeTrips(normalizedTrips, { skipAutoSync: true });
-  const firstTrip = normalizedTrips[0];
+  const localTrips = readTrips().map(normalizeTrip);
+  const mergedTrips = mergeTrips(localTrips, normalizedTrips);
+  writeTrips(mergedTrips, { skipAutoSync: true });
+  const firstTrip = mergedTrips[0];
   if (firstTrip) {
     setActiveTripId(firstTrip.id);
   } else {
     wx.removeStorageSync(ACTIVE_TRIP_KEY);
   }
-  return normalizedTrips;
+  return mergedTrips;
 }
 
 export function getDefaultTrip(): Trip {
@@ -395,7 +374,7 @@ export function getNoteCategories(): NoteCategory[] {
 function normalizeTrip(trip: Trip): Trip {
   return {
     ...trip,
-    budget: typeof trip.budget === "number" && Number.isFinite(trip.budget) ? trip.budget : 16800,
+    budget: typeof trip.budget === "number" && Number.isFinite(trip.budget) ? trip.budget : 10000,
     schedules: trip.schedules.map((item) => ({
       ...item,
       category: item.category || "其他",
@@ -408,6 +387,63 @@ function normalizeTrip(trip: Trip): Trip {
     })),
     sharedMembers: Array.isArray(trip.sharedMembers) ? trip.sharedMembers : []
   };
+}
+
+function mergeTrips(localTrips: Trip[], cloudTrips: Trip[]): Trip[] {
+  const tripMap = new Map<string, Trip>();
+  localTrips.forEach((trip) => tripMap.set(trip.id, normalizeTrip(trip)));
+  cloudTrips.forEach((trip) => {
+    const localTrip = tripMap.get(trip.id);
+    tripMap.set(trip.id, localTrip ? mergeTrip(localTrip, normalizeTrip(trip)) : normalizeTrip(trip));
+  });
+  return Array.from(tripMap.values()).sort((a, b) => {
+    const aTime = new Date(a.startDate || "1970-01-01").getTime();
+    const bTime = new Date(b.startDate || "1970-01-01").getTime();
+    return bTime - aTime;
+  });
+}
+
+function mergeTrip(localTrip: Trip, cloudTrip: Trip): Trip {
+  return normalizeTrip({
+    ...localTrip,
+    ...cloudTrip,
+    schedules: mergeById(localTrip.schedules, cloudTrip.schedules).sort(compareSchedule),
+    checklist: mergeById(localTrip.checklist, cloudTrip.checklist),
+    notes: mergeById(localTrip.notes, cloudTrip.notes).sort((a, b) => b.createdAt - a.createdAt),
+    expenses: mergeById(localTrip.expenses, cloudTrip.expenses).sort((a, b) => b.createdAt - a.createdAt),
+    sharedMembers: mergeById(localTrip.sharedMembers || [], cloudTrip.sharedMembers || [])
+  });
+}
+
+function mergeById<T extends { id?: string; openid?: string }>(localItems: T[], cloudItems: T[]): T[] {
+  const itemMap = new Map<string, T>();
+  localItems.forEach((item) => {
+    const key = item.id || item.openid;
+    if (key) itemMap.set(key, item);
+  });
+  cloudItems.forEach((item) => {
+    const key = item.id || item.openid;
+    if (key) itemMap.set(key, item);
+  });
+  return Array.from(itemMap.values());
+}
+
+function readDeletedItemIds(): DeletedItems {
+  const stored = wx.getStorageSync<DeletedItems>(DELETED_ITEMS_KEY);
+  return stored && typeof stored === "object" ? stored : {};
+}
+
+function markDeletedItem(tripId: string, collection: SyncItemCollection, itemId: string): void {
+  const deletedItems = readDeletedItemIds();
+  const tripDeletedItems = deletedItems[tripId] || {};
+  const collectionIds = tripDeletedItems[collection] || [];
+  wx.setStorageSync(DELETED_ITEMS_KEY, {
+    ...deletedItems,
+    [tripId]: {
+      ...tripDeletedItems,
+      [collection]: Array.from(new Set([...collectionIds, itemId]))
+    }
+  });
 }
 
 function compareSchedule(a: ScheduleItem, b: ScheduleItem): number {

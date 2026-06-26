@@ -40,7 +40,7 @@
       <view>
         <view class="month-control">
           <button class="month-arrow" bindtap="prevMonth">‹</button>
-          <picker mode="date" fields="month" value="{{calendarMonthValue}}" bindchange="onMonthChange">
+          <picker class="month-picker" mode="date" fields="month" value="{{calendarMonthValue}}" bindchange="onMonthChange">
             <view class="calendar-title">{{calendarTitle}} ▾</view>
           </picker>
           <button class="month-arrow" bindtap="nextMonth">›</button>

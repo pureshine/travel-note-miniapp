@@ -257,28 +257,36 @@
 }
 
 .month-control {
-  display: flex;
+  display: grid;
+  grid-template-columns: 48rpx minmax(190rpx, 1fr) 48rpx;
   align-items: center;
-  gap: 10rpx;
+  gap: 8rpx;
+  max-width: 100%;
 }
 
 .month-arrow {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 52rpx;
-  height: 52rpx;
+  width: 48rpx;
+  min-width: 48rpx;
+  max-width: 48rpx;
+  height: 48rpx;
   padding: 0;
-  border-radius: 18rpx;
-  background: #fff4df;
-  color: #d97949;
-  font-size: 34rpx;
+  border-radius: 16rpx;
+  background: #fff0c8;
+  color: #bf7a28;
+  font-size: 26rpx;
   font-weight: 900;
-  line-height: 52rpx;
+  line-height: 48rpx;
 }
 
 .month-arrow::after {
   border: 0;
+}
+
+.month-picker {
+  min-width: 0;
 }
 
 .calendar-sub {

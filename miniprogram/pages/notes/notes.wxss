@@ -18,7 +18,7 @@
   gap: 10rpx;
 }
 
-.memo-cat {
+.memo-duck {
   width: 46rpx;
   height: 46rpx;
 }
@@ -33,7 +33,7 @@
   height: 76rpx;
   padding: 0 18rpx;
   border-radius: 28rpx;
-  background: #fff1df;
+  background: linear-gradient(135deg, #fff5d6 0%, #fff1df 100%);
   color: #d97949;
   font-size: 24rpx;
   font-weight: 900;
@@ -54,12 +54,12 @@
   font-size: 30rpx;
 }
 
-.memo-paw {
+.memo-foot {
   width: 34rpx;
   height: 34rpx;
 }
 
-.empty-cat {
+.empty-duck-foot {
   display: block;
   width: 116rpx;
   height: 116rpx;

@@ -15,7 +15,7 @@ function formatSyncTime(timestamp) {
 Page({
     data: {
         loggedIn: false,
-        nickname: "临时出逃用户",
+        nickname: "冲鸭旅行者",
         avatarUrl: "",
         openid: "",
         profileSubtitle: "登录后可开启账号同步",
@@ -32,7 +32,7 @@ Page({
         inviteCode: "",
         inviteStatus: "选择一个旅行后，可邀请好友共同记录",
         sharePath: "/pages/profile/profile",
-        shareTitle: "邀请你一起临时出逃",
+        shareTitle: "邀请你一起冲鸭去旅行",
         pendingInviteCode: "",
         autoSynced: false,
         showProfileSetup: false,
@@ -286,7 +286,7 @@ Page({
         if (!profile) {
             this.setData({
                 loggedIn: false,
-                nickname: "临时出逃用户",
+                nickname: "冲鸭旅行者",
                 avatarUrl: "",
                 openid: "",
                 profileSubtitle: "登录后可开启账号同步",
@@ -378,7 +378,7 @@ Page({
         this.setData({
             inviteCode: invite.inviteCode,
             inviteStatus: `${invite.tripName} 已准备好分享`,
-            shareTitle: `邀请你一起记录「${invite.tripName}」`,
+            shareTitle: `邀请你一起冲鸭记录「${invite.tripName}」`,
             sharePath: `/pages/profile/profile?inviteCode=${invite.inviteCode}`
         });
     },

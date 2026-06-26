@@ -1,4 +1,4 @@
-import { exportTripsForSync, importTripsFromSync } from "./trip-store";
+import { clearDeletedItemIds, exportTripsForSync, importTripsFromSync } from "./trip-store";
 import { Trip } from "../types/trip";
 
 const PROFILE_KEY = "travel-note-profile";
@@ -114,6 +114,7 @@ export async function uploadTripsToCloud(): Promise<SyncResult> {
     trips,
     memberProfile: getSyncMemberProfile()
   });
+  clearDeletedItemIds();
   updateLastSyncAt(result.updatedAt || Date.now());
   return result;
 }
@@ -132,6 +133,12 @@ export async function downloadTripsFromCloud(): Promise<SyncResult> {
 export async function syncTripsWithCloud(): Promise<SyncResult> {
   await uploadTripsToCloud();
   return downloadTripsFromCloud();
+}
+
+export async function resetMyCloudData(): Promise<SyncResult> {
+  return callCloudFunction<SyncResult>("syncTrips", {
+    action: "resetMyData"
+  });
 }
 
 export async function createTripInvite(tripId: string): Promise<InviteResult> {

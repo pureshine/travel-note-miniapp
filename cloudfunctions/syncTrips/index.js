@@ -29,6 +29,8 @@ exports.main = async (event) => {
         ...(existing?.memberProfiles || {}),
         [openid]: normalizeMemberProfile(event.memberProfile, openid)
       };
+      const deletedIds = normalizeDeletedIds(trip.syncDeletedIds);
+      const nextTrip = existing?.trip ? mergeTrip(existing.trip, stripSharedFields(trip), deletedIds) : stripSharedFields(trip);
 
       await sharedTrips.doc(trip.id).set({
         data: {
@@ -37,7 +39,7 @@ exports.main = async (event) => {
           memberOpenids: members,
           memberCount: members.length,
           memberProfiles,
-          trip: stripSharedFields(trip),
+          trip: nextTrip,
           updatedAt,
           updatedBy: openid,
           updatedByProfile: memberProfiles[openid]
@@ -72,6 +74,24 @@ exports.main = async (event) => {
       sharedTripCount: trips.length,
       updatedAt: docs[0]?.updatedAt || 0,
       memberTotal: docs.reduce((total, item) => total + (item.memberCount || 1), 0)
+    };
+  }
+
+  if (event.action === "resetMyData") {
+    await sharedTrips
+      .where({
+        memberOpenids: _.in([openid])
+      })
+      .remove();
+    await invitations
+      .where({
+        inviterOpenid: openid
+      })
+      .remove();
+    return {
+      openid,
+      reset: true,
+      updatedAt: Date.now()
     };
   }
 
@@ -189,5 +209,53 @@ function profileMapToMembers(memberProfiles) {
 function stripSharedFields(trip) {
   const nextTrip = { ...trip };
   delete nextTrip.sharedMembers;
+  delete nextTrip.syncDeletedIds;
   return nextTrip;
+}
+
+function mergeTrip(cloudTrip, incomingTrip, deletedIds) {
+  return {
+    ...cloudTrip,
+    ...incomingTrip,
+    schedules: removeDeletedItems(mergeById(cloudTrip.schedules, incomingTrip.schedules), deletedIds.schedules).sort(compareSchedule),
+    checklist: removeDeletedItems(mergeById(cloudTrip.checklist, incomingTrip.checklist), deletedIds.checklist),
+    notes: removeDeletedItems(mergeById(cloudTrip.notes, incomingTrip.notes), deletedIds.notes).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)),
+    expenses: removeDeletedItems(mergeById(cloudTrip.expenses, incomingTrip.expenses), deletedIds.expenses).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+  };
+}
+
+function mergeById(cloudItems, incomingItems) {
+  const itemMap = new Map();
+  const safeCloudItems = Array.isArray(cloudItems) ? cloudItems : [];
+  const safeIncomingItems = Array.isArray(incomingItems) ? incomingItems : [];
+  safeCloudItems.forEach((item) => {
+    if (item?.id) itemMap.set(item.id, item);
+  });
+  safeIncomingItems.forEach((item) => {
+    if (item?.id) itemMap.set(item.id, item);
+  });
+  return Array.from(itemMap.values());
+}
+
+function compareSchedule(a, b) {
+  return `${a?.day || ""} ${a?.time || ""}`.localeCompare(`${b?.day || ""} ${b?.time || ""}`);
+}
+
+function normalizeDeletedIds(deletedIds) {
+  return {
+    schedules: normalizeIdList(deletedIds?.schedules),
+    checklist: normalizeIdList(deletedIds?.checklist),
+    notes: normalizeIdList(deletedIds?.notes),
+    expenses: normalizeIdList(deletedIds?.expenses)
+  };
+}
+
+function normalizeIdList(ids) {
+  return Array.isArray(ids) ? ids.filter((id) => typeof id === "string" && id) : [];
+}
+
+function removeDeletedItems(items, deletedIds) {
+  if (!deletedIds.length) return items;
+  const deletedIdSet = new Set(deletedIds);
+  return items.filter((item) => !deletedIdSet.has(item.id));
 }
