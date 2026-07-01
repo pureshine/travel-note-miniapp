@@ -13,8 +13,8 @@
   <view class="settings-list panel">
     <button class="settings-row" bindtap="resetData">
       <view>
-        <view class="settings-title">重置示例数据</view>
-        <view class="settings-desc">恢复首屏演示用的旅行、清单和消费</view>
+        <view class="settings-title">清空旅行数据</view>
+        <view class="settings-desc">删除本机旅行、清单、备忘和消费，从 0 开始测试</view>
       </view>
       <text class="settings-arrow">›</text>
     </button>

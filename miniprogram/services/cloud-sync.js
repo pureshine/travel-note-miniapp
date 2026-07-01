@@ -66,6 +66,7 @@ async function uploadTripsToCloud() {
     const result = await callCloudFunction("syncTrips", {
         action: "upload",
         trips,
+        deletedTripIds: (0, trip_store_1.getDeletedTripIdsForSync)(),
         memberProfile: getSyncMemberProfile()
     });
     (0, trip_store_1.clearDeletedItemIds)();

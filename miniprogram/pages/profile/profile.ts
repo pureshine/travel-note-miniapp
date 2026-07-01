@@ -10,7 +10,7 @@ import {
   syncTripsWithCloud,
   updateSavedProfile
 } from "../../services/cloud-sync";
-import { getDefaultTrip, getSummary, listTrips } from "../../services/trip-store";
+import { getActiveTrip, getSummary, listTrips } from "../../services/trip-store";
 
 function formatSyncTime(timestamp?: number): string {
   if (!timestamp) return "暂未同步";
@@ -239,7 +239,11 @@ Page({
       wx.showToast({ title: "请先微信登录", icon: "none" });
       return;
     }
-    const trip = getDefaultTrip();
+    const trip = getActiveTrip();
+    if (!trip) {
+      wx.showToast({ title: "请先新建旅行", icon: "none" });
+      return;
+    }
     this.setData({
       syncing: true,
       syncStatus: "生成中",
@@ -358,17 +362,17 @@ Page({
   refreshLocalStats() {
     const trips = listTrips();
     const summary = getSummary();
-    const currentTrip = getDefaultTrip();
-    const memberNames = (currentTrip.sharedMembers || [])
+    const currentTrip = getActiveTrip();
+    const memberNames = (currentTrip?.sharedMembers || [])
       .map((member) => member.nickname)
       .filter((name) => name && name !== "未设置名字");
     this.setData({
       tripCount: trips.length,
       expenseTotal: `${summary.expenseTotal}`,
-      currentTripId: currentTrip.id,
-      currentTripName: currentTrip.name,
+      currentTripId: currentTrip ? currentTrip.id : "",
+      currentTripName: currentTrip ? currentTrip.name : "暂无旅行",
       memberNamesText: memberNames.length > 0 ? memberNames.join("、") : "",
-      inviteStatus: this.data.inviteCode ? this.data.inviteStatus : `${currentTrip.name} 可生成好友邀请`
+      inviteStatus: this.data.inviteCode ? this.data.inviteStatus : currentTrip ? `${currentTrip.name} 可生成好友邀请` : "新建旅行后可邀请好友共同记录"
     });
   },
 

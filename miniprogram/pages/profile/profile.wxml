@@ -90,7 +90,7 @@
         value="{{draftNickname}}"
         bindinput="onSetupNicknameInput"
         bindblur="onSetupNicknameBlur"
-        placeholder="比如 小陈、阿圆、Pureshine"
+        placeholder="比如 小陈、阿圆、旅行搭子"
       />
       <button class="setup-save" bindtap="saveProfileSetup">保存资料</button>
       <button class="setup-skip" bindtap="skipProfileSetup">稍后再说</button>

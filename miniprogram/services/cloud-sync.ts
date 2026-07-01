@@ -1,4 +1,4 @@
-import { clearDeletedItemIds, exportTripsForSync, importTripsFromSync } from "./trip-store";
+import { clearDeletedItemIds, exportTripsForSync, getDeletedTripIdsForSync, importTripsFromSync } from "./trip-store";
 import { Trip } from "../types/trip";
 
 const PROFILE_KEY = "travel-note-profile";
@@ -112,6 +112,7 @@ export async function uploadTripsToCloud(): Promise<SyncResult> {
   const result = await callCloudFunction<SyncResult>("syncTrips", {
     action: "upload",
     trips,
+    deletedTripIds: getDeletedTripIdsForSync(),
     memberProfile: getSyncMemberProfile()
   });
   clearDeletedItemIds();

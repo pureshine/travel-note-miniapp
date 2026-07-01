@@ -1,4 +1,4 @@
-import { createTrip, getDefaultTrip, getExpenseByCategory, getSummary, listTrips } from "../../services/trip-store";
+import { createTrip, getExpenseByCategory, getSummary, listTrips } from "../../services/trip-store";
 import { Trip, TripSummary } from "../../types/trip";
 
 Page({
@@ -18,8 +18,12 @@ Page({
   },
 
   onShow() {
+    this.refreshHomeData();
+  },
+
+  refreshHomeData() {
     const trips = listTrips();
-    const trip = trips[0] || getDefaultTrip();
+    const trip = trips[0];
     const notes = trips.flatMap((item) => item.notes);
     const categories = getExpenseByCategory().filter((item) => item.amount > 0);
     const topCategory = categories.sort((a, b) => b.amount - a.amount)[0];
@@ -27,7 +31,7 @@ Page({
       trips,
       nextTrip: trip,
       summary: getSummary(),
-      scheduleCount: trip.schedules.length,
+      scheduleCount: trip ? trip.schedules.length : 0,
       memoDone: notes.filter((item) => item.done).length,
       memoTotal: notes.length,
       topCategory: topCategory ? topCategory.category : "暂无"

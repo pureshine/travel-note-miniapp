@@ -7,6 +7,10 @@ Page({
   },
 
   onShow() {
+    this.refreshTripList();
+  },
+
+  refreshTripList() {
     this.setData({ trips: listTrips() });
   },
 

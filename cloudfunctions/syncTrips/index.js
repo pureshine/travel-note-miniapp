@@ -19,10 +19,19 @@ exports.main = async (event) => {
 
   if (event.action === "upload") {
     const trips = Array.isArray(event.trips) ? event.trips : [];
+    const deletedTripIds = normalizeIdList(event.deletedTripIds);
     const updatedAt = Date.now();
+
+    for (const tripId of deletedTripIds) {
+      const existing = await getSharedTrip(tripId);
+      if (existing && Array.isArray(existing.memberOpenids) && existing.memberOpenids.includes(openid)) {
+        await sharedTrips.doc(tripId).remove();
+      }
+    }
 
     for (const trip of trips) {
       if (!trip || !trip.id) continue;
+      if (deletedTripIds.includes(trip.id)) continue;
       const existing = await getSharedTrip(trip.id);
       const members = existing ? ensureMember(existing.memberOpenids, openid) : [openid];
       const memberProfiles = {
@@ -51,6 +60,7 @@ exports.main = async (event) => {
       openid,
       tripCount: trips.length,
       sharedTripCount: trips.length,
+      deletedTripCount: deletedTripIds.length,
       updatedAt
     };
   }

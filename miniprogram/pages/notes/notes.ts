@@ -1,6 +1,6 @@
 import {
   deleteNote,
-  getDefaultTrip,
+  getActiveTrip,
   getNoteCategories,
   getTrip,
   listTrips,
@@ -34,15 +34,15 @@ Page({
   },
 
   loadSelectedTrip() {
-    const trip = getDefaultTrip();
+    const trip = getActiveTrip();
     const trips = listTrips();
     this.setData({
-      tripId: trip.id,
+      tripId: trip ? trip.id : "",
       trip,
       trips,
       tripNames: trips.map((item) => item.name),
-      activeTripIndex: Math.max(trips.findIndex((item) => item.id === trip.id), 0),
-      filteredNotes: this.filterNotes(trip.notes, this.data.selectedFilter)
+      activeTripIndex: trip ? Math.max(trips.findIndex((item) => item.id === trip.id), 0) : 0,
+      filteredNotes: this.filterNotes(trip ? trip.notes : [], this.data.selectedFilter)
     });
   },
 
@@ -76,6 +76,10 @@ Page({
   },
 
   goNoteForm() {
+    if (!this.data.tripId) {
+      wx.navigateTo({ url: "/pages/trip-form/trip-form" });
+      return;
+    }
     wx.navigateTo({ url: `/pages/note-form/note-form?tripId=${this.data.tripId}` });
   },
 

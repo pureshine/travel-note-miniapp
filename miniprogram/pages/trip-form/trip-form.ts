@@ -1,4 +1,5 @@
 import { createTrip, getTrip, updateTripInfo } from "../../services/trip-store";
+import { getSavedProfile, syncTripsWithCloud } from "../../services/cloud-sync";
 import { today } from "../../utils/date";
 
 Page({
@@ -49,7 +50,7 @@ Page({
     this.setData({ endDate: event.detail.value });
   },
 
-  saveTrip() {
+  async saveTrip() {
     if (this.data.saving) return;
     const destination = this.data.destination.trim();
     const name = this.data.name.trim() || `${destination || "新的"}旅行`;
@@ -68,6 +69,13 @@ Page({
       updateTripInfo(this.data.tripId, input);
     } else {
       createTrip(input);
+    }
+    if (getSavedProfile()) {
+      try {
+        await syncTripsWithCloud();
+      } catch (error) {
+        console.error("旅行同步失败", error);
+      }
     }
     wx.navigateBack();
   }

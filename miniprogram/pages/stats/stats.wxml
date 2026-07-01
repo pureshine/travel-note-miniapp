@@ -13,7 +13,7 @@
   </view>
 
   <view class="ledger-hero panel">
-    <view class="budget-card" bindtap="goBudgetForm">
+    <view class="budget-card" style="{{budgetRingStyle}}" bindtap="goBudgetForm">
       <view class="budget-ring">
         <view class="ring-value">{{budgetPercent}}%</view>
       </view>

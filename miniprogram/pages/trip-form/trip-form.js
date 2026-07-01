@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const trip_store_1 = require("../../services/trip-store");
+const cloud_sync_1 = require("../../services/cloud-sync");
 const date_1 = require("../../utils/date");
 Page({
     data: {
@@ -46,7 +47,7 @@ Page({
     onEndDateChange(event) {
         this.setData({ endDate: event.detail.value });
     },
-    saveTrip() {
+    async saveTrip() {
         if (this.data.saving)
             return;
         const destination = this.data.destination.trim();
@@ -67,6 +68,14 @@ Page({
         }
         else {
             (0, trip_store_1.createTrip)(input);
+        }
+        if ((0, cloud_sync_1.getSavedProfile)()) {
+            try {
+                await (0, cloud_sync_1.syncTripsWithCloud)();
+            }
+            catch (error) {
+                console.error("旅行同步失败", error);
+            }
         }
         wx.navigateBack();
     }

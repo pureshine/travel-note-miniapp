@@ -26,19 +26,19 @@ Page({
     },
     loadTrip() {
         const trips = (0, trip_store_1.listTrips)();
-        const trip = (0, trip_store_1.getDefaultTrip)();
-        const schedules = this.toScheduleViews(trip.schedules);
-        const tripStatus = getTripStatus(trip);
+        const trip = (0, trip_store_1.getActiveTrip)();
+        const schedules = this.toScheduleViews(trip ? trip.schedules : []);
+        const tripStatus = trip ? getTripStatus(trip) : "待出发";
         this.setData({
             trip,
             trips,
             tripOptions: trips.map((item) => formatTripOption(item)),
-            activeTripIndex: Math.max(trips.findIndex((item) => item.id === trip.id), 0),
+            activeTripIndex: trip ? Math.max(trips.findIndex((item) => item.id === trip.id), 0) : 0,
             tripStatus,
             tripStatusClass: getTripStatusClass(tripStatus),
             schedules,
             scheduleGroups: this.groupSchedulesByYear(schedules),
-            travelTip: createTravelTip(trip, schedules.length)
+            travelTip: trip ? createTravelTip(trip, schedules.length) : createEmptyTravelTip()
         });
     },
     onTripChange(event) {
@@ -208,5 +208,14 @@ function createTravelTip(trip, scheduleCount) {
         subtitle: dateText,
         metaTop: `${scheduleCount} 项日程`,
         metaBottom: trip.destination ? "目的地已定" : "轻松规划"
+    };
+}
+function createEmptyTravelTip() {
+    return {
+        icon: "鸭",
+        title: "准备冲鸭",
+        subtitle: "先新建一个旅行计划",
+        metaTop: "0 项日程",
+        metaBottom: "从 0 开始"
     };
 }

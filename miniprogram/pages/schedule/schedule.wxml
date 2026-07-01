@@ -1,4 +1,4 @@
-<view class="page schedule-page" wx:if="{{trip}}">
+<view class="page schedule-page">
   <view class="tip-card panel">
     <view class="tip-icon">
       <image class="tip-icon-duck" src="/assets/illustrations/duck-travel-sticker.png" mode="aspectFit" />
@@ -13,7 +13,7 @@
     </view>
   </view>
 
-  <view class="plan-card panel">
+  <view wx:if="{{trip}}" class="plan-card panel">
     <view class="plan-main">
       <picker class="plan-picker" mode="selector" range="{{tripOptions}}" value="{{activeTripIndex}}" bindchange="onTripChange">
         <view class="plan-pill">
@@ -30,11 +30,15 @@
     </view>
     <button class="quick-add" bindtap="goScheduleForm">+ 添加日程</button>
   </view>
+  <view wx:else class="plan-card panel">
+    <view class="empty">还没有旅行计划</view>
+    <button class="quick-add" bindtap="goTripForm">+ 新建旅行</button>
+  </view>
 
   <view class="section-title">
     <text>行程时间轴</text>
   </view>
-  <view class="timeline panel">
+  <view wx:if="{{trip}}" class="timeline panel">
     <view wx:for="{{scheduleGroups}}" wx:for-item="group" wx:key="year" class="year-group">
       <view class="year-label">{{group.year}}</view>
       <view wx:for="{{group.items}}" wx:for-item="item" wx:key="id" class="timeline-row {{item.active ? 'active' : ''}}">

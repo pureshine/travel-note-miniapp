@@ -10,7 +10,7 @@
 
   <view class="form-card panel">
     <view class="field-label">显示名字</view>
-    <input class="name-input" value="{{nickname}}" bindinput="onNameInput" maxlength="16" placeholder="比如 小陈、阿圆、Pureshine" />
+    <input class="name-input" value="{{nickname}}" bindinput="onNameInput" maxlength="16" placeholder="比如 小陈、阿圆、旅行搭子" />
 
     <view class="info-row">
       <text>最近同步</text>

@@ -14,6 +14,7 @@ Page({
         budget: 10000,
         remaining: 0,
         budgetPercent: 0,
+        budgetRingStyle: "",
         expenseTouchStartX: 0,
         openExpenseId: "",
         recentExpenses: [],
@@ -33,19 +34,20 @@ Page({
         this.loadSelectedTrip();
     },
     loadSelectedTrip() {
-        const trip = (0, trip_store_1.getDefaultTrip)();
         const trips = (0, trip_store_1.listTrips)();
-        const expenses = trip.expenses;
+        const trip = (0, trip_store_1.getActiveTrip)();
+        const expenses = trip ? trip.expenses : [];
         const expenseTotal = expenses.reduce((sum, item) => sum + item.amount, 0);
         const categories = getCategories(expenses, expenseTotal);
-        const budget = trip.budget || 10000;
+        const budget = trip?.budget || 10000;
+        const budgetPercent = Math.min(Math.round((expenseTotal / budget) * 100), 100);
         const selectedDateKey = this.data.selectedDateKey || formatDateKey(new Date());
         const calendarMonth = this.data.calendarMonth || selectedDateKey.slice(0, 7);
         const selectedDateExpenses = getExpensesByDate(expenses, selectedDateKey);
         this.setData({
             trips,
             tripNames: trips.map((item) => item.name),
-            activeTripIndex: Math.max(trips.findIndex((item) => item.id === trip.id), 0),
+            activeTripIndex: trip ? Math.max(trips.findIndex((item) => item.id === trip.id), 0) : 0,
             trip,
             expenseTotal,
             categories,
@@ -53,7 +55,8 @@ Page({
             averageExpense: expenses.length > 0 ? Math.round(expenseTotal / expenses.length) : 0,
             budget,
             remaining: Math.max(budget - expenseTotal, 0),
-            budgetPercent: Math.min(Math.round((expenseTotal / budget) * 100), 100),
+            budgetPercent,
+            budgetRingStyle: getRingStyle(budgetPercent),
             recentExpenses: expenses.slice(0, 4),
             selectedDateKey,
             selectedDateTitle: formatDateTitle(selectedDateKey),
@@ -75,13 +78,17 @@ Page({
         this.loadSelectedTrip();
     },
     goExpenseForm() {
-        if (!this.data.trip)
+        if (!this.data.trip) {
+            wx.navigateTo({ url: "/pages/trip-form/trip-form" });
             return;
+        }
         wx.navigateTo({ url: `/pages/expense-form/expense-form?tripId=${this.data.trip.id}&date=${this.data.selectedDateKey}` });
     },
     goBudgetForm() {
-        if (!this.data.trip)
+        if (!this.data.trip) {
+            wx.navigateTo({ url: "/pages/trip-form/trip-form" });
             return;
+        }
         wx.navigateTo({ url: `/pages/budget-form/budget-form?tripId=${this.data.trip.id}` });
     },
     selectCalendarDay(event) {
@@ -182,6 +189,9 @@ function getCategories(expenses, total) {
             percent
         };
     });
+}
+function getRingStyle(percent) {
+    return `background: conic-gradient(#ff6500 0% ${percent}%, #ffe7d2 ${percent}% 100%);`;
 }
 function buildCalendarDays(expenses, selectedDateKey, calendarMonth) {
     const currentMonth = parseMonth(calendarMonth);

@@ -24,15 +24,15 @@ Page({
         this.loadSelectedTrip();
     },
     loadSelectedTrip() {
-        const trip = (0, trip_store_1.getDefaultTrip)();
+        const trip = (0, trip_store_1.getActiveTrip)();
         const trips = (0, trip_store_1.listTrips)();
         this.setData({
-            tripId: trip.id,
+            tripId: trip ? trip.id : "",
             trip,
             trips,
             tripNames: trips.map((item) => item.name),
-            activeTripIndex: Math.max(trips.findIndex((item) => item.id === trip.id), 0),
-            filteredNotes: this.filterNotes(trip.notes, this.data.selectedFilter)
+            activeTripIndex: trip ? Math.max(trips.findIndex((item) => item.id === trip.id), 0) : 0,
+            filteredNotes: this.filterNotes(trip ? trip.notes : [], this.data.selectedFilter)
         });
     },
     loadTrip(tripId) {
@@ -63,6 +63,10 @@ Page({
         });
     },
     goNoteForm() {
+        if (!this.data.tripId) {
+            wx.navigateTo({ url: "/pages/trip-form/trip-form" });
+            return;
+        }
         wx.navigateTo({ url: `/pages/note-form/note-form?tripId=${this.data.tripId}` });
     },
     editNoteItem(event) {

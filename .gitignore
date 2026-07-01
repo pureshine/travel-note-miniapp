@@ -14,3 +14,4 @@ project.private.config.json
 # Secrets
 .env
 .env.*
+.ai-tracker

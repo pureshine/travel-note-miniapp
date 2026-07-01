@@ -6,6 +6,9 @@ Page({
         trips: []
     },
     onShow() {
+        this.refreshTripList();
+    },
+    refreshTripList() {
         this.setData({ trips: (0, trip_store_1.listTrips)() });
     },
     openTrip(event) {

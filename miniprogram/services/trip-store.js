@@ -1,14 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getNoteCategories = exports.getScheduleCategories = exports.setActiveTripId = exports.getDefaultTrip = exports.importTripsFromSync = exports.clearDeletedItemIds = exports.exportTripsForSync = exports.resetDemoData = exports.getExpenseByCategory = exports.getSummary = exports.deleteExpense = exports.updateExpense = exports.addExpense = exports.deleteNote = exports.toggleNoteItem = exports.updateNote = exports.addNote = exports.toggleChecklistItem = exports.addChecklistItem = exports.deleteSchedule = exports.updateSchedule = exports.addSchedule = exports.deleteTrip = exports.updateTripBudget = exports.updateTripInfo = exports.createTrip = exports.getTrip = exports.listTrips = void 0;
+exports.getNoteCategories = exports.getScheduleCategories = exports.setActiveTripId = exports.getActiveTrip = exports.getDefaultTrip = exports.importTripsFromSync = exports.getDeletedTripIdsForSync = exports.clearDeletedItemIds = exports.exportTripsForSync = exports.resetDemoData = exports.getExpenseByCategory = exports.getSummary = exports.deleteExpense = exports.updateExpense = exports.addExpense = exports.deleteNote = exports.toggleNoteItem = exports.updateNote = exports.addNote = exports.toggleChecklistItem = exports.addChecklistItem = exports.deleteSchedule = exports.updateSchedule = exports.addSchedule = exports.deleteTrip = exports.updateTripBudget = exports.updateTripInfo = exports.createTrip = exports.getTrip = exports.listTrips = void 0;
 const id_1 = require("../utils/id");
 const date_1 = require("../utils/date");
 const STORAGE_KEY = "travel-note-trips";
 const ACTIVE_TRIP_KEY = "travel-note-active-trip-id";
 const PROFILE_KEY = "travel-note-profile";
 const DELETED_ITEMS_KEY = "travel-note-deleted-item-ids";
+const DELETED_TRIPS_KEY = "travel-note-deleted-trip-ids";
+const DATA_UPDATED_AT_KEY = "travel-note-data-updated-at";
 const DATA_RESET_VERSION_KEY = "travel-note-data-reset-version";
-const CURRENT_DATA_RESET_VERSION = 2;
+const CURRENT_DATA_RESET_VERSION = 3;
 let autoSyncTimer;
 function seedTrips() {
     return [];
@@ -26,6 +28,7 @@ function writeTrips(trips, options) {
     wx.setStorageSync(STORAGE_KEY, trips);
     if (!options?.skipAutoSync)
         scheduleAutoSync(trips.map(normalizeTrip));
+    notifyTripDataChanged();
     return trips;
 }
 function resetLocalDataOnce() {
@@ -35,6 +38,7 @@ function resetLocalDataOnce() {
     wx.setStorageSync(STORAGE_KEY, []);
     wx.removeStorageSync(ACTIVE_TRIP_KEY);
     wx.removeStorageSync(DELETED_ITEMS_KEY);
+    wx.removeStorageSync(DELETED_TRIPS_KEY);
     wx.setStorageSync(DATA_RESET_VERSION_KEY, CURRENT_DATA_RESET_VERSION);
 }
 function scheduleAutoSync(trips) {
@@ -49,6 +53,7 @@ function scheduleAutoSync(trips) {
             data: {
                 action: "upload",
                 trips,
+                deletedTripIds: readDeletedTripIds(),
                 memberProfile: getSyncMemberProfile(profile)
             },
             success: (res) => {
@@ -133,6 +138,7 @@ function updateTripBudget(tripId, budget) {
 }
 exports.updateTripBudget = updateTripBudget;
 function deleteTrip(tripId) {
+    markDeletedTrip(tripId);
     const trips = readTrips().filter((trip) => trip.id !== tripId);
     writeTrips(trips);
     const nextTrip = trips[0];
@@ -270,7 +276,13 @@ function getExpenseByCategory() {
 }
 exports.getExpenseByCategory = getExpenseByCategory;
 function resetDemoData() {
-    writeTrips(seedTrips());
+    wx.setStorageSync(STORAGE_KEY, []);
+    wx.removeStorageSync(ACTIVE_TRIP_KEY);
+    wx.removeStorageSync(DELETED_ITEMS_KEY);
+    wx.removeStorageSync(DELETED_TRIPS_KEY);
+    wx.setStorageSync(DATA_RESET_VERSION_KEY, CURRENT_DATA_RESET_VERSION);
+    scheduleAutoSync([]);
+    notifyTripDataChanged();
 }
 exports.resetDemoData = resetDemoData;
 function exportTripsForSync() {
@@ -283,8 +295,13 @@ function exportTripsForSync() {
 exports.exportTripsForSync = exportTripsForSync;
 function clearDeletedItemIds() {
     wx.removeStorageSync(DELETED_ITEMS_KEY);
+    wx.removeStorageSync(DELETED_TRIPS_KEY);
 }
 exports.clearDeletedItemIds = clearDeletedItemIds;
+function getDeletedTripIdsForSync() {
+    return readDeletedTripIds();
+}
+exports.getDeletedTripIdsForSync = getDeletedTripIdsForSync;
 function importTripsFromSync(trips) {
     const normalizedTrips = trips.map(normalizeTrip);
     const localTrips = readTrips().map(normalizeTrip);
@@ -311,6 +328,12 @@ function getDefaultTrip() {
     return createTrip();
 }
 exports.getDefaultTrip = getDefaultTrip;
+function getActiveTrip() {
+    const activeTripId = wx.getStorageSync(ACTIVE_TRIP_KEY);
+    const trips = listTrips();
+    return trips.find((trip) => trip.id === activeTripId) || trips[0];
+}
+exports.getActiveTrip = getActiveTrip;
 function setActiveTripId(tripId) {
     wx.setStorageSync(ACTIVE_TRIP_KEY, tripId);
 }
@@ -381,6 +404,46 @@ function mergeById(localItems, cloudItems) {
 function readDeletedItemIds() {
     const stored = wx.getStorageSync(DELETED_ITEMS_KEY);
     return stored && typeof stored === "object" ? stored : {};
+}
+function readDeletedTripIds() {
+    const stored = wx.getStorageSync(DELETED_TRIPS_KEY);
+    return Array.isArray(stored) ? stored.filter((id) => typeof id === "string" && id) : [];
+}
+function markDeletedTrip(tripId) {
+    const deletedTripIds = readDeletedTripIds();
+    wx.setStorageSync(DELETED_TRIPS_KEY, Array.from(new Set([...deletedTripIds, tripId])));
+    const deletedItems = readDeletedItemIds();
+    if (deletedItems[tripId]) {
+        const nextDeletedItems = { ...deletedItems };
+        delete nextDeletedItems[tripId];
+        wx.setStorageSync(DELETED_ITEMS_KEY, nextDeletedItems);
+    }
+}
+function notifyTripDataChanged() {
+    wx.setStorageSync(DATA_UPDATED_AT_KEY, Date.now());
+    const pages = typeof getCurrentPages === "function" ? getCurrentPages() : [];
+    pages.forEach((page) => {
+        const route = typeof page.route === "string" ? page.route : "";
+        if (route === "pages/index/index" && typeof page.refreshHomeData === "function") {
+            page.refreshHomeData();
+            return;
+        }
+        if (route === "pages/trips/trips" && typeof page.refreshTripList === "function") {
+            page.refreshTripList();
+            return;
+        }
+        if (route === "pages/schedule/schedule" && typeof page.loadTrip === "function") {
+            page.loadTrip();
+            return;
+        }
+        if ((route === "pages/notes/notes" || route === "pages/stats/stats" || route === "pages/expenses/expenses") && typeof page.loadSelectedTrip === "function") {
+            page.loadSelectedTrip();
+            return;
+        }
+        if (route === "pages/profile/profile" && typeof page.refreshLocalStats === "function") {
+            page.refreshLocalStats();
+        }
+    });
 }
 function markDeletedItem(tripId, collection, itemId) {
     const deletedItems = readDeletedItemIds();

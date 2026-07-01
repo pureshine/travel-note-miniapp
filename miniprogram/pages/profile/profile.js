@@ -238,7 +238,11 @@ Page({
             wx.showToast({ title: "请先微信登录", icon: "none" });
             return;
         }
-        const trip = (0, trip_store_1.getDefaultTrip)();
+        const trip = (0, trip_store_1.getActiveTrip)();
+        if (!trip) {
+            wx.showToast({ title: "请先新建旅行", icon: "none" });
+            return;
+        }
         this.setData({
             syncing: true,
             syncStatus: "生成中",
@@ -354,17 +358,17 @@ Page({
     refreshLocalStats() {
         const trips = (0, trip_store_1.listTrips)();
         const summary = (0, trip_store_1.getSummary)();
-        const currentTrip = (0, trip_store_1.getDefaultTrip)();
-        const memberNames = (currentTrip.sharedMembers || [])
+        const currentTrip = (0, trip_store_1.getActiveTrip)();
+        const memberNames = (currentTrip?.sharedMembers || [])
             .map((member) => member.nickname)
             .filter((name) => name && name !== "未设置名字");
         this.setData({
             tripCount: trips.length,
             expenseTotal: `${summary.expenseTotal}`,
-            currentTripId: currentTrip.id,
-            currentTripName: currentTrip.name,
+            currentTripId: currentTrip ? currentTrip.id : "",
+            currentTripName: currentTrip ? currentTrip.name : "暂无旅行",
             memberNamesText: memberNames.length > 0 ? memberNames.join("、") : "",
-            inviteStatus: this.data.inviteCode ? this.data.inviteStatus : `${currentTrip.name} 可生成好友邀请`
+            inviteStatus: this.data.inviteCode ? this.data.inviteStatus : currentTrip ? `${currentTrip.name} 可生成好友邀请` : "新建旅行后可邀请好友共同记录"
         });
     },
     applySyncResult(tripCount, updatedAt) {

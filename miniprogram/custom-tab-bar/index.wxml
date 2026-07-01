@@ -1,0 +1,13 @@
+<view class="duck-tabbar">
+  <view
+    wx:for="{{list}}"
+    wx:key="pagePath"
+    class="duck-tabbar-item {{selected === index ? 'duck-tabbar-item-active' : ''}}"
+    data-path="{{item.pagePath}}"
+    data-index="{{index}}"
+    bindtap="switchTab"
+  >
+    <image class="duck-tabbar-icon" src="{{selected === index ? item.selectedIconPath : item.iconPath}}" mode="aspectFit" />
+    <text class="duck-tabbar-text">{{item.text}}</text>
+  </view>
+</view>

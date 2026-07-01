@@ -1,0 +1,53 @@
+.duck-tabbar {
+  position: fixed;
+  right: 32rpx;
+  bottom: calc(20rpx + env(safe-area-inset-bottom));
+  left: 32rpx;
+  z-index: 99;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  height: 116rpx;
+  padding: 10rpx 28rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.92);
+  border-radius: 54rpx;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 8rpx 32rpx rgba(0, 0, 0, 0.03),
+    0 16rpx 64rpx rgba(255, 122, 0, 0.05);
+}
+
+.duck-tabbar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 112rpx;
+  height: 92rpx;
+  border-radius: 34rpx;
+  transition: transform 0.16s ease;
+}
+
+.duck-tabbar-icon {
+  width: 46rpx;
+  height: 46rpx;
+}
+
+.duck-tabbar-text {
+  margin-top: 8rpx;
+  color: #8a93a3;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  font-size: 22rpx;
+  font-weight: 750;
+  line-height: 28rpx;
+}
+
+.duck-tabbar-item-active .duck-tabbar-text {
+  color: #ff6500;
+  font-weight: 900;
+}
+
+.duck-tabbar-item-active {
+  transform: translateY(-4rpx);
+}

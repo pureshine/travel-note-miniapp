@@ -1,4 +1,4 @@
-<view class="page" wx:if="{{trip}}">
+<view class="page">
   <view class="memo-title-row">
     <view>
       <view class="title">备忘</view>
@@ -13,7 +13,7 @@
     </view>
   </view>
 
-  <view class="plan-switch panel">
+  <view wx:if="{{trip}}" class="plan-switch panel">
     <picker mode="selector" range="{{tripNames}}" value="{{activeTripIndex}}" bindchange="onTripChange">
       <view class="plan-picker">
         <view class="plan-dot"></view>
@@ -24,6 +24,9 @@
         <view class="plan-change">切换 ▾</view>
       </view>
     </picker>
+  </view>
+  <view wx:else class="plan-switch panel">
+    <button class="memo-add" bindtap="goNoteForm">+ 新建旅行后添加备忘</button>
   </view>
 
   <scroll-view class="filter-scroll" scroll-x>

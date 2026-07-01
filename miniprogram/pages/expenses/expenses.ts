@@ -1,4 +1,4 @@
-import { addExpense, deleteExpense as removeExpense, getDefaultTrip, getTrip, listTrips, setActiveTripId } from "../../services/trip-store";
+import { addExpense, deleteExpense as removeExpense, getActiveTrip, getTrip, listTrips, setActiveTripId } from "../../services/trip-store";
 import { getSavedProfile } from "../../services/cloud-sync";
 import { ExpenseCategory, Trip } from "../../types/trip";
 
@@ -33,7 +33,18 @@ Page({
   },
 
   loadSelectedTrip() {
-    const trip = getDefaultTrip();
+    const trip = getActiveTrip();
+    if (!trip) {
+      this.setData({
+        tripId: "",
+        trip: undefined,
+        trips: listTrips(),
+        tripNames: [],
+        activeTripIndex: 0,
+        total: 0
+      });
+      return;
+    }
     this.loadTrip(trip.id);
   },
 
@@ -77,6 +88,10 @@ Page({
   },
 
   addItem() {
+    if (!this.data.tripId) {
+      wx.navigateTo({ url: "/pages/trip-form/trip-form" });
+      return;
+    }
     const title = this.data.title.trim();
     const amount = Number(this.data.amount);
     if (!title || !Number.isFinite(amount) || amount <= 0) {

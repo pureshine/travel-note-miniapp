@@ -17,8 +17,11 @@ Page({
         topCategory: "暂无"
     },
     onShow() {
+        this.refreshHomeData();
+    },
+    refreshHomeData() {
         const trips = (0, trip_store_1.listTrips)();
-        const trip = trips[0] || (0, trip_store_1.getDefaultTrip)();
+        const trip = trips[0];
         const notes = trips.flatMap((item) => item.notes);
         const categories = (0, trip_store_1.getExpenseByCategory)().filter((item) => item.amount > 0);
         const topCategory = categories.sort((a, b) => b.amount - a.amount)[0];
@@ -26,7 +29,7 @@ Page({
             trips,
             nextTrip: trip,
             summary: (0, trip_store_1.getSummary)(),
-            scheduleCount: trip.schedules.length,
+            scheduleCount: trip ? trip.schedules.length : 0,
             memoDone: notes.filter((item) => item.done).length,
             memoTotal: notes.length,
             topCategory: topCategory ? topCategory.category : "暂无"

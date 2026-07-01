@@ -1,4 +1,4 @@
-import { deleteSchedule, deleteTrip as removeTrip, getDefaultTrip, listTrips, setActiveTripId } from "../../services/trip-store";
+import { deleteSchedule, deleteTrip as removeTrip, getActiveTrip, listTrips, setActiveTripId } from "../../services/trip-store";
 import { ScheduleItem, Trip } from "../../types/trip";
 
 type ScheduleStatus = "已完成" | "进行中" | "待进行";
@@ -48,19 +48,19 @@ Page({
 
   loadTrip() {
     const trips = listTrips();
-    const trip = getDefaultTrip();
-    const schedules = this.toScheduleViews(trip.schedules);
-    const tripStatus = getTripStatus(trip);
+    const trip = getActiveTrip();
+    const schedules = this.toScheduleViews(trip ? trip.schedules : []);
+    const tripStatus = trip ? getTripStatus(trip) : "待出发";
     this.setData({
       trip,
       trips,
       tripOptions: trips.map((item) => formatTripOption(item)),
-      activeTripIndex: Math.max(trips.findIndex((item) => item.id === trip.id), 0),
+      activeTripIndex: trip ? Math.max(trips.findIndex((item) => item.id === trip.id), 0) : 0,
       tripStatus,
       tripStatusClass: getTripStatusClass(tripStatus),
       schedules,
       scheduleGroups: this.groupSchedulesByYear(schedules),
-      travelTip: createTravelTip(trip, schedules.length)
+      travelTip: trip ? createTravelTip(trip, schedules.length) : createEmptyTravelTip()
     });
   },
 
@@ -231,5 +231,15 @@ function createTravelTip(trip: Trip, scheduleCount: number): TravelTipView {
     subtitle: dateText,
     metaTop: `${scheduleCount} 项日程`,
     metaBottom: trip.destination ? "目的地已定" : "轻松规划"
+  };
+}
+
+function createEmptyTravelTip(): TravelTipView {
+  return {
+    icon: "鸭",
+    title: "准备冲鸭",
+    subtitle: "先新建一个旅行计划",
+    metaTop: "0 项日程",
+    metaBottom: "从 0 开始"
   };
 }

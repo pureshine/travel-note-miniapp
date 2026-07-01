@@ -8,6 +8,7 @@ declare const wx: WechatMiniprogram.Wx;
 declare const App: WechatMiniprogram.App.Constructor;
 declare const Page: WechatMiniprogram.Page.Constructor;
 declare const getApp: WechatMiniprogram.GetApp;
+declare const getCurrentPages: () => Array<Record<string, unknown>>;
 
 declare namespace WechatMiniprogram {
   interface Wx {

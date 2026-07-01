@@ -30,7 +30,18 @@ Page({
         this.loadSelectedTrip();
     },
     loadSelectedTrip() {
-        const trip = (0, trip_store_1.getDefaultTrip)();
+        const trip = (0, trip_store_1.getActiveTrip)();
+        if (!trip) {
+            this.setData({
+                tripId: "",
+                trip: undefined,
+                trips: (0, trip_store_1.listTrips)(),
+                tripNames: [],
+                activeTripIndex: 0,
+                total: 0
+            });
+            return;
+        }
         this.loadTrip(trip.id);
     },
     loadTrip(tripId) {
@@ -68,6 +79,10 @@ Page({
         this.setData({ category: this.data.categories[index] });
     },
     addItem() {
+        if (!this.data.tripId) {
+            wx.navigateTo({ url: "/pages/trip-form/trip-form" });
+            return;
+        }
         const title = this.data.title.trim();
         const amount = Number(this.data.amount);
         if (!title || !Number.isFinite(amount) || amount <= 0) {
