@@ -11,6 +11,7 @@ import {
   updateSavedProfile
 } from "../../services/cloud-sync";
 import { getActiveTrip, getSummary, listTrips } from "../../services/trip-store";
+import { getCustomNavStyle, getSafeTopStyle } from "../../utils/ui";
 
 function formatSyncTime(timestamp?: number): string {
   if (!timestamp) return "暂未同步";
@@ -24,6 +25,8 @@ function formatSyncTime(timestamp?: number): string {
 
 Page({
   data: {
+    safeTopStyle: getSafeTopStyle(14),
+    customNavStyle: getCustomNavStyle(),
     loggedIn: false,
     nickname: "冲鸭旅行者",
     avatarUrl: "",

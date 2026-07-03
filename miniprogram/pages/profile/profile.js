@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const cloud_sync_1 = require("../../services/cloud-sync");
 const trip_store_1 = require("../../services/trip-store");
+const ui_1 = require("../../utils/ui");
 function formatSyncTime(timestamp) {
     if (!timestamp)
         return "暂未同步";
@@ -14,6 +15,8 @@ function formatSyncTime(timestamp) {
 }
 Page({
     data: {
+        safeTopStyle: (0, ui_1.getSafeTopStyle)(14),
+        customNavStyle: (0, ui_1.getCustomNavStyle)(),
         loggedIn: false,
         nickname: "冲鸭旅行者",
         avatarUrl: "",

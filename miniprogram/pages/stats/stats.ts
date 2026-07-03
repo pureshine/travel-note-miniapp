@@ -1,5 +1,6 @@
 import { deleteExpense as removeExpense, getActiveTrip, listTrips, setActiveTripId } from "../../services/trip-store";
 import { ExpenseCategory, ExpenseItem, Trip } from "../../types/trip";
+import { getCustomNavStyle, getSafeTopStyle } from "../../utils/ui";
 
 type CalendarDay = {
   dateKey: string;
@@ -19,6 +20,8 @@ type DailyBar = {
 
 Page({
   data: {
+    safeTopStyle: getSafeTopStyle(14),
+    customNavStyle: getCustomNavStyle(),
     trips: [] as Trip[],
     tripNames: [] as string[],
     activeTripIndex: 0,

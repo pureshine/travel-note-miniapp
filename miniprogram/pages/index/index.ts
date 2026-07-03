@@ -1,8 +1,11 @@
 import { createTrip, getExpenseByCategory, getSummary, listTrips } from "../../services/trip-store";
 import { Trip, TripSummary } from "../../types/trip";
+import { getCustomNavStyle, getSafeTopStyle } from "../../utils/ui";
 
 Page({
   data: {
+    safeTopStyle: getSafeTopStyle(14),
+    customNavStyle: getCustomNavStyle(),
     trips: [] as Trip[],
     summary: {
       tripCount: 0,

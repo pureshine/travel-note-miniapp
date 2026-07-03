@@ -1,8 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const trip_store_1 = require("../../services/trip-store");
+const ui_1 = require("../../utils/ui");
 Page({
     data: {
+        safeTopStyle: (0, ui_1.getSafeTopStyle)(14),
+        customNavStyle: (0, ui_1.getCustomNavStyle)(),
         trip: undefined,
         trips: [],
         tripOptions: [],
@@ -93,6 +96,16 @@ Page({
         if (!this.data.trip)
             return;
         wx.navigateTo({ url: `/pages/schedule-form/schedule-form?tripId=${this.data.trip.id}` });
+    },
+    previewScheduleImage(event) {
+        const schedule = this.data.schedules.find((item) => item.id === event.currentTarget.dataset.id);
+        if (!schedule || schedule.images.length === 0)
+            return;
+        const index = Number(event.currentTarget.dataset.index) || 0;
+        wx.previewImage({
+            urls: schedule.images,
+            current: schedule.images[Math.min(Math.max(index, 0), schedule.images.length - 1)]
+        });
     },
     onScheduleTouchStart(event) {
         this.setData({

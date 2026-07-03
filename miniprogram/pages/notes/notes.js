@@ -1,8 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const trip_store_1 = require("../../services/trip-store");
+const ui_1 = require("../../utils/ui");
 Page({
     data: {
+        safeTopStyle: (0, ui_1.getSafeTopStyle)(14),
+        customNavStyle: (0, ui_1.getCustomNavStyle)(),
         tripId: "",
         trip: undefined,
         trips: [],

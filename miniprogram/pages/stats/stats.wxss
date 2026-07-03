@@ -493,3 +493,275 @@
   font-size: 24rpx;
   font-weight: 850;
 }
+
+/* Design refresh: budget dashboard, calendar and transaction list. */
+.stats-page {
+  position: relative;
+}
+
+.brand-row {
+  display: flex;
+  align-items: center;
+  min-height: 76rpx;
+  margin-bottom: 20rpx;
+}
+
+.plan-switch,
+.ledger-hero,
+.calendar-card,
+.recent-card,
+.category-chip {
+  border-radius: 36rpx;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 8rpx 32rpx rgba(0, 0, 0, 0.03),
+    0 16rpx 64rpx rgba(255, 122, 0, 0.05);
+}
+
+.plan-picker {
+  min-height: 84rpx;
+  border-radius: 28rpx;
+  background: #f8fafc;
+}
+
+.plan-dot {
+  background: #ff6500;
+  box-shadow: 0 0 0 8rpx rgba(255, 101, 0, 0.13);
+}
+
+.plan-label,
+.budget-sub,
+.budget-side,
+.calendar-sub,
+.recent-meta,
+.chip-head {
+  color: #7d8593;
+}
+
+.plan-name,
+.budget-title,
+.budget-total,
+.calendar-title,
+.recent-title,
+.chip-amount {
+  color: #111827;
+}
+
+.plan-change,
+.budget-edit,
+.calendar-total {
+  color: #ff6500;
+}
+
+.ledger-hero {
+  position: relative;
+  min-height: 384rpx;
+  padding: 34rpx 28rpx;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 82% 38%, rgba(255, 122, 0, 0.2) 0, rgba(255, 122, 0, 0) 172rpx),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 249, 242, 0.92) 100%);
+}
+
+.ledger-duck {
+  position: absolute;
+  right: -26rpx;
+  top: 104rpx;
+  z-index: 1;
+  width: 228rpx;
+  height: 228rpx;
+  pointer-events: none;
+}
+
+.budget-card {
+  position: absolute;
+  right: 132rpx;
+  top: 78rpx;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 206rpx;
+  height: 206rpx;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: conic-gradient(#ff6500 0% 68%, #ffe7d2 68% 100%);
+  box-shadow: inset 0 0 0 26rpx rgba(255, 255, 255, 0.9);
+}
+
+.budget-ring {
+  width: 146rpx;
+  height: 146rpx;
+  border: 0;
+  background: #ffffff;
+}
+
+.ring-value {
+  color: #ff6500;
+  font-size: 46rpx;
+  font-weight: 950;
+}
+
+.budget-main {
+  position: absolute;
+  right: 0;
+  bottom: 42rpx;
+  left: 0;
+  text-align: center;
+}
+
+.budget-title {
+  font-size: 21rpx;
+}
+
+.budget-sub {
+  display: none;
+}
+
+.budget-side {
+  display: none;
+}
+
+.hero-total-row {
+  position: relative;
+  z-index: 3;
+  display: block;
+  margin-top: 6rpx;
+  padding-right: 348rpx;
+}
+
+.budget-label {
+  position: relative;
+  padding-left: 22rpx;
+  color: #111827;
+  font-size: 30rpx;
+  font-weight: 900;
+}
+
+.budget-label::before {
+  content: "";
+  position: absolute;
+  top: 14rpx;
+  left: 0;
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background: #ff6500;
+}
+
+.budget-total {
+  margin-top: 28rpx;
+  font-size: 82rpx;
+  line-height: 0.98;
+  white-space: nowrap;
+}
+
+.hero-add {
+  width: 190rpx;
+  height: 72rpx;
+  margin-top: 30rpx;
+  border-radius: 999rpx;
+  background: linear-gradient(135deg, #ff9a1f 0%, #ff6500 100%);
+  box-shadow: 0 16rpx 30rpx rgba(255, 101, 0, 0.22);
+}
+
+.calendar-card {
+  padding: 26rpx 24rpx;
+}
+
+.calendar-title {
+  background: transparent;
+  font-size: 31rpx;
+}
+
+.month-arrow {
+  background: #f8fafc;
+  color: #111827;
+}
+
+.calendar-total {
+  background: #fff0e5;
+}
+
+.calendar-day {
+  height: 82rpx;
+  border-radius: 20rpx;
+  background: transparent;
+}
+
+.calendar-day.has-amount,
+.calendar-day.high {
+  background: #fff7f0;
+}
+
+.calendar-day.selected {
+  background: linear-gradient(180deg, #ff8a1f 0%, #ff6500 100%);
+  box-shadow: 0 12rpx 24rpx rgba(255, 101, 0, 0.22);
+}
+
+.month-trend {
+  display: none;
+}
+
+.recent-card {
+  grid-template-columns: 66rpx minmax(0, 1fr) minmax(82rpx, auto) 108rpx;
+  min-height: 96rpx;
+  padding: 20rpx;
+  border-radius: 30rpx;
+}
+
+.recent-icon {
+  background: #fff0e5;
+  color: #ff6500;
+}
+
+.recent-title {
+  font-size: 27rpx;
+  font-weight: 900;
+}
+
+.recent-amount {
+  color: #111827;
+}
+
+.tool-button {
+  background: #fff0e5;
+  color: #ff6500;
+}
+
+.category-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 340px) {
+  .hero-total-row {
+    padding-right: 300rpx;
+  }
+
+  .budget-total {
+    font-size: 70rpx;
+  }
+
+  .budget-card {
+    right: 112rpx;
+    width: 184rpx;
+    height: 184rpx;
+  }
+
+  .ledger-duck {
+    width: 204rpx;
+    height: 204rpx;
+  }
+}
+
+.stats-page {
+  background:
+    radial-gradient(circle at 84% 6%, rgba(255, 255, 255, 0.96) 0, rgba(255, 255, 255, 0) 230rpx),
+    radial-gradient(circle at 72% 20%, rgba(255, 122, 0, 0.055) 0, rgba(255, 122, 0, 0) 220rpx),
+    linear-gradient(180deg, #fbfdff 0%, #f5f8fd 48%, #eef4fb 100%);
+}
+
+.stats-page .brand-row {
+  display: none !important;
+}

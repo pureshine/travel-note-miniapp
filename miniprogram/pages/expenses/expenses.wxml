@@ -1,14 +1,4 @@
 <view class="page" wx:if="{{trip}}">
-  <view class="plan-switch panel">
-    <picker mode="selector" range="{{tripNames}}" value="{{activeTripIndex}}" bindchange="onTripChange">
-      <view class="plan-picker">
-        <view class="plan-label">当前计划</view>
-        <view class="plan-name">{{trip.name}}</view>
-        <view class="plan-date">{{trip.destination}} · {{trip.startDate}} - {{trip.endDate}}</view>
-      </view>
-    </picker>
-  </view>
-
   <view class="summary panel">
     <text class="summary-label">当前旅行花费</text>
     <view class="summary-value">¥{{total}}</view>

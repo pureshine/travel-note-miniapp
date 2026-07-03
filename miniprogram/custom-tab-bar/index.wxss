@@ -8,10 +8,10 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-around;
-  height: 116rpx;
-  padding: 10rpx 28rpx;
+  height: 124rpx;
+  padding: 12rpx 28rpx;
   border: 2rpx solid rgba(255, 255, 255, 0.92);
-  border-radius: 54rpx;
+  border-radius: 58rpx;
   background: rgba(255, 255, 255, 0.94);
   box-shadow:
     0 8rpx 32rpx rgba(0, 0, 0, 0.03),
@@ -24,7 +24,7 @@
   align-items: center;
   justify-content: center;
   width: 112rpx;
-  height: 92rpx;
+  height: 96rpx;
   border-radius: 34rpx;
   transition: transform 0.16s ease;
 }
@@ -49,5 +49,5 @@
 }
 
 .duck-tabbar-item-active {
-  transform: translateY(-4rpx);
+  transform: translateY(-6rpx);
 }

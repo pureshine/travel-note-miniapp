@@ -121,3 +121,439 @@
   font-size: 24rpx;
   font-weight: 850;
 }
+
+/* Shared design refresh: align secondary pages with the duck travel visual system. */
+.form-page,
+.budget-page,
+.profile-edit-page,
+.settings-page,
+.trip-detail-page,
+.index-page,
+.trips-page,
+.checklist-page,
+.expenses-page {
+  background:
+    radial-gradient(circle at 76% 8%, rgba(255, 122, 0, 0.1) 0, rgba(255, 122, 0, 0) 210rpx),
+    linear-gradient(180deg, #f9fbff 0%, #f1f5fa 100%);
+}
+
+.form-title,
+.page-title,
+.title {
+  color: #111827 !important;
+  font-weight: 950 !important;
+  letter-spacing: 0 !important;
+}
+
+.form-subtitle,
+.page-subtitle,
+.subtitle,
+.desc,
+.muted {
+  color: #7d8593 !important;
+}
+
+.form-card,
+.budget-card,
+.preset-card,
+.panel,
+.card {
+  border: 2rpx solid rgba(255, 255, 255, 0.92) !important;
+  border-radius: 36rpx !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  box-shadow:
+    0 8rpx 32rpx rgba(0, 0, 0, 0.03),
+    0 16rpx 64rpx rgba(255, 122, 0, 0.05) !important;
+}
+
+.field,
+.textarea,
+.picker-field,
+input,
+textarea {
+  border: 2rpx solid rgba(226, 232, 240, 0.88) !important;
+  border-radius: 28rpx !important;
+  background: #ffffff !important;
+  color: #111827 !important;
+}
+
+.save-button,
+.primary-button,
+.submit-button,
+.confirm-button {
+  border-radius: 30rpx !important;
+  background: linear-gradient(135deg, #ff9a1f 0%, #ff6500 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 16rpx 30rpx rgba(255, 101, 0, 0.22) !important;
+}
+
+.preset-button,
+.ghost-button,
+.secondary-button {
+  border-radius: 26rpx !important;
+  background: #fff0e5 !important;
+  color: #ff6500 !important;
+}
+
+/* Profile edit premium refresh: match the current duck travel visual system. */
+.profile-edit-page {
+  position: relative;
+  min-height: 100vh;
+  padding: 30rpx 30rpx calc(44rpx + env(safe-area-inset-bottom));
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 86% 8%, rgba(255, 122, 0, 0.08) 0, rgba(255, 122, 0, 0) 210rpx),
+    linear-gradient(180deg, #fbfdff 0%, #f5f7fa 48%, #eef4fb 100%) !important;
+  box-sizing: border-box;
+}
+
+.profile-edit-bg-mountain {
+  position: absolute;
+  right: -110rpx;
+  top: 58rpx;
+  width: 520rpx;
+  height: 320rpx;
+  opacity: 0.9;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 48% 100%, rgba(196, 207, 222, 0.2) 0, rgba(196, 207, 222, 0.2) 48%, rgba(196, 207, 222, 0) 49%),
+    radial-gradient(ellipse at 82% 96%, rgba(219, 226, 236, 0.42) 0, rgba(219, 226, 236, 0.42) 56%, rgba(219, 226, 236, 0) 57%);
+  filter: blur(1rpx);
+}
+
+.profile-edit-page .profile-card {
+  position: relative;
+  min-height: 400rpx;
+  padding: 44rpx 34rpx 38rpx;
+  overflow: hidden;
+  border: 2rpx solid rgba(255, 255, 255, 0.92) !important;
+  border-radius: 38rpx !important;
+  background:
+    radial-gradient(circle at 78% 30%, rgba(255, 255, 255, 0.86) 0, rgba(255, 255, 255, 0) 130rpx),
+    linear-gradient(135deg, rgba(255, 246, 236, 0.96) 0%, rgba(255, 255, 255, 0.96) 50%, rgba(241, 246, 252, 0.96) 100%) !important;
+  box-shadow:
+    0 8rpx 32rpx rgba(0, 0, 0, 0.03),
+    0 18rpx 58rpx rgba(17, 24, 39, 0.045) !important;
+  box-sizing: border-box;
+}
+
+.profile-edit-page .profile-card::before {
+  position: absolute;
+  right: -90rpx;
+  bottom: -76rpx;
+  width: 430rpx;
+  height: 210rpx;
+  border-radius: 58% 42% 0 0;
+  background:
+    radial-gradient(ellipse at 54% 100%, rgba(197, 208, 222, 0.18) 0, rgba(197, 208, 222, 0.18) 48%, rgba(197, 208, 222, 0) 49%),
+    radial-gradient(ellipse at 82% 98%, rgba(216, 224, 235, 0.38) 0, rgba(216, 224, 235, 0.38) 56%, rgba(216, 224, 235, 0) 57%);
+  content: "";
+}
+
+.profile-edit-page .profile-card-duck {
+  position: absolute;
+  left: -34rpx;
+  bottom: -10rpx;
+  width: 250rpx;
+  height: 270rpx;
+  opacity: 0.98;
+  pointer-events: none;
+}
+
+.profile-edit-page .avatar-picker {
+  position: relative;
+  z-index: 2;
+  width: 172rpx !important;
+  height: 172rpx !important;
+  padding: 0 !important;
+  overflow: hidden;
+  border: 8rpx solid rgba(255, 255, 255, 0.92) !important;
+  border-radius: 44rpx !important;
+  background:
+    radial-gradient(circle at 50% 28%, #ffffff 0, #ffffff 40%, #fff4e7 100%) !important;
+  box-shadow:
+    0 12rpx 28rpx rgba(17, 24, 39, 0.06),
+    0 18rpx 42rpx rgba(255, 122, 0, 0.08) !important;
+}
+
+.profile-edit-page .avatar-image {
+  width: 100% !important;
+  height: 100% !important;
+  background: transparent !important;
+}
+
+.profile-edit-page .profile-title {
+  position: relative;
+  z-index: 2;
+  margin-top: 28rpx !important;
+  color: #111827 !important;
+  font-size: 42rpx !important;
+  font-weight: 850 !important;
+  line-height: 1.15;
+}
+
+.profile-edit-page .profile-subtitle {
+  position: relative;
+  z-index: 2;
+  max-width: 520rpx;
+  margin-top: 14rpx !important;
+  color: #7d8593 !important;
+  font-size: 25rpx !important;
+  font-weight: 500 !important;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.profile-edit-page .form-card {
+  position: relative;
+  z-index: 2;
+  margin-top: 26rpx !important;
+  padding: 34rpx 30rpx !important;
+  border-radius: 36rpx !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  box-shadow:
+    0 8rpx 30rpx rgba(17, 24, 39, 0.035),
+    0 16rpx 54rpx rgba(17, 24, 39, 0.035) !important;
+}
+
+.profile-edit-page .field-label {
+  color: #7d8593 !important;
+  font-size: 25rpx !important;
+  font-weight: 750 !important;
+}
+
+.profile-edit-page .name-input {
+  height: 92rpx !important;
+  margin-top: 16rpx !important;
+  padding: 0 28rpx !important;
+  border: 2rpx solid #e4eaf2 !important;
+  border-radius: 28rpx !important;
+  background: #ffffff !important;
+  color: #111827 !important;
+  font-size: 31rpx !important;
+  font-weight: 750 !important;
+  box-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.86);
+}
+
+.profile-edit-page .info-row {
+  min-height: 82rpx !important;
+  margin-top: 0 !important;
+  border-bottom: 1rpx solid #edf0f5;
+  color: #8b95a4 !important;
+  font-size: 25rpx !important;
+  font-weight: 650 !important;
+}
+
+.profile-edit-page .name-input + .info-row {
+  margin-top: 22rpx !important;
+}
+
+.profile-edit-page .info-row:last-child {
+  border-bottom: 0;
+}
+
+.profile-edit-page .info-row text:last-child {
+  color: #4b5563 !important;
+  font-weight: 750 !important;
+}
+
+.profile-edit-page .save-button {
+  position: relative;
+  z-index: 2;
+  width: 420rpx !important;
+  height: 88rpx !important;
+  min-height: 88rpx !important;
+  margin: 30rpx auto 0 !important;
+  border-radius: 34rpx !important;
+  background: linear-gradient(135deg, #ff9319 0%, #ff6500 100%) !important;
+  color: #ffffff !important;
+  font-size: 29rpx !important;
+  font-weight: 850 !important;
+  line-height: 88rpx !important;
+  box-shadow:
+    0 16rpx 32rpx rgba(255, 101, 0, 0.22),
+    0 24rpx 58rpx rgba(255, 101, 0, 0.12) !important;
+}
+
+.profile-edit-page .logout-text {
+  position: relative;
+  z-index: 2;
+  width: 220rpx !important;
+  height: 72rpx !important;
+  min-height: 72rpx !important;
+  margin: 18rpx auto 0 !important;
+  color: #8f7b6a !important;
+  font-size: 25rpx !important;
+  font-weight: 750 !important;
+  line-height: 72rpx !important;
+  background: transparent !important;
+}
+
+@media (max-width: 340px) {
+  .profile-edit-page {
+    padding-right: 24rpx;
+    padding-left: 24rpx;
+  }
+
+  .profile-edit-page .profile-card {
+    min-height: 360rpx;
+    padding-top: 36rpx;
+  }
+
+  .profile-edit-page .profile-card-duck {
+    left: -58rpx;
+    width: 224rpx;
+    height: 246rpx;
+  }
+
+  .profile-edit-page .avatar-picker {
+    width: 150rpx !important;
+    height: 150rpx !important;
+    border-radius: 38rpx !important;
+  }
+
+  .profile-edit-page .profile-title {
+    font-size: 36rpx !important;
+  }
+
+  .profile-edit-page .profile-subtitle {
+    font-size: 22rpx !important;
+  }
+
+  .profile-edit-page .save-button {
+    width: 360rpx !important;
+  }
+}
+
+/* Compact profile edit: avoid duplicate large mascot and keep the page within one screen. */
+.profile-edit-page {
+  padding-top: 22rpx !important;
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom)) !important;
+}
+
+.profile-edit-page .profile-card {
+  min-height: 286rpx !important;
+  padding: 30rpx 32rpx 28rpx !important;
+  border-radius: 34rpx !important;
+}
+
+.profile-edit-page .profile-card-duck {
+  display: none !important;
+}
+
+.profile-edit-page .profile-card::before {
+  right: -120rpx;
+  bottom: -112rpx;
+  opacity: 0.68;
+}
+
+.profile-edit-page .avatar-picker {
+  width: 132rpx !important;
+  height: 132rpx !important;
+  border-width: 6rpx !important;
+  border-radius: 34rpx !important;
+}
+
+.profile-edit-page .profile-title {
+  margin-top: 20rpx !important;
+  font-size: 38rpx !important;
+}
+
+.profile-edit-page .profile-subtitle {
+  margin-top: 10rpx !important;
+  font-size: 23rpx !important;
+}
+
+.profile-edit-page .form-card {
+  margin-top: 22rpx !important;
+  padding: 28rpx 28rpx 22rpx !important;
+  border-radius: 34rpx !important;
+}
+
+.profile-edit-page .name-input {
+  height: 84rpx !important;
+  margin-top: 14rpx !important;
+  font-size: 30rpx !important;
+}
+
+.profile-edit-page .info-row {
+  min-height: 72rpx !important;
+  font-size: 24rpx !important;
+}
+
+.profile-edit-page .name-input + .info-row {
+  margin-top: 18rpx !important;
+}
+
+.profile-edit-page .save-button {
+  width: 396rpx !important;
+  height: 82rpx !important;
+  min-height: 82rpx !important;
+  margin-top: 26rpx !important;
+  border-radius: 32rpx !important;
+  font-size: 28rpx !important;
+  line-height: 82rpx !important;
+}
+
+.profile-edit-page .logout-text {
+  height: 62rpx !important;
+  min-height: 62rpx !important;
+  margin-top: 10rpx !important;
+  font-size: 24rpx !important;
+  line-height: 62rpx !important;
+}
+
+@media (max-width: 340px) {
+  .profile-edit-page {
+    padding-top: 16rpx !important;
+  }
+
+  .profile-edit-page .profile-card {
+    min-height: 258rpx !important;
+    padding-top: 24rpx !important;
+    padding-bottom: 24rpx !important;
+  }
+
+  .profile-edit-page .avatar-picker {
+    width: 116rpx !important;
+    height: 116rpx !important;
+    border-radius: 30rpx !important;
+  }
+
+  .profile-edit-page .profile-title {
+    margin-top: 16rpx !important;
+    font-size: 34rpx !important;
+  }
+
+  .profile-edit-page .profile-subtitle {
+    font-size: 21rpx !important;
+  }
+
+  .profile-edit-page .form-card {
+    margin-top: 18rpx !important;
+    padding: 24rpx 24rpx 18rpx !important;
+  }
+
+  .profile-edit-page .name-input {
+    height: 76rpx !important;
+  }
+
+  .profile-edit-page .info-row {
+    min-height: 64rpx !important;
+    font-size: 22rpx !important;
+  }
+
+  .profile-edit-page .save-button {
+    width: 340rpx !important;
+    height: 76rpx !important;
+    min-height: 76rpx !important;
+    margin-top: 20rpx !important;
+    line-height: 76rpx !important;
+  }
+
+  .profile-edit-page .logout-text {
+    height: 56rpx !important;
+    min-height: 56rpx !important;
+    line-height: 56rpx !important;
+  }
+}

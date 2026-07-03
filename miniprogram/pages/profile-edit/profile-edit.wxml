@@ -1,8 +1,10 @@
 <view class="page profile-edit-page">
+  <view class="profile-edit-bg-mountain"></view>
   <view class="profile-card panel">
+    <image class="profile-card-duck" src="/assets/design3d/profile-duck-camera-full.png" mode="aspectFit" />
     <button class="avatar-picker" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
       <image wx:if="{{avatarUrl}}" class="avatar-image" src="{{avatarUrl}}" mode="aspectFit" />
-      <image wx:else class="avatar-image" src="/assets/illustrations/duck-avatar.png" mode="aspectFit" />
+      <image wx:else class="avatar-image" src="/assets/design3d/app-avatar-duck-transparent-300.png" mode="aspectFit" />
     </button>
     <view class="profile-title">个人资料</view>
     <view class="profile-subtitle">好友共享和记录人会使用这个显示名字</view>

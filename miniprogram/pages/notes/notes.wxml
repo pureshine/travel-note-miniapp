@@ -1,5 +1,19 @@
-<view class="page">
-  <view class="memo-title-row">
+<view class="page notes-page" style="{{safeTopStyle}}">
+  <view class="custom-nav" style="{{customNavStyle}}">
+    <view class="custom-nav-logo"></view>
+  </view>
+  <view class="memo-hero">
+    <view class="memo-title-row">
+      <view>
+        <view class="memo-brand"><text class="memo-brand-hot">冲鸭</text>去旅行</view>
+        <view class="title">旅行清单</view>
+        <view class="muted">{{trip.name}}</view>
+      </view>
+      <image class="memo-hero-duck" src="/assets/design3d/app-avatar-duck-transparent-300.png" mode="aspectFit" />
+    </view>
+  </view>
+
+  <view class="memo-title-row legacy-title-row">
     <view>
       <view class="title">备忘</view>
       <view class="muted">{{trip.name}}</view>
@@ -11,22 +25,6 @@
         <image class="memo-foot" src="/assets/illustrations/duck-foot-icon.png" mode="aspectFit" />
       </button>
     </view>
-  </view>
-
-  <view wx:if="{{trip}}" class="plan-switch panel">
-    <picker mode="selector" range="{{tripNames}}" value="{{activeTripIndex}}" bindchange="onTripChange">
-      <view class="plan-picker">
-        <view class="plan-dot"></view>
-        <view class="plan-copy">
-          <view class="plan-label">当前计划</view>
-          <view class="plan-name">{{trip.name}}</view>
-        </view>
-        <view class="plan-change">切换 ▾</view>
-      </view>
-    </picker>
-  </view>
-  <view wx:else class="plan-switch panel">
-    <button class="memo-add" bindtap="goNoteForm">+ 新建旅行后添加备忘</button>
   </view>
 
   <scroll-view class="filter-scroll" scroll-x>

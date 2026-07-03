@@ -35,6 +35,7 @@ declare namespace WechatMiniprogram {
     switchTab(options: { url: string }): void;
     setNavigationBarTitle(options: { title: string }): void;
     setClipboardData(options: { data: string; success?: () => void }): void;
+    previewImage(options: { urls: string[]; current?: string }): void;
     chooseMedia(options: {
       count?: number;
       mediaType?: Array<"image" | "video">;

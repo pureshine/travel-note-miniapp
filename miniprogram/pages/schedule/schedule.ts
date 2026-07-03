@@ -1,5 +1,6 @@
 import { deleteSchedule, deleteTrip as removeTrip, getActiveTrip, listTrips, setActiveTripId } from "../../services/trip-store";
 import { ScheduleItem, Trip } from "../../types/trip";
+import { getCustomNavStyle, getSafeTopStyle } from "../../utils/ui";
 
 type ScheduleStatus = "已完成" | "进行中" | "待进行";
 type TripStatus = "待出发" | "已完成";
@@ -23,6 +24,8 @@ type TravelTipView = {
 };
 Page({
   data: {
+    safeTopStyle: getSafeTopStyle(14),
+    customNavStyle: getCustomNavStyle(),
     trip: undefined as Trip | undefined,
     trips: [] as Trip[],
     tripOptions: [] as string[],
@@ -115,6 +118,16 @@ Page({
   goScheduleForm() {
     if (!this.data.trip) return;
     wx.navigateTo({ url: `/pages/schedule-form/schedule-form?tripId=${this.data.trip.id}` });
+  },
+
+  previewScheduleImage(event: { currentTarget: { dataset: { id: string; index: string | number } } }) {
+    const schedule = this.data.schedules.find((item) => item.id === event.currentTarget.dataset.id);
+    if (!schedule || schedule.images.length === 0) return;
+    const index = Number(event.currentTarget.dataset.index) || 0;
+    wx.previewImage({
+      urls: schedule.images,
+      current: schedule.images[Math.min(Math.max(index, 0), schedule.images.length - 1)]
+    });
   },
 
   onScheduleTouchStart(event: { changedTouches: Array<{ clientX: number }>; currentTarget: { dataset: { id: string } } }) {

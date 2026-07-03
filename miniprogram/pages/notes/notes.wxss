@@ -287,3 +287,206 @@
 .note-card.done .note-content {
   color: #8a9691;
 }
+
+/* Design refresh: packing-list glass cards and orange segmented controls. */
+.memo-hero {
+  position: relative;
+  min-height: 260rpx;
+  margin: -4rpx 0 22rpx;
+  padding: 30rpx 30rpx 28rpx;
+  overflow: hidden;
+  border-radius: 40rpx;
+  background:
+    radial-gradient(circle at 78% 38%, rgba(255, 122, 0, 0.16) 0, rgba(255, 122, 0, 0) 150rpx),
+    rgba(255, 255, 255, 0.72);
+  box-shadow:
+    0 8rpx 32rpx rgba(0, 0, 0, 0.03),
+    0 16rpx 64rpx rgba(255, 122, 0, 0.05);
+}
+
+.memo-hero .memo-title-row {
+  align-items: flex-start;
+  margin: 0;
+}
+
+.memo-brand {
+  color: #111827;
+  font-size: 42rpx;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.memo-brand-hot {
+  color: #ff6500;
+}
+
+.memo-hero .title {
+  margin-top: 34rpx;
+  color: #111827;
+  font-size: 58rpx;
+  font-weight: 950;
+  line-height: 1.06;
+}
+
+.memo-hero .muted {
+  margin-top: 14rpx;
+  color: #7d8593;
+  font-size: 28rpx;
+  font-weight: 750;
+}
+
+.memo-hero-duck {
+  position: absolute;
+  right: -8rpx;
+  bottom: -8rpx;
+  width: 238rpx;
+  height: 238rpx;
+}
+
+.legacy-title-row {
+  margin-bottom: 20rpx;
+}
+
+.legacy-title-row > view:first-child {
+  display: none;
+}
+
+.legacy-title-row .memo-actions {
+  width: 100%;
+}
+
+.legacy-title-row .memo-add {
+  width: 100%;
+  height: 86rpx;
+  border-radius: 30rpx;
+  background: linear-gradient(135deg, #ff9a1f 0%, #ff6500 100%);
+  color: #ffffff;
+  box-shadow: 0 16rpx 30rpx rgba(255, 101, 0, 0.2);
+}
+
+.plan-switch {
+  border-radius: 36rpx;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.plan-picker {
+  min-height: 84rpx;
+  border-radius: 28rpx;
+  background: #f8fafc;
+}
+
+.plan-dot {
+  background: #ff6500;
+  box-shadow: 0 0 0 8rpx rgba(255, 101, 0, 0.13);
+}
+
+.plan-label,
+.note-content {
+  color: #7d8593;
+}
+
+.plan-name,
+.note-title {
+  color: #111827;
+}
+
+.plan-change {
+  color: #ff6500;
+}
+
+.filter-row {
+  gap: 10rpx;
+  padding: 10rpx;
+  border-radius: 42rpx;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 8rpx 32rpx rgba(0, 0, 0, 0.03),
+    0 16rpx 64rpx rgba(255, 122, 0, 0.05);
+}
+
+.filter-chip {
+  min-width: 118rpx;
+  height: 66rpx;
+  border-radius: 32rpx;
+  color: #313844;
+  font-size: 27rpx;
+}
+
+.filter-chip.active {
+  background: linear-gradient(135deg, #ff9a1f 0%, #ff6500 100%);
+  color: #ffffff;
+  box-shadow: 0 12rpx 24rpx rgba(255, 101, 0, 0.2);
+}
+
+.note-list {
+  gap: 16rpx;
+}
+
+.note-card {
+  border-radius: 34rpx;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.note-swipe {
+  min-height: 112rpx;
+  padding: 28rpx;
+  border-radius: 34rpx;
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.note-top {
+  gap: 24rpx;
+}
+
+.check-dot {
+  flex: 0 0 auto;
+  width: 52rpx;
+  height: 52rpx;
+  border: 4rpx solid #ff6500;
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 34rpx;
+  line-height: 52rpx;
+}
+
+.note-title {
+  overflow: hidden;
+  font-size: 32rpx;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.note-tag {
+  flex: 0 0 auto;
+  max-width: 140rpx;
+  overflow: hidden;
+  background: #fff0e5;
+  color: #ff6500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.note-card.done {
+  opacity: 1;
+}
+
+.note-card.done .check-dot {
+  border-color: #ff6500;
+  background: #ff6500;
+}
+
+.note-card.done .note-swipe {
+  background: linear-gradient(90deg, rgba(255, 122, 0, 0.08) 0%, rgba(255, 255, 255, 0.96) 100%);
+}
+
+.notes-page {
+  background:
+    radial-gradient(circle at 84% 6%, rgba(255, 255, 255, 0.96) 0, rgba(255, 255, 255, 0) 230rpx),
+    radial-gradient(circle at 72% 20%, rgba(255, 122, 0, 0.055) 0, rgba(255, 122, 0, 0) 220rpx),
+    linear-gradient(180deg, #fbfdff 0%, #f5f8fd 48%, #eef4fb 100%);
+}
+
+.notes-page .memo-brand {
+  display: none !important;
+}

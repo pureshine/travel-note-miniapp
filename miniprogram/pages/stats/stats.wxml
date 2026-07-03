@@ -1,18 +1,19 @@
-<view class="page stats-page">
-  <view class="plan-switch panel" wx:if="{{trip}}">
-    <picker mode="selector" range="{{tripNames}}" value="{{activeTripIndex}}" bindchange="onTripChange">
-      <view class="plan-picker">
-        <view class="plan-dot"></view>
-        <view class="plan-copy">
-          <view class="plan-label">当前计划</view>
-          <view class="plan-name">{{trip.name}}</view>
-        </view>
-        <view class="plan-change">切换 ▾</view>
-      </view>
-    </picker>
+<view class="page stats-page" style="{{safeTopStyle}}">
+  <view class="custom-nav" style="{{customNavStyle}}">
+    <view class="custom-nav-logo"></view>
+  </view>
+  <view class="brand-row">
+    <view class="brand-wordmark">
+      <text class="brand-hot">冲鸭</text>去旅行
+    </view>
   </view>
 
   <view class="ledger-hero panel">
+    <image
+      class="ledger-duck"
+      src="/assets/design3d/app-avatar-duck-transparent-300.png"
+      mode="aspectFit"
+    />
     <view class="budget-card" style="{{budgetRingStyle}}" bindtap="goBudgetForm">
       <view class="budget-ring">
         <view class="ring-value">{{budgetPercent}}%</view>
@@ -35,17 +36,26 @@
     </view>
   </view>
 
-  <view class="calendar-card panel" bindtouchstart="onCalendarTouchStart" bindtouchend="onCalendarTouchEnd">
+  <view
+    class="calendar-card panel"
+    bindtouchstart="onCalendarTouchStart"
+    bindtouchend="onCalendarTouchEnd"
+  >
     <view class="calendar-head">
       <view>
         <view class="month-control">
           <button class="month-arrow" bindtap="prevMonth">‹</button>
-          <picker class="month-picker" mode="date" fields="month" value="{{calendarMonthValue}}" bindchange="onMonthChange">
+          <picker
+            class="month-picker"
+            mode="date"
+            fields="month"
+            value="{{calendarMonthValue}}"
+            bindchange="onMonthChange"
+          >
             <view class="calendar-title">{{calendarTitle}} ▾</view>
           </picker>
           <button class="month-arrow" bindtap="nextMonth">›</button>
         </view>
-        <view class="calendar-sub">点选日期查看流水</view>
       </view>
       <view class="calendar-total">本日 ¥{{selectedDateExpenseTotal}}</view>
     </view>
@@ -67,7 +77,11 @@
     <view class="month-trend">
       <view class="trend-title">近期消费曲线</view>
       <view class="daily-chart">
-        <view wx:for="{{dailyBars}}" wx:key="label" class="bar-item {{item.active ? 'active' : ''}}">
+        <view
+          wx:for="{{dailyBars}}"
+          wx:key="label"
+          class="bar-item {{item.active ? 'active' : ''}}"
+        >
           <view class="bar-amount">{{item.amountText}}</view>
           <view class="bar-track">
             <view class="bar-fill" style="height: {{item.height}}%;"></view>

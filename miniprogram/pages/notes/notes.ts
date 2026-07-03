@@ -8,9 +8,12 @@ import {
   toggleNoteItem
 } from "../../services/trip-store";
 import { NoteItem, Trip } from "../../types/trip";
+import { getCustomNavStyle, getSafeTopStyle } from "../../utils/ui";
 
 Page({
   data: {
+    safeTopStyle: getSafeTopStyle(14),
+    customNavStyle: getCustomNavStyle(),
     tripId: "",
     trip: undefined as Trip | undefined,
     trips: [] as Trip[],

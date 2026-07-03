@@ -1,21 +1,36 @@
-<view class="page schedule-page">
+<view class="page schedule-page" style="{{safeTopStyle}}">
+  <view class="custom-nav" style="{{customNavStyle}}">
+    <view class="custom-nav-logo"></view>
+  </view>
+  <view class="brand-row">
+    <view class="brand-wordmark">
+      <text class="brand-hot">冲鸭</text>去旅行
+    </view>
+  </view>
+
   <view class="tip-card panel">
     <view class="tip-icon">
-      <image class="tip-icon-duck" src="/assets/illustrations/duck-travel-sticker.png" mode="aspectFit" />
+      <image class="tip-icon-duck" src="/assets/design3d/schedule-plan-duck.png" mode="aspectFit" />
     </view>
-    <view>
+    <view class="tip-copy">
       <view class="tip-title">{{travelTip.title}}</view>
       <view class="tip-sub">{{travelTip.subtitle}}</view>
     </view>
     <view class="tip-meta">
       <text>{{travelTip.metaTop}}</text>
-      <text>{{travelTip.metaBottom}}</text>
+      <!-- <text>{{travelTip.metaBottom}}</text> -->
     </view>
   </view>
 
   <view wx:if="{{trip}}" class="plan-card panel">
     <view class="plan-main">
-      <picker class="plan-picker" mode="selector" range="{{tripOptions}}" value="{{activeTripIndex}}" bindchange="onTripChange">
+      <picker
+        class="plan-picker"
+        mode="selector"
+        range="{{tripOptions}}"
+        value="{{activeTripIndex}}"
+        bindchange="onTripChange"
+      >
         <view class="plan-pill">
           <view class="plan-dot {{tripStatusClass}}"></view>
           <view class="plan-copy">
@@ -39,9 +54,19 @@
     <text>行程时间轴</text>
   </view>
   <view wx:if="{{trip}}" class="timeline panel">
+    <image
+      class="timeline-mascot"
+      src="/assets/design3d/timeline-duck-right.png"
+      mode="aspectFit"
+    />
     <view wx:for="{{scheduleGroups}}" wx:for-item="group" wx:key="year" class="year-group">
       <view class="year-label">{{group.year}}</view>
-      <view wx:for="{{group.items}}" wx:for-item="item" wx:key="id" class="timeline-row {{item.active ? 'active' : ''}}">
+      <view
+        wx:for="{{group.items}}"
+        wx:for-item="item"
+        wx:key="id"
+        class="timeline-row {{item.active ? 'active' : ''}}"
+      >
         <view class="time-block">
           <text class="day">{{item.monthDay}}</text>
           <text class="time">{{item.time}}</text>
@@ -51,25 +76,48 @@
           <view class="dot"></view>
         </view>
         <view class="event-wrap">
-          <view class="event-actions">
-            <button class="swipe-action edit" catchtap="editSchedule" data-id="{{item.id}}">编辑</button>
-            <button class="swipe-action danger" catchtap="deleteScheduleItem" data-id="{{item.id}}">删除</button>
-          </view>
           <view
-            class="event {{openScheduleId === item.id ? 'open' : ''}}"
+            class="event {{item.images.length > 0 ? 'has-image' : ''}} {{openScheduleId === item.id ? 'open' : ''}}"
             bindtouchstart="onScheduleTouchStart"
             bindtouchmove="onScheduleTouchMove"
             data-id="{{item.id}}"
           >
-            <view class="event-head">
-              <text class="category">{{item.category}}</text>
-              <text class="place">{{item.place}}</text>
+            <view class="event-copy">
+              <view class="event-head">
+                <text class="category">{{item.category}}</text>
+                <text class="place">{{item.place}}</text>
+              </view>
+              <view class="event-title">{{item.title}}</view>
+              <view wx:if="{{item.note}}" class="event-note">{{item.note}}</view>
             </view>
-            <view class="event-title">{{item.title}}</view>
-            <view wx:if="{{item.note}}" class="event-note">{{item.note}}</view>
-            <scroll-view wx:if="{{item.images.length > 0}}" class="image-row" scroll-x>
-              <image wx:for="{{item.images}}" wx:key="*this" class="event-image" src="{{item}}" mode="aspectFill" />
-            </scroll-view>
+            <swiper
+              wx:if="{{item.images.length > 0}}"
+              class="event-swiper"
+              indicator-dots="{{item.images.length > 1}}"
+              indicator-color="rgba(255,255,255,0.55)"
+              indicator-active-color="#ff6500"
+              circular="{{item.images.length > 1}}"
+              data-id="{{item.id}}"
+            >
+              <swiper-item wx:for="{{item.images}}" wx:for-item="image" wx:for-index="imageIndex" wx:key="*this">
+                <image
+                  class="event-image"
+                  src="{{image}}"
+                  mode="aspectFill"
+                  data-id="{{item.id}}"
+                  data-index="{{imageIndex}}"
+                  bindtap="previewScheduleImage"
+                />
+              </swiper-item>
+            </swiper>
+          </view>
+          <view class="event-actions {{openScheduleId === item.id ? 'show' : ''}}">
+            <button class="swipe-action edit" catchtap="editSchedule" data-id="{{item.id}}">编辑</button>
+            <button
+              class="swipe-action danger"
+              catchtap="deleteScheduleItem"
+              data-id="{{item.id}}"
+            >删除</button>
           </view>
         </view>
       </view>
