@@ -21,8 +21,8 @@ Page({
             title: "准备冲鸭",
             subtitle: "先添加一个旅行计划",
             metaTop: "0 项",
-            metaBottom: "待规划"
-        }
+            metaBottom: "待规划",
+        },
     },
     onShow() {
         this.loadTrip();
@@ -30,18 +30,29 @@ Page({
     loadTrip() {
         const trips = (0, trip_store_1.listTrips)();
         const trip = (0, trip_store_1.getActiveTrip)();
+        if (!trip) {
+            this.setData({
+                ...this.getEmptyScheduleState(),
+                trips,
+            });
+            return;
+        }
         const schedules = this.toScheduleViews(trip ? trip.schedules : []);
         const tripStatus = trip ? getTripStatus(trip) : "待出发";
         this.setData({
             trip,
             trips,
             tripOptions: trips.map((item) => formatTripOption(item)),
-            activeTripIndex: trip ? Math.max(trips.findIndex((item) => item.id === trip.id), 0) : 0,
+            activeTripIndex: trip
+                ? Math.max(trips.findIndex((item) => item.id === trip.id), 0)
+                : 0,
             tripStatus,
             tripStatusClass: getTripStatusClass(tripStatus),
             schedules,
             scheduleGroups: this.groupSchedulesByYear(schedules),
-            travelTip: trip ? createTravelTip(trip, schedules.length) : createEmptyTravelTip()
+            travelTip: trip
+                ? createTravelTip(trip, schedules.length)
+                : createEmptyTravelTip(),
         });
     },
     onTripChange(event) {
@@ -73,29 +84,46 @@ Page({
                 }
                 if (res.tapIndex === 2)
                     this.confirmDeleteTrip(trip);
-            }
+            },
         });
     },
     confirmDeleteTrip(trip) {
         const hasOnlyOneTrip = this.data.trips.length <= 1;
         wx.showModal({
             title: "删除计划",
-            content: hasOnlyOneTrip ? `确定删除“${trip.name}”吗？删除后会自动创建一个新的空计划。` : `确定删除“${trip.name}”吗？里面的日程、备忘和消费都会一起删除。`,
+            content: hasOnlyOneTrip
+                ? `确定删除“${trip.name}”吗？删除后会回到无计划状态。`
+                : `确定删除“${trip.name}”吗？里面的日程、备忘和消费都会一起删除。`,
             confirmText: "删除",
             confirmColor: "#dc2626",
             success: (result) => {
                 if (!result.confirm)
                     return;
-                (0, trip_store_1.deleteTrip)(trip.id);
-                this.loadTrip();
+                const nextTrip = (0, trip_store_1.deleteTrip)(trip.id, { clearActive: true });
+                const latestTrips = (0, trip_store_1.listTrips)();
+                if (nextTrip) {
+                    this.applyTripState(nextTrip, latestTrips);
+                }
+                else {
+                    this.setData({
+                        ...this.getEmptyScheduleState(),
+                        trips: latestTrips,
+                    });
+                }
                 wx.showToast({ title: "已删除", icon: "success" });
-            }
+            },
         });
     },
     goScheduleForm() {
-        if (!this.data.trip)
+        const trip = this.data.trip || (0, trip_store_1.getActiveTrip)();
+        if (!trip) {
+            wx.showToast({ title: "请先新建旅行计划", icon: "none" });
             return;
-        wx.navigateTo({ url: `/pages/schedule-form/schedule-form?tripId=${this.data.trip.id}` });
+        }
+        (0, trip_store_1.setActiveTripId)(trip.id);
+        wx.navigateTo({
+            url: `/pages/schedule-form/schedule-form?tripId=${trip.id}`,
+        });
     },
     previewScheduleImage(event) {
         const schedule = this.data.schedules.find((item) => item.id === event.currentTarget.dataset.id);
@@ -104,13 +132,15 @@ Page({
         const index = Number(event.currentTarget.dataset.index) || 0;
         wx.previewImage({
             urls: schedule.images,
-            current: schedule.images[Math.min(Math.max(index, 0), schedule.images.length - 1)]
+            current: schedule.images[Math.min(Math.max(index, 0), schedule.images.length - 1)],
         });
     },
     onScheduleTouchStart(event) {
         this.setData({
             scheduleTouchStartX: event.changedTouches[0].clientX,
-            openScheduleId: this.data.openScheduleId === event.currentTarget.dataset.id ? this.data.openScheduleId : ""
+            openScheduleId: this.data.openScheduleId === event.currentTarget.dataset.id
+                ? this.data.openScheduleId
+                : "",
         });
     },
     onScheduleTouchMove(event) {
@@ -126,7 +156,9 @@ Page({
     editSchedule(event) {
         if (!this.data.trip)
             return;
-        wx.navigateTo({ url: `/pages/schedule-form/schedule-form?tripId=${this.data.trip.id}&scheduleId=${event.currentTarget.dataset.id}` });
+        wx.navigateTo({
+            url: `/pages/schedule-form/schedule-form?tripId=${this.data.trip.id}&scheduleId=${event.currentTarget.dataset.id}`,
+        });
     },
     deleteScheduleItem(event) {
         if (!this.data.trip)
@@ -145,7 +177,7 @@ Page({
                 (0, trip_store_1.deleteSchedule)(this.data.trip.id, schedule.id);
                 this.setData({ openScheduleId: "" });
                 this.loadTrip();
-            }
+            },
         });
     },
     toScheduleViews(items) {
@@ -156,7 +188,7 @@ Page({
                 ...formatScheduleDate(item.day),
                 status,
                 statusClass: getStatusClass(status),
-                active: status === "进行中"
+                active: status === "进行中",
             };
         });
     },
@@ -171,7 +203,37 @@ Page({
             group.items.push(item);
         });
         return groups;
-    }
+    },
+    applyTripState(trip, trips) {
+        const schedules = this.toScheduleViews(trip.schedules);
+        const tripStatus = getTripStatus(trip);
+        this.setData({
+            trip,
+            trips,
+            tripOptions: trips.map((item) => formatTripOption(item)),
+            activeTripIndex: Math.max(trips.findIndex((item) => item.id === trip.id), 0),
+            tripStatus,
+            tripStatusClass: getTripStatusClass(tripStatus),
+            openScheduleId: "",
+            schedules,
+            scheduleGroups: this.groupSchedulesByYear(schedules),
+            travelTip: createTravelTip(trip, schedules.length),
+        });
+    },
+    getEmptyScheduleState() {
+        return {
+            trip: undefined,
+            trips: [],
+            tripOptions: [],
+            activeTripIndex: 0,
+            tripStatus: "待出发",
+            tripStatusClass: "upcoming",
+            openScheduleId: "",
+            schedules: [],
+            scheduleGroups: [],
+            travelTip: createEmptyTravelTip(),
+        };
+    },
 });
 function getScheduleStatus(item) {
     const scheduleTime = new Date(`${item.day}T${item.time || "00:00"}:00`).getTime();
@@ -209,18 +271,20 @@ function formatScheduleDate(day) {
         return { year: "", monthDay: day };
     return {
         year: parts[0],
-        monthDay: `${Number(parts[1])}.${Number(parts[2])}`
+        monthDay: `${Number(parts[1])}.${Number(parts[2])}`,
     };
 }
 function createTravelTip(trip, scheduleCount) {
     const destination = trip.destination || "待定目的地";
-    const dateText = trip.startDate === trip.endDate ? trip.startDate : `${trip.startDate} - ${trip.endDate}`;
+    const dateText = trip.startDate === trip.endDate
+        ? trip.startDate
+        : `${trip.startDate} - ${trip.endDate}`;
     return {
         icon: "鸭",
         title: `${destination}冲鸭计划`,
         subtitle: dateText,
         metaTop: `${scheduleCount} 项日程`,
-        metaBottom: trip.destination ? "目的地已定" : "轻松规划"
+        metaBottom: trip.destination ? "目的地已定" : "轻松规划",
     };
 }
 function createEmptyTravelTip() {
@@ -229,6 +293,6 @@ function createEmptyTravelTip() {
         title: "准备冲鸭",
         subtitle: "先新建一个旅行计划",
         metaTop: "0 项日程",
-        metaBottom: "从 0 开始"
+        metaBottom: "从 0 开始",
     };
 }

@@ -14,6 +14,7 @@ import { today } from "../utils/date";
 
 const STORAGE_KEY = "travel-note-trips";
 const ACTIVE_TRIP_KEY = "travel-note-active-trip-id";
+const ACTIVE_TRIP_CLEARED_KEY = "travel-note-active-trip-cleared";
 const PROFILE_KEY = "travel-note-profile";
 const DELETED_ITEMS_KEY = "travel-note-deleted-item-ids";
 const DELETED_TRIPS_KEY = "travel-note-deleted-trip-ids";
@@ -65,6 +66,7 @@ function resetLocalDataOnce(): void {
   if (resetVersion >= CURRENT_DATA_RESET_VERSION) return;
   wx.setStorageSync(STORAGE_KEY, []);
   wx.removeStorageSync(ACTIVE_TRIP_KEY);
+  wx.removeStorageSync(ACTIVE_TRIP_CLEARED_KEY);
   wx.removeStorageSync(DELETED_ITEMS_KEY);
   wx.removeStorageSync(DELETED_TRIPS_KEY);
   wx.setStorageSync(DATA_RESET_VERSION_KEY, CURRENT_DATA_RESET_VERSION);
@@ -169,17 +171,13 @@ export function updateTripBudget(tripId: string, budget: number): Trip | undefin
   }));
 }
 
-export function deleteTrip(tripId: string): Trip | undefined {
+export function deleteTrip(tripId: string, options?: { clearActive?: boolean }): Trip | undefined {
   markDeletedTrip(tripId);
+  const activeTripId = wx.getStorageSync<string>(ACTIVE_TRIP_KEY);
   const trips = readTrips().filter((trip) => trip.id !== tripId);
+  if (options?.clearActive || !activeTripId || activeTripId === tripId) clearActiveTripId();
   writeTrips(trips);
-  const nextTrip = trips[0];
-  if (nextTrip) {
-    setActiveTripId(nextTrip.id);
-  } else {
-    wx.removeStorageSync(ACTIVE_TRIP_KEY);
-  }
-  return nextTrip;
+  return getActiveTrip();
 }
 
 export function addSchedule(tripId: string, item: Omit<ScheduleItem, "id">): Trip | undefined {
@@ -329,6 +327,7 @@ export function getExpenseByCategory(): Array<{ category: ExpenseCategory; amoun
 export function resetDemoData(): void {
   wx.setStorageSync(STORAGE_KEY, []);
   wx.removeStorageSync(ACTIVE_TRIP_KEY);
+  wx.removeStorageSync(ACTIVE_TRIP_CLEARED_KEY);
   wx.removeStorageSync(DELETED_ITEMS_KEY);
   wx.removeStorageSync(DELETED_TRIPS_KEY);
   wx.setStorageSync(DATA_RESET_VERSION_KEY, CURRENT_DATA_RESET_VERSION);
@@ -354,15 +353,22 @@ export function getDeletedTripIdsForSync(): string[] {
 }
 
 export function importTripsFromSync(trips: Trip[]): Trip[] {
-  const normalizedTrips = trips.map(normalizeTrip);
+  const activeTripId = wx.getStorageSync<string>(ACTIVE_TRIP_KEY);
+  const activeTripWasCleared = Boolean(wx.getStorageSync(ACTIVE_TRIP_CLEARED_KEY));
+  const deletedTripIds = new Set(readDeletedTripIds());
+  const normalizedTrips = trips.filter((trip) => !deletedTripIds.has(trip.id)).map(normalizeTrip);
   const localTrips = readTrips().map(normalizeTrip);
   const mergedTrips = mergeTrips(localTrips, normalizedTrips);
   writeTrips(mergedTrips, { skipAutoSync: true });
-  const firstTrip = mergedTrips[0];
-  if (firstTrip) {
-    setActiveTripId(firstTrip.id);
+  const stillActiveTrip = activeTripId ? mergedTrips.find((trip) => trip.id === activeTripId) : undefined;
+  if (stillActiveTrip) {
+    setActiveTripId(stillActiveTrip.id);
+  } else if (activeTripWasCleared || (activeTripId && deletedTripIds.has(activeTripId))) {
+    clearActiveTripId();
+  } else if (!activeTripId && mergedTrips[0]) {
+    setActiveTripId(mergedTrips[0].id);
   } else {
-    wx.removeStorageSync(ACTIVE_TRIP_KEY);
+    clearActiveTripId();
   }
   return mergedTrips;
 }
@@ -379,11 +385,20 @@ export function getDefaultTrip(): Trip {
 export function getActiveTrip(): Trip | undefined {
   const activeTripId = wx.getStorageSync<string>(ACTIVE_TRIP_KEY);
   const trips = listTrips();
-  return trips.find((trip) => trip.id === activeTripId) || trips[0];
+  if (!activeTripId) {
+    return wx.getStorageSync(ACTIVE_TRIP_CLEARED_KEY) ? undefined : trips[0];
+  }
+  return trips.find((trip) => trip.id === activeTripId);
 }
 
 export function setActiveTripId(tripId: string): void {
   wx.setStorageSync(ACTIVE_TRIP_KEY, tripId);
+  wx.removeStorageSync(ACTIVE_TRIP_CLEARED_KEY);
+}
+
+export function clearActiveTripId(): void {
+  wx.removeStorageSync(ACTIVE_TRIP_KEY);
+  wx.setStorageSync(ACTIVE_TRIP_CLEARED_KEY, true);
 }
 
 export function getScheduleCategories(): ScheduleCategory[] {
@@ -391,7 +406,7 @@ export function getScheduleCategories(): ScheduleCategory[] {
 }
 
 export function getNoteCategories(): NoteCategory[] {
-  return ["证件", "财务", "物品", "预订", "事项"];
+  return ["财务", "物品", "预订", "事项"];
 }
 
 function normalizeTrip(trip: Trip): Trip {

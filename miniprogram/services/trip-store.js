@@ -1,10 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getNoteCategories = exports.getScheduleCategories = exports.setActiveTripId = exports.getActiveTrip = exports.getDefaultTrip = exports.importTripsFromSync = exports.getDeletedTripIdsForSync = exports.clearDeletedItemIds = exports.exportTripsForSync = exports.resetDemoData = exports.getExpenseByCategory = exports.getSummary = exports.deleteExpense = exports.updateExpense = exports.addExpense = exports.deleteNote = exports.toggleNoteItem = exports.updateNote = exports.addNote = exports.toggleChecklistItem = exports.addChecklistItem = exports.deleteSchedule = exports.updateSchedule = exports.addSchedule = exports.deleteTrip = exports.updateTripBudget = exports.updateTripInfo = exports.createTrip = exports.getTrip = exports.listTrips = void 0;
+exports.getNoteCategories = exports.getScheduleCategories = exports.clearActiveTripId = exports.setActiveTripId = exports.getActiveTrip = exports.getDefaultTrip = exports.importTripsFromSync = exports.getDeletedTripIdsForSync = exports.clearDeletedItemIds = exports.exportTripsForSync = exports.resetDemoData = exports.getExpenseByCategory = exports.getSummary = exports.deleteExpense = exports.updateExpense = exports.addExpense = exports.deleteNote = exports.toggleNoteItem = exports.updateNote = exports.addNote = exports.toggleChecklistItem = exports.addChecklistItem = exports.deleteSchedule = exports.updateSchedule = exports.addSchedule = exports.deleteTrip = exports.updateTripBudget = exports.updateTripInfo = exports.createTrip = exports.getTrip = exports.listTrips = void 0;
 const id_1 = require("../utils/id");
 const date_1 = require("../utils/date");
 const STORAGE_KEY = "travel-note-trips";
 const ACTIVE_TRIP_KEY = "travel-note-active-trip-id";
+const ACTIVE_TRIP_CLEARED_KEY = "travel-note-active-trip-cleared";
 const PROFILE_KEY = "travel-note-profile";
 const DELETED_ITEMS_KEY = "travel-note-deleted-item-ids";
 const DELETED_TRIPS_KEY = "travel-note-deleted-trip-ids";
@@ -37,6 +38,7 @@ function resetLocalDataOnce() {
         return;
     wx.setStorageSync(STORAGE_KEY, []);
     wx.removeStorageSync(ACTIVE_TRIP_KEY);
+    wx.removeStorageSync(ACTIVE_TRIP_CLEARED_KEY);
     wx.removeStorageSync(DELETED_ITEMS_KEY);
     wx.removeStorageSync(DELETED_TRIPS_KEY);
     wx.setStorageSync(DATA_RESET_VERSION_KEY, CURRENT_DATA_RESET_VERSION);
@@ -137,18 +139,14 @@ function updateTripBudget(tripId, budget) {
     }));
 }
 exports.updateTripBudget = updateTripBudget;
-function deleteTrip(tripId) {
+function deleteTrip(tripId, options) {
     markDeletedTrip(tripId);
+    const activeTripId = wx.getStorageSync(ACTIVE_TRIP_KEY);
     const trips = readTrips().filter((trip) => trip.id !== tripId);
+    if (options?.clearActive || !activeTripId || activeTripId === tripId)
+        clearActiveTripId();
     writeTrips(trips);
-    const nextTrip = trips[0];
-    if (nextTrip) {
-        setActiveTripId(nextTrip.id);
-    }
-    else {
-        wx.removeStorageSync(ACTIVE_TRIP_KEY);
-    }
-    return nextTrip;
+    return getActiveTrip();
 }
 exports.deleteTrip = deleteTrip;
 function addSchedule(tripId, item) {
@@ -278,6 +276,7 @@ exports.getExpenseByCategory = getExpenseByCategory;
 function resetDemoData() {
     wx.setStorageSync(STORAGE_KEY, []);
     wx.removeStorageSync(ACTIVE_TRIP_KEY);
+    wx.removeStorageSync(ACTIVE_TRIP_CLEARED_KEY);
     wx.removeStorageSync(DELETED_ITEMS_KEY);
     wx.removeStorageSync(DELETED_TRIPS_KEY);
     wx.setStorageSync(DATA_RESET_VERSION_KEY, CURRENT_DATA_RESET_VERSION);
@@ -303,16 +302,25 @@ function getDeletedTripIdsForSync() {
 }
 exports.getDeletedTripIdsForSync = getDeletedTripIdsForSync;
 function importTripsFromSync(trips) {
-    const normalizedTrips = trips.map(normalizeTrip);
+    const activeTripId = wx.getStorageSync(ACTIVE_TRIP_KEY);
+    const activeTripWasCleared = Boolean(wx.getStorageSync(ACTIVE_TRIP_CLEARED_KEY));
+    const deletedTripIds = new Set(readDeletedTripIds());
+    const normalizedTrips = trips.filter((trip) => !deletedTripIds.has(trip.id)).map(normalizeTrip);
     const localTrips = readTrips().map(normalizeTrip);
     const mergedTrips = mergeTrips(localTrips, normalizedTrips);
     writeTrips(mergedTrips, { skipAutoSync: true });
-    const firstTrip = mergedTrips[0];
-    if (firstTrip) {
-        setActiveTripId(firstTrip.id);
+    const stillActiveTrip = activeTripId ? mergedTrips.find((trip) => trip.id === activeTripId) : undefined;
+    if (stillActiveTrip) {
+        setActiveTripId(stillActiveTrip.id);
+    }
+    else if (activeTripWasCleared || (activeTripId && deletedTripIds.has(activeTripId))) {
+        clearActiveTripId();
+    }
+    else if (!activeTripId && mergedTrips[0]) {
+        setActiveTripId(mergedTrips[0].id);
     }
     else {
-        wx.removeStorageSync(ACTIVE_TRIP_KEY);
+        clearActiveTripId();
     }
     return mergedTrips;
 }
@@ -331,19 +339,28 @@ exports.getDefaultTrip = getDefaultTrip;
 function getActiveTrip() {
     const activeTripId = wx.getStorageSync(ACTIVE_TRIP_KEY);
     const trips = listTrips();
-    return trips.find((trip) => trip.id === activeTripId) || trips[0];
+    if (!activeTripId) {
+        return wx.getStorageSync(ACTIVE_TRIP_CLEARED_KEY) ? undefined : trips[0];
+    }
+    return trips.find((trip) => trip.id === activeTripId);
 }
 exports.getActiveTrip = getActiveTrip;
 function setActiveTripId(tripId) {
     wx.setStorageSync(ACTIVE_TRIP_KEY, tripId);
+    wx.removeStorageSync(ACTIVE_TRIP_CLEARED_KEY);
 }
 exports.setActiveTripId = setActiveTripId;
+function clearActiveTripId() {
+    wx.removeStorageSync(ACTIVE_TRIP_KEY);
+    wx.setStorageSync(ACTIVE_TRIP_CLEARED_KEY, true);
+}
+exports.clearActiveTripId = clearActiveTripId;
 function getScheduleCategories() {
     return ["景点", "交通", "住宿", "餐饮", "其他"];
 }
 exports.getScheduleCategories = getScheduleCategories;
 function getNoteCategories() {
-    return ["证件", "财务", "物品", "预订", "事项"];
+    return ["财务", "物品", "预订", "事项"];
 }
 exports.getNoteCategories = getNoteCategories;
 function normalizeTrip(trip) {

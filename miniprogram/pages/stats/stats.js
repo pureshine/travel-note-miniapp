@@ -17,6 +17,10 @@ Page({
         budget: 10000,
         remaining: 0,
         budgetPercent: 0,
+        remainingPercent: 0,
+        expenseTotalText: "0",
+        budgetText: "0",
+        remainingText: "0",
         budgetRingStyle: "",
         expenseTouchStartX: 0,
         openExpenseId: "",
@@ -43,7 +47,9 @@ Page({
         const expenseTotal = expenses.reduce((sum, item) => sum + item.amount, 0);
         const categories = getCategories(expenses, expenseTotal);
         const budget = trip?.budget || 10000;
-        const budgetPercent = Math.min(Math.round((expenseTotal / budget) * 100), 100);
+        const remaining = Math.max(budget - expenseTotal, 0);
+        const budgetPercent = budget > 0 ? Math.min(Math.round((expenseTotal / budget) * 100), 100) : 0;
+        const remainingPercent = budget > 0 ? Math.max(100 - budgetPercent, 0) : 0;
         const selectedDateKey = this.data.selectedDateKey || formatDateKey(new Date());
         const calendarMonth = this.data.calendarMonth || selectedDateKey.slice(0, 7);
         const selectedDateExpenses = getExpensesByDate(expenses, selectedDateKey);
@@ -57,8 +63,12 @@ Page({
             expenseCount: expenses.length,
             averageExpense: expenses.length > 0 ? Math.round(expenseTotal / expenses.length) : 0,
             budget,
-            remaining: Math.max(budget - expenseTotal, 0),
+            remaining,
             budgetPercent,
+            remainingPercent,
+            expenseTotalText: formatMoney(expenseTotal),
+            budgetText: formatMoney(budget),
+            remainingText: formatMoney(remaining),
             budgetRingStyle: getRingStyle(budgetPercent),
             recentExpenses: expenses.slice(0, 4),
             selectedDateKey,
@@ -81,18 +91,24 @@ Page({
         this.loadSelectedTrip();
     },
     goExpenseForm() {
-        if (!this.data.trip) {
-            wx.navigateTo({ url: "/pages/trip-form/trip-form" });
+        const trip = (0, trip_store_1.getActiveTrip)();
+        if (!trip) {
+            wx.showToast({ title: "请先新建旅行计划", icon: "none" });
             return;
         }
-        wx.navigateTo({ url: `/pages/expense-form/expense-form?tripId=${this.data.trip.id}&date=${this.data.selectedDateKey}` });
+        (0, trip_store_1.setActiveTripId)(trip.id);
+        this.setData({ trip });
+        wx.navigateTo({ url: `/pages/expense-form/expense-form?tripId=${trip.id}&date=${this.data.selectedDateKey}` });
     },
     goBudgetForm() {
-        if (!this.data.trip) {
-            wx.navigateTo({ url: "/pages/trip-form/trip-form" });
+        const trip = (0, trip_store_1.getActiveTrip)();
+        if (!trip) {
+            wx.showToast({ title: "请先新建旅行计划", icon: "none" });
             return;
         }
-        wx.navigateTo({ url: `/pages/budget-form/budget-form?tripId=${this.data.trip.id}` });
+        (0, trip_store_1.setActiveTripId)(trip.id);
+        this.setData({ trip });
+        wx.navigateTo({ url: `/pages/budget-form/budget-form?tripId=${trip.id}` });
     },
     selectCalendarDay(event) {
         const selectedDateKey = event.currentTarget.dataset.date;
@@ -194,7 +210,10 @@ function getCategories(expenses, total) {
     });
 }
 function getRingStyle(percent) {
-    return `background: conic-gradient(#ff6500 0% ${percent}%, #ffe7d2 ${percent}% 100%);`;
+    return `background: conic-gradient(#ff6500 0% ${percent}%, rgba(255, 122, 0, 0.14) ${percent}% 100%);`;
+}
+function formatMoney(amount) {
+    return Math.round(amount).toLocaleString("en-US");
 }
 function buildCalendarDays(expenses, selectedDateKey, calendarMonth) {
     const currentMonth = parseMonth(calendarMonth);

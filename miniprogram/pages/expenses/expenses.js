@@ -79,9 +79,15 @@ Page({
         this.setData({ category: this.data.categories[index] });
     },
     addItem() {
-        if (!this.data.tripId) {
-            wx.navigateTo({ url: "/pages/trip-form/trip-form" });
+        const activeTrip = (0, trip_store_1.getActiveTrip)();
+        const tripId = this.data.tripId || activeTrip?.id || "";
+        if (!tripId) {
+            wx.showToast({ title: "请先新建旅行计划", icon: "none" });
             return;
+        }
+        if (activeTrip && this.data.tripId !== activeTrip.id) {
+            (0, trip_store_1.setActiveTripId)(activeTrip.id);
+            this.setData({ tripId: activeTrip.id, trip: activeTrip });
         }
         const title = this.data.title.trim();
         const amount = Number(this.data.amount);
@@ -89,9 +95,9 @@ Page({
             wx.showToast({ title: "填写消费和金额", icon: "none" });
             return;
         }
-        (0, trip_store_1.addExpense)(this.data.tripId, title, amount, this.data.category, this.data.paidBy.trim() || getDefaultPaidBy());
+        (0, trip_store_1.addExpense)(tripId, title, amount, this.data.category, this.data.paidBy.trim() || getDefaultPaidBy());
         this.setData({ title: "", amount: "" });
-        this.loadTrip(this.data.tripId);
+        this.loadTrip(tripId);
     },
     onExpenseTouchStart(event) {
         this.setData({

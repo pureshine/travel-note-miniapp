@@ -11,7 +11,7 @@ Page({
         trip: undefined,
         title: "",
         content: "",
-        category: "证件",
+        category: "事项",
         categories: (0, trip_store_1.getNoteCategories)(),
         saving: false
     },

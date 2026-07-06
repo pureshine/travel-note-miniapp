@@ -2,6 +2,18 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const trip_store_1 = require("../../services/trip-store");
 const ui_1 = require("../../utils/ui");
+function getNoteProgress(trip) {
+    const noteCount = trip ? trip.notes.length : 0;
+    const noteDoneCount = trip
+        ? trip.notes.filter((item) => item.done).length
+        : 0;
+    const progress = noteCount > 0 ? Math.round((noteDoneCount / noteCount) * 100) : 0;
+    return {
+        noteCount,
+        noteDoneCount,
+        noteProgressStyle: `width: ${progress}%;`,
+    };
+}
 Page({
     data: {
         safeTopStyle: (0, ui_1.getSafeTopStyle)(14),
@@ -16,7 +28,10 @@ Page({
         selectedFilter: "全部",
         noteTouchStartX: 0,
         openNoteId: "",
-        filteredNotes: []
+        noteCount: 0,
+        noteDoneCount: 0,
+        noteProgressStyle: "width: 0%;",
+        filteredNotes: [],
     },
     onLoad(options) {
         if (options.id)
@@ -34,8 +49,11 @@ Page({
             trip,
             trips,
             tripNames: trips.map((item) => item.name),
-            activeTripIndex: trip ? Math.max(trips.findIndex((item) => item.id === trip.id), 0) : 0,
-            filteredNotes: this.filterNotes(trip ? trip.notes : [], this.data.selectedFilter)
+            activeTripIndex: trip
+                ? Math.max(trips.findIndex((item) => item.id === trip.id), 0)
+                : 0,
+            ...getNoteProgress(trip),
+            filteredNotes: this.filterNotes(trip ? trip.notes : [], this.data.selectedFilter),
         });
     },
     loadTrip(tripId) {
@@ -47,7 +65,8 @@ Page({
             trips,
             tripNames: trips.map((item) => item.name),
             activeTripIndex: Math.max(trips.findIndex((item) => item.id === tripId), 0),
-            filteredNotes: this.filterNotes(trip ? trip.notes : [], this.data.selectedFilter)
+            ...getNoteProgress(trip),
+            filteredNotes: this.filterNotes(trip ? trip.notes : [], this.data.selectedFilter),
         });
     },
     onTripChange(event) {
@@ -62,23 +81,30 @@ Page({
         const selectedFilter = event.currentTarget.dataset.value;
         this.setData({
             selectedFilter,
-            filteredNotes: this.filterNotes(this.data.trip ? this.data.trip.notes : [], selectedFilter)
+            filteredNotes: this.filterNotes(this.data.trip ? this.data.trip.notes : [], selectedFilter),
         });
     },
     goNoteForm() {
-        if (!this.data.tripId) {
-            wx.navigateTo({ url: "/pages/trip-form/trip-form" });
+        const trip = (0, trip_store_1.getActiveTrip)();
+        if (!trip) {
+            wx.showToast({ title: "请先新建旅行计划", icon: "none" });
             return;
         }
-        wx.navigateTo({ url: `/pages/note-form/note-form?tripId=${this.data.tripId}` });
+        (0, trip_store_1.setActiveTripId)(trip.id);
+        this.setData({ tripId: trip.id, trip });
+        wx.navigateTo({ url: `/pages/note-form/note-form?tripId=${trip.id}` });
     },
     editNoteItem(event) {
-        wx.navigateTo({ url: `/pages/note-form/note-form?tripId=${this.data.tripId}&noteId=${event.currentTarget.dataset.id}` });
+        wx.navigateTo({
+            url: `/pages/note-form/note-form?tripId=${this.data.tripId}&noteId=${event.currentTarget.dataset.id}`,
+        });
     },
     onNoteTouchStart(event) {
         this.setData({
             noteTouchStartX: event.changedTouches[0].clientX,
-            openNoteId: this.data.openNoteId === event.currentTarget.dataset.id ? this.data.openNoteId : ""
+            openNoteId: this.data.openNoteId === event.currentTarget.dataset.id
+                ? this.data.openNoteId
+                : "",
         });
     },
     onNoteTouchMove(event) {
@@ -99,7 +125,8 @@ Page({
         const trip = (0, trip_store_1.toggleNoteItem)(this.data.tripId, event.currentTarget.dataset.id);
         this.setData({
             trip,
-            filteredNotes: this.filterNotes(trip ? trip.notes : [], this.data.selectedFilter)
+            ...getNoteProgress(trip),
+            filteredNotes: this.filterNotes(trip ? trip.notes : [], this.data.selectedFilter),
         });
     },
     deleteNoteItem(event) {
@@ -118,17 +145,20 @@ Page({
                 this.setData({
                     trip,
                     openNoteId: "",
-                    filteredNotes: this.filterNotes(trip ? trip.notes : [], this.data.selectedFilter)
+                    ...getNoteProgress(trip),
+                    filteredNotes: this.filterNotes(trip ? trip.notes : [], this.data.selectedFilter),
                 });
-            }
+            },
         });
     },
     filterNotes(notes, selectedFilter) {
-        const filtered = selectedFilter === "全部" ? notes : notes.filter((item) => item.category === selectedFilter);
+        const filtered = selectedFilter === "全部"
+            ? notes
+            : notes.filter((item) => item.category === selectedFilter);
         return [...filtered].sort((a, b) => {
             if (a.done !== b.done)
                 return a.done ? 1 : -1;
             return b.createdAt - a.createdAt;
         });
-    }
+    },
 });

@@ -8,8 +8,8 @@
     </view>
   </view>
 
-  <view class="tip-card panel">
-    <view class="tip-icon">
+  <view class="tip-card panel {{trip ? '' : 'empty-tip-card'}}">
+    <view wx:if="{{trip}}" class="tip-icon">
       <image class="tip-icon-duck" src="/assets/design3d/schedule-plan-duck.png" mode="aspectFit" />
     </view>
     <view class="tip-copy">
@@ -50,11 +50,12 @@
     <button class="quick-add" bindtap="goTripForm">+ 新建旅行</button>
   </view>
 
-  <view class="section-title">
+  <view wx:if="{{trip}}" class="section-title">
     <text>行程时间轴</text>
   </view>
   <view wx:if="{{trip}}" class="timeline panel">
     <image
+      wx:if="{{schedules.length > 0}}"
       class="timeline-mascot"
       src="/assets/design3d/timeline-duck-right.png"
       mode="aspectFit"
@@ -122,6 +123,16 @@
         </view>
       </view>
     </view>
-    <view wx:if="{{schedules.length === 0}}" class="empty">还没有日程安排，先添加一个计划吧</view>
+    <view wx:if="{{schedules.length === 0}}" class="empty schedule-empty-schedules" bindtap="goScheduleForm">
+      <view class="empty-state-icon">+</view>
+      <view class="empty-state-title">还没有日程安排</view>
+      <view class="empty-state-desc">先添加一个行程，时间轴就会自动生成</view>
+    </view>
+  </view>
+  <view wx:else class="schedule-empty-state panel">
+    <view class="empty-state-icon">+</view>
+    <view class="empty-state-title">还没有旅行计划</view>
+    <view class="empty-state-desc">新建一个计划后，再开始安排每天的行程</view>
+    <button class="empty-state-button" bindtap="goTripForm">新建旅行</button>
   </view>
 </view>

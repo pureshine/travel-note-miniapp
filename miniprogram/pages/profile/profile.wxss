@@ -2189,6 +2189,18 @@
   pointer-events: none;
 }
 
+.profile-page .sync-card::after {
+  position: absolute;
+  top: 0;
+  right: 276rpx;
+  bottom: 0;
+  z-index: 2;
+  width: 126rpx;
+  background: linear-gradient(90deg, #fff2dc 0%, rgba(255, 242, 220, 0.92) 28%, rgba(255, 242, 220, 0) 100%);
+  content: "";
+  pointer-events: none;
+}
+
 .profile-page .invite-bg-duck {
   right: 0 !important;
   bottom: 0 !important;
@@ -2205,6 +2217,7 @@
 .profile-page .member-row,
 .profile-page .soft-action.full,
 .profile-page .share-action {
+  z-index: 3 !important;
   max-width: 410rpx !important;
 }
 
@@ -2347,5 +2360,280 @@
     right: -56rpx !important;
     width: 326rpx !important;
     height: 218rpx !important;
+  }
+}
+
+/* Invite banner edge-to-edge artwork: remove top/right visual gaps. */
+.profile-page .sync-card {
+  box-sizing: border-box !important;
+  height: 254rpx !important;
+  min-height: 254rpx !important;
+  padding-top: 42rpx !important;
+  padding-bottom: 30rpx !important;
+}
+
+.profile-page .invite-bg-duck {
+  top: 0 !important;
+  right: -46rpx !important;
+  bottom: auto !important;
+  width: 386rpx !important;
+  height: 100% !important;
+  border-radius: 0 26rpx 26rpx 0 !important;
+}
+
+@media (max-width: 340px) {
+  .profile-page .sync-card {
+    height: 230rpx !important;
+    min-height: 230rpx !important;
+    padding-top: 34rpx !important;
+    padding-bottom: 24rpx !important;
+  }
+
+  .profile-page .invite-bg-duck {
+    top: 0 !important;
+    right: -58rpx !important;
+    width: 304rpx !important;
+    height: 100% !important;
+  }
+
+  .profile-page .sync-card::after {
+    right: 206rpx;
+    width: 92rpx;
+  }
+}
+
+/* Invite card final blend: more top breathing room without a hard visual split. */
+.profile-page .sync-card {
+  background:
+    radial-gradient(circle at 72% 12%, rgba(255, 255, 255, 0.74) 0, rgba(255, 255, 255, 0) 118rpx),
+    linear-gradient(90deg, #fff4df 0%, #fff2dc 48%, #ffe4c1 100%) !important;
+}
+
+.profile-page .sync-card::after {
+  right: 318rpx !important;
+  z-index: 2 !important;
+  width: 136rpx !important;
+  background: linear-gradient(90deg, #fff4df 0%, rgba(255, 244, 223, 0.9) 44%, rgba(255, 244, 223, 0) 100%) !important;
+}
+
+.profile-page .invite-bg-duck {
+  top: 0 !important;
+  right: -34rpx !important;
+  width: 382rpx !important;
+  height: 100% !important;
+  border-radius: 0 24rpx 24rpx 0 !important;
+}
+
+@media (max-width: 340px) {
+  .profile-page .sync-card::after {
+    right: 240rpx !important;
+    width: 106rpx !important;
+  }
+
+  .profile-page .invite-bg-duck {
+    top: 0 !important;
+    right: -48rpx !important;
+    width: 298rpx !important;
+    height: 100% !important;
+  }
+}
+
+/* Invite state: show members instead of a spinning generate button. */
+.profile-page .sync-card.has-members .card-head,
+.profile-page .sync-card.has-members .member-row {
+  max-width: 430rpx !important;
+}
+
+.profile-page .sync-card.has-members .member-row {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 14rpx !important;
+  max-width: 410rpx !important;
+  min-height: 64rpx !important;
+  margin-top: 30rpx !important;
+  padding: 0 22rpx !important;
+  border-radius: 999rpx !important;
+  background: rgba(255, 255, 255, 0.68) !important;
+  box-shadow: inset 0 0 0 1rpx rgba(255, 122, 0, 0.14) !important;
+}
+
+.profile-page .sync-card.has-members .member-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 56rpx;
+  height: 36rpx;
+  padding: 0 12rpx;
+  border-radius: 999rpx;
+  color: #ff6500;
+  font-size: 22rpx;
+  font-weight: 850;
+  background: #fff0bf;
+}
+
+.profile-page .sync-card.has-members .member-names {
+  max-width: 300rpx;
+  overflow: hidden;
+  color: #6a3a20;
+  font-size: 25rpx;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Collaboration banner redesign: cleaner hierarchy and real friend names. */
+.profile-page .sync-card {
+  position: relative !important;
+  height: 248rpx !important;
+  min-height: 248rpx !important;
+  margin-top: 28rpx !important;
+  padding: 40rpx 36rpx 30rpx !important;
+  overflow: hidden !important;
+  border-radius: 30rpx !important;
+  background:
+    linear-gradient(90deg, rgba(255, 244, 223, 0.98) 0%, rgba(255, 244, 223, 0.96) 45%, rgba(255, 229, 197, 0.82) 100%),
+    radial-gradient(circle at 82% 24%, rgba(255, 255, 255, 0.92) 0, rgba(255, 255, 255, 0) 164rpx) !important;
+  box-shadow:
+    0 4rpx 16rpx rgba(0, 0, 0, 0.03),
+    0 14rpx 38rpx rgba(255, 122, 0, 0.08) !important;
+}
+
+.profile-page .sync-card::after {
+  right: 300rpx !important;
+  width: 160rpx !important;
+  background: linear-gradient(90deg, #fff4df 0%, rgba(255, 244, 223, 0.9) 54%, rgba(255, 244, 223, 0) 100%) !important;
+}
+
+.profile-page .invite-bg-duck {
+  top: 0 !important;
+  right: -28rpx !important;
+  width: 390rpx !important;
+  height: 100% !important;
+  opacity: 0.96 !important;
+}
+
+.profile-page .card-head {
+  position: relative !important;
+  z-index: 4 !important;
+  max-width: 420rpx !important;
+}
+
+.profile-page .sync-title {
+  color: #5a270f !important;
+  font-size: 38rpx !important;
+  font-weight: 900 !important;
+  line-height: 1.18 !important;
+  letter-spacing: 0 !important;
+  white-space: nowrap !important;
+}
+
+.profile-page .sync-desc {
+  margin-top: 16rpx !important;
+  color: #7b5b48 !important;
+  font-size: 25rpx !important;
+  font-weight: 500 !important;
+  line-height: 1.25 !important;
+  white-space: nowrap !important;
+}
+
+.profile-page .sync-tip,
+.profile-page .invite-strip,
+.profile-page .sync-badge {
+  display: none !important;
+}
+
+.profile-page .sync-card .soft-action.full,
+.profile-page .sync-card .share-action {
+  position: relative !important;
+  z-index: 5 !important;
+  width: 224rpx !important;
+  height: 66rpx !important;
+  min-height: 66rpx !important;
+  margin: 32rpx 0 0 !important;
+  border-radius: 999rpx !important;
+  color: #ffffff !important;
+  font-size: 26rpx !important;
+  font-weight: 850 !important;
+  line-height: 66rpx !important;
+  background: linear-gradient(135deg, #ff921c 0%, #ff6200 100%) !important;
+  box-shadow: 0 14rpx 28rpx rgba(255, 101, 0, 0.2) !important;
+}
+
+.profile-page .sync-card .share-action {
+  margin-top: 18rpx !important;
+  color: #ff6500 !important;
+  background: rgba(255, 255, 255, 0.72) !important;
+  box-shadow: inset 0 0 0 1rpx rgba(255, 122, 0, 0.16) !important;
+}
+
+.profile-page .sync-card.has-members .member-row {
+  position: relative !important;
+  z-index: 5 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 14rpx !important;
+  max-width: 388rpx !important;
+  min-height: 62rpx !important;
+  margin-top: 30rpx !important;
+  padding: 0 20rpx !important;
+  border-radius: 999rpx !important;
+  background: rgba(255, 255, 255, 0.74) !important;
+  box-shadow:
+    inset 0 0 0 1rpx rgba(255, 122, 0, 0.16),
+    0 10rpx 20rpx rgba(255, 122, 0, 0.08) !important;
+}
+
+.profile-page .sync-card.has-members .member-label {
+  min-width: 58rpx !important;
+  height: 36rpx !important;
+  padding: 0 12rpx !important;
+  border-radius: 999rpx !important;
+  color: #ff6500 !important;
+  font-size: 22rpx !important;
+  font-weight: 850 !important;
+  line-height: 36rpx !important;
+  background: #fff0bf !important;
+}
+
+.profile-page .sync-card.has-members .member-names {
+  max-width: 274rpx !important;
+  color: #5d3828 !important;
+  font-size: 25rpx !important;
+  font-weight: 750 !important;
+  line-height: 1 !important;
+}
+
+@media (max-width: 340px) {
+  .profile-page .sync-card {
+    height: 226rpx !important;
+    min-height: 226rpx !important;
+    padding: 34rpx 28rpx 24rpx !important;
+  }
+
+  .profile-page .sync-title {
+    font-size: 32rpx !important;
+  }
+
+  .profile-page .sync-desc {
+    font-size: 22rpx !important;
+  }
+
+  .profile-page .invite-bg-duck {
+    right: -58rpx !important;
+    width: 318rpx !important;
+  }
+
+  .profile-page .sync-card::after {
+    right: 220rpx !important;
+    width: 118rpx !important;
+  }
+
+  .profile-page .sync-card .soft-action.full,
+  .profile-page .sync-card .share-action {
+    width: 188rpx !important;
+    height: 58rpx !important;
+    min-height: 58rpx !important;
+    font-size: 23rpx !important;
+    line-height: 58rpx !important;
   }
 }

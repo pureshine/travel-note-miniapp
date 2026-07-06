@@ -16,7 +16,11 @@ declare namespace WechatMiniprogram {
     getStorageSync<T = unknown>(key: string): T;
     setStorageSync(key: string, data: unknown): void;
     removeStorageSync(key: string): void;
-    showToast(options: { title: string; icon?: "success" | "error" | "loading" | "none"; duration?: number }): void;
+    showToast(options: {
+      title: string;
+      icon?: "success" | "error" | "loading" | "none";
+      duration?: number;
+    }): void;
     showModal(options: {
       title: string;
       content: string;
@@ -43,10 +47,26 @@ declare namespace WechatMiniprogram {
       success?: (res: { tempFiles: Array<{ tempFilePath: string }> }) => void;
       fail?: () => void;
     }): void;
+    chooseImage(options: {
+      count?: number;
+      sizeType?: Array<"original" | "compressed">;
+      sourceType?: Array<"album" | "camera">;
+      success?: (res: { tempFilePaths: string[] }) => void;
+      fail?: (error: { errMsg?: string }) => void;
+    }): void;
     getFileSystemManager(): {
       accessSync(path: string): void;
+      readFile(options: {
+        filePath: string;
+        encoding?: "base64" | "utf8" | "binary";
+        success?: (res: { data: string | ArrayBuffer }) => void;
+        fail?: (error: { errMsg?: string }) => void;
+      }): void;
     };
-    login(options: { success?: (res: { code: string }) => void; fail?: () => void }): void;
+    login(options: {
+      success?: (res: { code: string }) => void;
+      fail?: () => void;
+    }): void;
   }
 
   interface Cloud {
@@ -67,7 +87,13 @@ declare namespace WechatMiniprogram {
 
   namespace App {
     interface Constructor {
-      <T>(options: T & { globalData: IAppOption["globalData"]; onLaunch?: () => void; onShow?: () => void }): void;
+      <T>(
+        options: T & {
+          globalData: IAppOption["globalData"];
+          onLaunch?: () => void;
+          onShow?: () => void;
+        },
+      ): void;
     }
   }
 

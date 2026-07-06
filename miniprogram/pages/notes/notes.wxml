@@ -3,14 +3,25 @@
     <view class="custom-nav-logo"></view>
   </view>
   <view class="memo-hero">
-    <view class="memo-title-row">
-      <view>
-        <view class="memo-brand"><text class="memo-brand-hot">冲鸭</text>去旅行</view>
-        <view class="title">旅行清单</view>
-        <view class="muted">{{trip.name}}</view>
+    <view class="memo-hero-copy">
+      <image class="memo-hero-logo" src="/assets/design3d/memo-wordmark-transparent.png" mode="aspectFit" />
+      <view class="memo-hero-subtitle">旅行清单 · 轻松出发</view>
+      <view class="memo-progress-pill">
+        <view class="memo-progress-copy">
+          <text class="memo-progress-label">已完成</text>
+          <text class="memo-progress-done">{{noteDoneCount}}</text>
+          <text class="memo-progress-total">/{{noteCount}}</text>
+        </view>
+        <view class="memo-progress-track">
+          <view class="memo-progress-fill" style="{{noteProgressStyle}}"></view>
+        </view>
       </view>
-      <image class="memo-hero-duck" src="/assets/design3d/app-avatar-duck-transparent-300.png" mode="aspectFit" />
     </view>
+    <image
+      class="memo-hero-duck"
+      src="/assets/design3d/memo-duck-pencil-transparent.png"
+      mode="aspectFit"
+    />
   </view>
 
   <view class="memo-title-row legacy-title-row">
@@ -20,7 +31,11 @@
     </view>
     <view class="memo-actions">
       <button class="memo-add" bindtap="goNoteForm">
-        <image class="memo-duck" src="/assets/illustrations/duck-travel-sticker.png" mode="aspectFit" />
+        <image
+          class="memo-duck"
+          src="/assets/illustrations/duck-travel-sticker.png"
+          mode="aspectFit"
+        />
         <text class="memo-add-text">写备忘</text>
         <image class="memo-foot" src="/assets/illustrations/duck-foot-icon.png" mode="aspectFit" />
       </button>
@@ -35,14 +50,16 @@
         class="filter-chip {{selectedFilter === item ? 'active' : ''}}"
         data-value="{{item}}"
         bindtap="selectFilter"
-      >
-        {{item}}
-      </button>
+      >{{item}}</button>
     </view>
   </scroll-view>
 
   <view class="note-list">
-    <view wx:for="{{filteredNotes}}" wx:key="id" class="note-card panel {{item.done ? 'done' : ''}}">
+    <view
+      wx:for="{{filteredNotes}}"
+      wx:key="id"
+      class="note-card panel {{item.done ? 'done' : ''}} {{openNoteId === item.id ? 'open' : ''}}"
+    >
       <view class="note-actions">
         <button class="note-action edit" catchtap="editNoteItem" data-id="{{item.id}}">编辑</button>
         <button class="note-action danger" catchtap="deleteNoteItem" data-id="{{item.id}}">删除</button>
@@ -64,7 +81,11 @@
       </view>
     </view>
     <view wx:if="{{filteredNotes.length === 0}}" class="empty panel">
-      <image class="empty-duck-foot" src="/assets/illustrations/duck-foot-icon.png" mode="aspectFit" />
+      <image
+        class="empty-duck-foot"
+        src="/assets/illustrations/duck-foot-icon.png"
+        mode="aspectFit"
+      />
       <view>还没有备忘</view>
     </view>
   </view>

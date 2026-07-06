@@ -29,6 +29,18 @@
       {
         "value": "miniprogram/assets/brand",
         "type": "folder"
+      },
+      {
+        "value": ".ts",
+        "type": "suffix"
+      },
+      {
+        "value": ".d.ts",
+        "type": "suffix"
+      },
+      {
+        "value": "scripts",
+        "type": "folder"
       }
     ],
     "include": []

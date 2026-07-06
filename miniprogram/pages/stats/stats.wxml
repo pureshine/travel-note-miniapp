@@ -2,37 +2,48 @@
   <view class="custom-nav" style="{{customNavStyle}}">
     <view class="custom-nav-logo"></view>
   </view>
-  <view class="brand-row">
+  <!-- <view class="brand-row">
     <view class="brand-wordmark">
       <text class="brand-hot">冲鸭</text>去旅行
     </view>
-  </view>
+  </view>-->
 
-  <view class="ledger-hero panel">
-    <image
-      class="ledger-duck"
-      src="/assets/design3d/app-avatar-duck-transparent-300.png"
-      mode="aspectFit"
-    />
-    <view class="budget-card" style="{{budgetRingStyle}}" bindtap="goBudgetForm">
-      <view class="budget-ring">
-        <view class="ring-value">{{budgetPercent}}%</view>
+  <view class="ledger-hero">
+    <view class="budget-panel">
+      <view class="budget-left">
+        <view class="budget-block">
+          <view class="budget-tag">
+            <view class="tag-dot"></view>
+            <text>本次花费</text>
+          </view>
+          <view class="spend-total">¥ {{expenseTotalText}}</view>
+          <view class="spend-sub">总预算 ¥{{budgetText}}</view>
+        </view>
+        <view class="budget-split"></view>
+        <view class="budget-block">
+          <view class="budget-tag">
+            <view class="tag-dot"></view>
+            <text>预算剩余</text>
+          </view>
+          <view class="remain-row">
+            <text class="remain-total">¥ {{remainingText}}</text>
+            <view class="remain-pill">{{remainingPercent}}%</view>
+          </view>
+        </view>
       </view>
-      <view class="budget-main">
-        <view class="budget-title">本次预算</view>
-        <view class="budget-sub">支出预算 ¥{{budget}}</view>
+      <view class="ring-box" bindtap="goBudgetForm">
+        <view class="budget-ring" style="{{budgetRingStyle}}">
+          <view class="ring-inner">
+            <view class="ring-value">{{budgetPercent}}%</view>
+            <view class="ring-label">预算使用率</view>
+          </view>
+        </view>
       </view>
-      <view class="budget-side">
-        <text>可用 ¥{{remaining}}</text>
-        <text class="budget-edit">设置</text>
-      </view>
+      <image class="budget-duck" src="/assets/design3d/expense-duck-coin-full.png" mode="aspectFit" />
     </view>
-    <view class="hero-total-row">
-      <view>
-        <view class="budget-label">本次总支出</view>
-        <view class="budget-total">¥{{expenseTotal}}</view>
-      </view>
+    <view class="hero-actions">
       <button class="hero-add" bindtap="goExpenseForm">+ 记一笔</button>
+      <button class="budget-set" bindtap="goBudgetForm">设置预算</button>
     </view>
   </view>
 

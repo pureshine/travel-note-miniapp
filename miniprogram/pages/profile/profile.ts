@@ -37,6 +37,7 @@ Page({
     syncTip: "登录后自动同步旅行数据",
     lastSyncText: "暂未同步",
     syncing: false,
+    inviteLoading: false,
     tripCount: 0,
     expenseTotal: "0",
     currentTripId: "",
@@ -237,9 +238,17 @@ Page({
   },
 
   async createInvite() {
-    if (this.data.syncing) return;
+    if (this.data.inviteLoading) return;
+    if (this.data.memberNamesText) {
+      wx.showToast({ title: "已有同行人", icon: "none" });
+      return;
+    }
     if (!this.data.loggedIn) {
       wx.showToast({ title: "请先微信登录", icon: "none" });
+      return;
+    }
+    if (this.data.syncing) {
+      wx.showToast({ title: "正在同步，请稍后", icon: "none" });
       return;
     }
     const trip = getActiveTrip();
@@ -248,7 +257,7 @@ Page({
       return;
     }
     this.setData({
-      syncing: true,
+      inviteLoading: true,
       syncStatus: "生成中",
       syncTip: "正在准备好友邀请",
       inviteStatus: "正在准备共享邀请"
@@ -262,7 +271,7 @@ Page({
       console.error("生成邀请失败", error);
       wx.showToast({ title: "生成失败", icon: "none" });
     } finally {
-      this.setData({ syncing: false });
+      this.setData({ inviteLoading: false });
     }
   },
 
@@ -366,7 +375,9 @@ Page({
     const trips = listTrips();
     const summary = getSummary();
     const currentTrip = getActiveTrip();
+    const myOpenid = this.data.openid || getSavedProfile()?.openid || "";
     const memberNames = (currentTrip?.sharedMembers || [])
+      .filter((member) => member.openid !== myOpenid)
       .map((member) => member.nickname)
       .filter((name) => name && name !== "未设置名字");
     this.setData({

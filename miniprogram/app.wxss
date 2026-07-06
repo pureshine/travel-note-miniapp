@@ -2,7 +2,9 @@ page {
   min-height: 100vh;
   background: #f7fafe;
   color: #111827;
-  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial,
+    sans-serif;
   font-size: 28rpx;
   letter-spacing: 0;
 }
@@ -37,10 +39,17 @@ button::after {
   width: 100%;
   overflow-x: hidden;
   padding: 32rpx;
-  padding-bottom: calc(172rpx + env(safe-area-inset-bottom));
   background:
-    radial-gradient(circle at 76% 8%, rgba(255, 255, 255, 0.95) 0, rgba(255, 255, 255, 0) 210rpx),
-    radial-gradient(circle at 78% 18%, rgba(255, 122, 0, 0.055) 0, rgba(255, 122, 0, 0) 220rpx),
+    radial-gradient(
+      circle at 76% 8%,
+      rgba(255, 255, 255, 0.95) 0,
+      rgba(255, 255, 255, 0) 210rpx
+    ),
+    radial-gradient(
+      circle at 78% 18%,
+      rgba(255, 122, 0, 0.055) 0,
+      rgba(255, 122, 0, 0) 220rpx
+    ),
     linear-gradient(180deg, #fbfdff 0%, #f4f8fd 48%, #eef4fb 100%);
 }
 

@@ -51,7 +51,7 @@
     </view>
   </view>
 
-  <view class="sync-card panel">
+  <view class="sync-card panel {{memberNamesText ? 'has-members' : ''}}">
     <image class="invite-bg-duck" src="/assets/design3d/profile-invite-scene-crop.png" mode="aspectFill" />
     <view class="card-head">
       <view>
@@ -76,7 +76,7 @@
       <text class="member-names">{{memberNamesText}}</text>
     </view>
 
-    <button class="soft-action full" loading="{{syncing}}" bindtap="createInvite">生成邀请</button>
+    <button wx:if="{{!memberNamesText}}" class="soft-action full" loading="{{inviteLoading}}" bindtap="createInvite">生成邀请</button>
     <button wx:if="{{inviteCode}}" class="share-action" open-type="share">分享给好友</button>
   </view>
 

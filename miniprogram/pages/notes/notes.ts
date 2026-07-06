@@ -5,10 +5,25 @@ import {
   getTrip,
   listTrips,
   setActiveTripId,
-  toggleNoteItem
+  toggleNoteItem,
 } from "../../services/trip-store";
 import { NoteItem, Trip } from "../../types/trip";
 import { getCustomNavStyle, getSafeTopStyle } from "../../utils/ui";
+
+function getNoteProgress(trip?: Trip) {
+  const noteCount = trip ? trip.notes.length : 0;
+  const noteDoneCount = trip
+    ? trip.notes.filter((item) => item.done).length
+    : 0;
+  const progress =
+    noteCount > 0 ? Math.round((noteDoneCount / noteCount) * 100) : 0;
+
+  return {
+    noteCount,
+    noteDoneCount,
+    noteProgressStyle: `width: ${progress}%;`,
+  };
+}
 
 Page({
   data: {
@@ -24,7 +39,10 @@ Page({
     selectedFilter: "全部",
     noteTouchStartX: 0,
     openNoteId: "",
-    filteredNotes: [] as NoteItem[]
+    noteCount: 0,
+    noteDoneCount: 0,
+    noteProgressStyle: "width: 0%;",
+    filteredNotes: [] as NoteItem[],
   },
 
   onLoad(options: { id?: string }) {
@@ -44,8 +62,17 @@ Page({
       trip,
       trips,
       tripNames: trips.map((item) => item.name),
-      activeTripIndex: trip ? Math.max(trips.findIndex((item) => item.id === trip.id), 0) : 0,
-      filteredNotes: this.filterNotes(trip ? trip.notes : [], this.data.selectedFilter)
+      activeTripIndex: trip
+        ? Math.max(
+            trips.findIndex((item) => item.id === trip.id),
+            0,
+          )
+        : 0,
+      ...getNoteProgress(trip),
+      filteredNotes: this.filterNotes(
+        trip ? trip.notes : [],
+        this.data.selectedFilter,
+      ),
     });
   },
 
@@ -57,8 +84,15 @@ Page({
       trip,
       trips,
       tripNames: trips.map((item) => item.name),
-      activeTripIndex: Math.max(trips.findIndex((item) => item.id === tripId), 0),
-      filteredNotes: this.filterNotes(trip ? trip.notes : [], this.data.selectedFilter)
+      activeTripIndex: Math.max(
+        trips.findIndex((item) => item.id === tripId),
+        0,
+      ),
+      ...getNoteProgress(trip),
+      filteredNotes: this.filterNotes(
+        trip ? trip.notes : [],
+        this.data.selectedFilter,
+      ),
     });
   },
 
@@ -74,31 +108,49 @@ Page({
     const selectedFilter = event.currentTarget.dataset.value;
     this.setData({
       selectedFilter,
-      filteredNotes: this.filterNotes(this.data.trip ? this.data.trip.notes : [], selectedFilter)
+      filteredNotes: this.filterNotes(
+        this.data.trip ? this.data.trip.notes : [],
+        selectedFilter,
+      ),
     });
   },
 
   goNoteForm() {
-    if (!this.data.tripId) {
-      wx.navigateTo({ url: "/pages/trip-form/trip-form" });
+    const trip = getActiveTrip();
+    if (!trip) {
+      wx.showToast({ title: "请先新建旅行计划", icon: "none" });
       return;
     }
-    wx.navigateTo({ url: `/pages/note-form/note-form?tripId=${this.data.tripId}` });
+    setActiveTripId(trip.id);
+    this.setData({ tripId: trip.id, trip });
+    wx.navigateTo({ url: `/pages/note-form/note-form?tripId=${trip.id}` });
   },
 
   editNoteItem(event: { currentTarget: { dataset: { id: string } } }) {
-    wx.navigateTo({ url: `/pages/note-form/note-form?tripId=${this.data.tripId}&noteId=${event.currentTarget.dataset.id}` });
-  },
-
-  onNoteTouchStart(event: { changedTouches: Array<{ clientX: number }>; currentTarget: { dataset: { id: string } } }) {
-    this.setData({
-      noteTouchStartX: event.changedTouches[0].clientX,
-      openNoteId: this.data.openNoteId === event.currentTarget.dataset.id ? this.data.openNoteId : ""
+    wx.navigateTo({
+      url: `/pages/note-form/note-form?tripId=${this.data.tripId}&noteId=${event.currentTarget.dataset.id}`,
     });
   },
 
-  onNoteTouchMove(event: { changedTouches: Array<{ clientX: number }>; currentTarget: { dataset: { id: string } } }) {
-    const distance = this.data.noteTouchStartX - event.changedTouches[0].clientX;
+  onNoteTouchStart(event: {
+    changedTouches: Array<{ clientX: number }>;
+    currentTarget: { dataset: { id: string } };
+  }) {
+    this.setData({
+      noteTouchStartX: event.changedTouches[0].clientX,
+      openNoteId:
+        this.data.openNoteId === event.currentTarget.dataset.id
+          ? this.data.openNoteId
+          : "",
+    });
+  },
+
+  onNoteTouchMove(event: {
+    changedTouches: Array<{ clientX: number }>;
+    currentTarget: { dataset: { id: string } };
+  }) {
+    const distance =
+      this.data.noteTouchStartX - event.changedTouches[0].clientX;
     const noteId = event.currentTarget.dataset.id;
     if (distance > 40) {
       this.setData({ openNoteId: noteId });
@@ -112,15 +164,24 @@ Page({
       this.setData({ openNoteId: "" });
       return;
     }
-    const trip = toggleNoteItem(this.data.tripId, event.currentTarget.dataset.id);
+    const trip = toggleNoteItem(
+      this.data.tripId,
+      event.currentTarget.dataset.id,
+    );
     this.setData({
       trip,
-      filteredNotes: this.filterNotes(trip ? trip.notes : [], this.data.selectedFilter)
+      ...getNoteProgress(trip),
+      filteredNotes: this.filterNotes(
+        trip ? trip.notes : [],
+        this.data.selectedFilter,
+      ),
     });
   },
 
   deleteNoteItem(event: { currentTarget: { dataset: { id: string } } }) {
-    const note = this.data.trip?.notes.find((item) => item.id === event.currentTarget.dataset.id);
+    const note = this.data.trip?.notes.find(
+      (item) => item.id === event.currentTarget.dataset.id,
+    );
     if (!note) return;
     wx.showModal({
       title: "删除备忘",
@@ -133,17 +194,24 @@ Page({
         this.setData({
           trip,
           openNoteId: "",
-          filteredNotes: this.filterNotes(trip ? trip.notes : [], this.data.selectedFilter)
+          ...getNoteProgress(trip),
+          filteredNotes: this.filterNotes(
+            trip ? trip.notes : [],
+            this.data.selectedFilter,
+          ),
         });
-      }
+      },
     });
   },
 
   filterNotes(notes: NoteItem[], selectedFilter: string): NoteItem[] {
-    const filtered = selectedFilter === "全部" ? notes : notes.filter((item) => item.category === selectedFilter);
+    const filtered =
+      selectedFilter === "全部"
+        ? notes
+        : notes.filter((item) => item.category === selectedFilter);
     return [...filtered].sort((a, b) => {
       if (a.done !== b.done) return a.done ? 1 : -1;
       return b.createdAt - a.createdAt;
     });
-  }
+  },
 });

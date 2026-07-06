@@ -1,8 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const trip_store_1 = require("../../services/trip-store");
+const cloud_1 = require("../../config/cloud");
 const date_1 = require("../../utils/date");
 const id_1 = require("../../utils/id");
+let cloudReady = false;
 function getFileExt(filePath) {
     const match = filePath.match(/\.([a-zA-Z0-9]+)(?:\?|$)/);
     return match ? match[1].toLowerCase() : "jpg";
@@ -10,18 +12,87 @@ function getFileExt(filePath) {
 function isCloudFile(filePath) {
     return filePath.startsWith("cloud://");
 }
+function ensureCloudReady() {
+    if (!wx.cloud)
+        return false;
+    if (!cloudReady) {
+        wx.cloud.init({
+            env: cloud_1.CLOUD_ENV_ID,
+            traceUser: true,
+        });
+        cloudReady = true;
+    }
+    return true;
+}
+function getSafeCloudPath(filePath, tripId) {
+    const safeTripId = tripId.replace(/[^a-zA-Z0-9_-]/g, "_") || "trip";
+    const safeExt = getFileExt(filePath).replace(/[^a-zA-Z0-9]/g, "") || "jpg";
+    return `trip-images/${safeTripId}/${Date.now()}-${(0, id_1.createId)("img")}.${safeExt}`;
+}
+function getErrorMessage(error) {
+    if (error instanceof Error && error.message)
+        return error.message;
+    if (typeof error === "object" && error && "errMsg" in error) {
+        return String(error.errMsg || "图片上传失败");
+    }
+    return "图片上传失败";
+}
+function shouldFallbackToCloudFunction(error) {
+    const message = getErrorMessage(error);
+    return /STORAGE_EXCEED_AUTHORITY|Have no access right|access right|authority/i.test(message);
+}
+function readFileAsBase64(filePath) {
+    return new Promise((resolve, reject) => {
+        wx.getFileSystemManager().readFile({
+            filePath,
+            encoding: "base64",
+            success: (res) => resolve(String(res.data)),
+            fail: (error) => reject(new Error(error.errMsg || "读取图片失败")),
+        });
+    });
+}
+function uploadImageByCloudFunction(filePath, tripId) {
+    return new Promise(async (resolve, reject) => {
+        if (!ensureCloudReady() || !wx.cloud) {
+            reject(new Error("云开发未初始化"));
+            return;
+        }
+        try {
+            const fileContent = await readFileAsBase64(filePath);
+            wx.cloud.callFunction({
+                name: "uploadImage",
+                data: {
+                    cloudPath: getSafeCloudPath(filePath, tripId),
+                    fileContent,
+                },
+                success: (res) => {
+                    const result = res.result;
+                    if (!result?.fileID) {
+                        reject(new Error(result?.error || "云函数上传未返回 fileID"));
+                        return;
+                    }
+                    resolve(result.fileID);
+                },
+                fail: (error) => reject(new Error(error.errMsg || "云函数上传失败")),
+            });
+        }
+        catch (error) {
+            reject(error);
+        }
+    });
+}
 function uploadImageToCloud(filePath, tripId) {
     return new Promise((resolve, reject) => {
         if (isCloudFile(filePath)) {
             resolve(filePath);
             return;
         }
-        if (!wx.cloud) {
+        if (!ensureCloudReady() || !wx.cloud) {
             reject(new Error("云开发未初始化"));
             return;
         }
         wx.cloud.uploadFile({
-            cloudPath: `trip-images/${tripId}/${Date.now()}-${(0, id_1.createId)("img")}.${getFileExt(filePath)}`,
+            cloudPath: getSafeCloudPath(filePath, tripId),
             filePath,
             success: (res) => {
                 if (!res.fileID) {
@@ -30,7 +101,16 @@ function uploadImageToCloud(filePath, tripId) {
                 }
                 resolve(res.fileID);
             },
-            fail: (error) => reject(new Error(error.errMsg || "图片上传失败"))
+            fail: (error) => {
+                const uploadError = new Error(error.errMsg || "图片上传失败");
+                if (!shouldFallbackToCloudFunction(uploadError)) {
+                    reject(uploadError);
+                    return;
+                }
+                uploadImageByCloudFunction(filePath, tripId)
+                    .then(resolve)
+                    .catch(reject);
+            },
         });
     });
 }
@@ -40,6 +120,9 @@ async function uploadImagesToCloud(filePaths, tripId) {
         uploaded.push(await uploadImageToCloud(filePath, tripId));
     }
     return uploaded;
+}
+function hasLocalImage(filePaths) {
+    return filePaths.some((filePath) => !isCloudFile(filePath));
 }
 Page({
     data: {
@@ -58,7 +141,7 @@ Page({
         categories: (0, trip_store_1.getScheduleCategories)(),
         images: [],
         uploadingImages: false,
-        saving: false
+        saving: false,
     },
     onLoad(options) {
         if (!options.tripId)
@@ -83,7 +166,7 @@ Page({
             place: schedule ? schedule.place : trip ? trip.destination : "",
             note: schedule ? schedule.note : "",
             category: schedule ? schedule.category : this.data.category,
-            images: schedule ? schedule.images : []
+            images: schedule ? schedule.images : [],
         });
         if (schedule)
             wx.setNavigationBarTitle({ title: "编辑日程" });
@@ -110,16 +193,16 @@ Page({
     chooseImages() {
         if (this.data.uploadingImages)
             return;
-        wx.chooseMedia({
+        wx.chooseImage({
             count: Math.max(3 - this.data.images.length, 1),
-            mediaType: ["image"],
+            sizeType: ["compressed"],
             sourceType: ["album", "camera"],
             success: async (res) => {
-                const selected = res.tempFiles.map((item) => item.tempFilePath).slice(0, Math.max(3 - this.data.images.length, 0));
+                const selected = res.tempFilePaths.slice(0, Math.max(3 - this.data.images.length, 0));
                 if (selected.length === 0)
                     return;
-                if (!wx.cloud) {
-                    wx.showToast({ title: "请先开启云开发", icon: "none" });
+                if (!ensureCloudReady()) {
+                    wx.showToast({ title: "云开发不可用，无法上传", icon: "none" });
                     return;
                 }
                 this.setData({ uploadingImages: true });
@@ -127,20 +210,32 @@ Page({
                 try {
                     const uploaded = await uploadImagesToCloud(selected, this.data.tripId);
                     this.setData({
-                        images: [...this.data.images, ...uploaded].slice(0, 3)
+                        images: [...this.data.images, ...uploaded].slice(0, 3),
                     });
                     wx.showToast({ title: "上传成功", icon: "success" });
                 }
                 catch (error) {
-                    wx.showToast({ title: "图片上传失败", icon: "none" });
+                    const message = getErrorMessage(error);
+                    console.error("图片上传失败", { message, selected, error });
+                    wx.showToast({
+                        title: message.slice(0, 18),
+                        icon: "none",
+                        duration: 2600,
+                    });
                 }
                 finally {
                     this.setData({ uploadingImages: false });
                 }
-            }
+            },
+            fail: (error) => {
+                if (error.errMsg && !error.errMsg.includes("cancel")) {
+                    console.error("选择图片失败", error);
+                    wx.showToast({ title: "选择图片失败", icon: "none" });
+                }
+            },
         });
     },
-    saveSchedule() {
+    async saveSchedule() {
         if (this.data.saving)
             return;
         const title = this.data.title.trim();
@@ -153,6 +248,30 @@ Page({
             return;
         }
         this.setData({ saving: true });
+        let images = this.data.images;
+        if (hasLocalImage(images)) {
+            if (!ensureCloudReady()) {
+                this.setData({ saving: false });
+                wx.showToast({ title: "图片需上传云端后才能保存", icon: "none" });
+                return;
+            }
+            try {
+                wx.showToast({ title: "同步图片中", icon: "loading" });
+                images = await uploadImagesToCloud(images, this.data.tripId);
+                this.setData({ images });
+            }
+            catch (error) {
+                const message = getErrorMessage(error);
+                console.error("保存前上传图片失败", { message, error });
+                this.setData({ saving: false });
+                wx.showToast({
+                    title: message.slice(0, 18),
+                    icon: "none",
+                    duration: 2600,
+                });
+                return;
+            }
+        }
         const input = {
             day: this.data.day,
             time: this.data.time,
@@ -160,7 +279,7 @@ Page({
             title,
             place: this.data.place || this.data.trip?.destination || "",
             note: this.data.note,
-            images: this.data.images
+            images,
         };
         if (this.data.isEditing) {
             (0, trip_store_1.updateSchedule)(this.data.tripId, this.data.scheduleId, input);
@@ -169,5 +288,5 @@ Page({
             (0, trip_store_1.addSchedule)(this.data.tripId, input);
         }
         wx.navigateBack();
-    }
+    },
 });
