@@ -236,7 +236,7 @@ function getCategories(expenses: ExpenseItem[], total: number): Array<{ category
 }
 
 function getRingStyle(percent: number): string {
-  return `background: conic-gradient(#ff6500 0% ${percent}%, rgba(255, 122, 0, 0.14) ${percent}% 100%);`;
+  return `background: conic-gradient(#ff6500 0% ${percent}%, #ffe4d0 ${percent}% 100%);`;
 }
 
 function formatMoney(amount: number): string {

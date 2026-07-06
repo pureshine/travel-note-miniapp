@@ -1201,6 +1201,12 @@
   height: 340rpx !important;
 }
 
+/* Opaque ring track masks coin edge even at 0% usage. */
+.stats-page .ring-inner {
+  background: #ffffff !important;
+  box-shadow: 0 0 0 2rpx #ffffff !important;
+}
+
 @media (max-width: 340px) {
   .stats-page .ring-box {
     right: 148rpx !important;
