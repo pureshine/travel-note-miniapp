@@ -55,6 +55,8 @@ export interface Trip {
 export interface TripSummary {
   tripCount: number;
   expenseTotal: number;
+  noteCount: number;
+  scheduleCount: number;
   checklistDone: number;
   checklistTotal: number;
 }

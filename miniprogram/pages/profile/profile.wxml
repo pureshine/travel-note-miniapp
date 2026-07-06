@@ -42,8 +42,8 @@
       <view class="mini-label">旅行</view>
     </view>
     <view class="mini-card">
-      <view class="mini-value">¥{{expenseTotal}}</view>
-      <view class="mini-label">已记录</view>
+      <view class="mini-value">{{scheduleCount}}</view>
+      <view class="mini-label">日程</view>
     </view>
     <view class="mini-card wide">
       <view class="mini-value sync-time">{{lastSyncText}}</view>

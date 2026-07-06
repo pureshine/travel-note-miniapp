@@ -20,12 +20,23 @@ exports.main = async (event) => {
   if (event.action === "upload") {
     const trips = Array.isArray(event.trips) ? event.trips : [];
     const deletedTripIds = normalizeIdList(event.deletedTripIds);
+    const localTripIds = normalizeIdList(event.localTripIds);
     const updatedAt = Date.now();
 
     for (const tripId of deletedTripIds) {
       const existing = await getSharedTrip(tripId);
       if (existing && Array.isArray(existing.memberOpenids) && existing.memberOpenids.includes(openid)) {
         await sharedTrips.doc(tripId).remove();
+      }
+    }
+
+    if (Array.isArray(event.localTripIds)) {
+      const ownerTrips = await sharedTrips.where({ ownerOpenid: openid }).limit(100).get();
+      for (const doc of ownerTrips.data || []) {
+        const tripId = doc._id;
+        if (!localTripIds.includes(tripId) && !deletedTripIds.includes(tripId)) {
+          await sharedTrips.doc(tripId).remove();
+        }
       }
     }
 

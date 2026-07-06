@@ -10,7 +10,7 @@ import {
   syncTripsWithCloud,
   updateSavedProfile
 } from "../../services/cloud-sync";
-import { getActiveTrip, getSummary, listTrips } from "../../services/trip-store";
+import { getActiveTrip, getSummary, listTrips, reconcileClearedPlanState } from "../../services/trip-store";
 import { getCustomNavStyle, getSafeTopStyle } from "../../utils/ui";
 
 function formatSyncTime(timestamp?: number): string {
@@ -39,7 +39,7 @@ Page({
     syncing: false,
     inviteLoading: false,
     tripCount: 0,
-    expenseTotal: "0",
+    scheduleCount: 0,
     currentTripId: "",
     currentTripName: "暂无旅行",
     memberNamesText: "",
@@ -66,9 +66,27 @@ Page({
   onShow() {
     this.applyProfile(getSavedProfile());
     this.refreshLocalStats();
-    if (this.data.loggedIn && !this.data.autoSynced) {
-      this.autoSyncCloudData();
+    if (this.data.loggedIn && !this.data.syncing) {
+      void this.reconcileWithCloud();
     }
+  },
+
+  async reconcileWithCloud() {
+    if (this.data.syncing) return;
+    this.setData({ syncing: true, syncStatus: "同步中", syncTip: "正在与云端对齐数据" });
+    try {
+      const result = await syncTripsWithCloud();
+      this.applySyncResult(result.tripCount || 0, result.updatedAt);
+      this.refreshLocalStats();
+    } catch (error) {
+      console.error("云端对齐失败", error);
+    } finally {
+      this.setData({ syncing: false, autoSynced: true });
+    }
+  },
+
+  async pushLocalChanges() {
+    return this.reconcileWithCloud();
   },
 
   async loginWithWechat() {
@@ -232,8 +250,6 @@ Page({
   },
 
   async restoreOrUploadTrips() {
-    const cloudResult = await downloadTripsFromCloud();
-    if ((cloudResult.tripCount || 0) > 0) return cloudResult;
     return syncTripsWithCloud();
   },
 
@@ -372,6 +388,7 @@ Page({
   },
 
   refreshLocalStats() {
+    reconcileClearedPlanState();
     const trips = listTrips();
     const summary = getSummary();
     const currentTrip = getActiveTrip();
@@ -382,7 +399,7 @@ Page({
       .filter((name) => name && name !== "未设置名字");
     this.setData({
       tripCount: trips.length,
-      expenseTotal: `${summary.expenseTotal}`,
+      scheduleCount: summary.scheduleCount,
       currentTripId: currentTrip ? currentTrip.id : "",
       currentTripName: currentTrip ? currentTrip.name : "暂无旅行",
       memberNamesText: memberNames.length > 0 ? memberNames.join("、") : "",
@@ -390,7 +407,8 @@ Page({
     });
   },
 
-  applySyncResult(tripCount: number, updatedAt?: number) {
+  applySyncResult(_tripCount: number, updatedAt?: number) {
+    const tripCount = listTrips().length;
     this.setData({
       syncStatus: "已同步",
       syncTip: `${tripCount} 个旅行已保存到云端`,

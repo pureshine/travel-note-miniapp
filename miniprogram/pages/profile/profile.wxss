@@ -2637,3 +2637,19 @@
     line-height: 58rpx !important;
   }
 }
+
+/* Profile overview: unified stat values, full display. */
+.profile-page .overview-grid .mini-value {
+  overflow: visible !important;
+  color: #111827 !important;
+  font-size: 28rpx !important;
+  font-weight: 800 !important;
+  line-height: 1.12 !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+}
+
+.profile-page .overview-grid .mini-card.wide .mini-value {
+  width: 100% !important;
+  max-width: none !important;
+}

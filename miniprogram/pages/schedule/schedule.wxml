@@ -41,7 +41,7 @@
           <view class="plan-change">▾</view>
         </view>
       </picker>
-      <button class="plan-menu" bindtap="manageTrip">操作</button>
+      <view class="plan-menu" catchtap="manageTrip">操作</view>
     </view>
     <button class="quick-add" bindtap="goScheduleForm">+ 添加日程</button>
   </view>

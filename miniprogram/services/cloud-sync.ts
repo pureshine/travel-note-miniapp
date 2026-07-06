@@ -1,4 +1,11 @@
-import { clearDeletedItemIds, exportTripsForSync, getDeletedTripIdsForSync, importTripsFromSync } from "./trip-store";
+import {
+  clearDeletedItemIds,
+  exportTripsForSync,
+  getDeletedTripIdsForSync,
+  importTripsFromSync,
+  isLocalTripsCleared,
+  reconcileClearedPlanState
+} from "./trip-store";
 import { Trip } from "../types/trip";
 
 const PROFILE_KEY = "travel-note-profile";
@@ -107,15 +114,18 @@ export function updateSavedProfile(input: Partial<Pick<CloudProfile, "nickname" 
   return nextProfile;
 }
 
-export async function uploadTripsToCloud(): Promise<SyncResult> {
+export async function uploadTripsToCloud(options?: { clearDeleted?: boolean }): Promise<SyncResult> {
   const trips = exportTripsForSync();
   const result = await callCloudFunction<SyncResult>("syncTrips", {
     action: "upload",
     trips,
     deletedTripIds: getDeletedTripIdsForSync(),
+    localTripIds: trips.map((trip) => trip.id),
     memberProfile: getSyncMemberProfile()
   });
-  clearDeletedItemIds();
+  if (options?.clearDeleted !== false) {
+    clearDeletedItemIds();
+  }
   updateLastSyncAt(result.updatedAt || Date.now());
   return result;
 }
@@ -124,16 +134,32 @@ export async function downloadTripsFromCloud(): Promise<SyncResult> {
   const result = await callCloudFunction<SyncResult>("syncTrips", {
     action: "download"
   });
-  if (Array.isArray(result.trips) && result.trips.length > 0) {
-    importTripsFromSync(result.trips);
+  if (Array.isArray(result.trips)) {
+    if (result.trips.length === 0) {
+      importTripsFromSync([], { replace: true });
+    } else {
+      importTripsFromSync(result.trips);
+    }
   }
   updateLastSyncAt(result.updatedAt || Date.now());
   return result;
 }
 
 export async function syncTripsWithCloud(): Promise<SyncResult> {
-  await uploadTripsToCloud();
-  return downloadTripsFromCloud();
+  reconcileClearedPlanState();
+  await uploadTripsToCloud({ clearDeleted: false });
+  const result = await callCloudFunction<SyncResult>("syncTrips", {
+    action: "download"
+  });
+  const cloudTrips = Array.isArray(result.trips) ? result.trips : [];
+  if (isLocalTripsCleared() && cloudTrips.length > 0) {
+    importTripsFromSync([], { replace: true });
+  } else {
+    importTripsFromSync(cloudTrips, { replace: true });
+  }
+  clearDeletedItemIds();
+  updateLastSyncAt(result.updatedAt || Date.now());
+  return result;
 }
 
 export async function resetMyCloudData(): Promise<SyncResult> {

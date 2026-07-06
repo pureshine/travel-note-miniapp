@@ -61,15 +61,18 @@ function updateSavedProfile(input) {
     return nextProfile;
 }
 exports.updateSavedProfile = updateSavedProfile;
-async function uploadTripsToCloud() {
+async function uploadTripsToCloud(options) {
     const trips = (0, trip_store_1.exportTripsForSync)();
     const result = await callCloudFunction("syncTrips", {
         action: "upload",
         trips,
         deletedTripIds: (0, trip_store_1.getDeletedTripIdsForSync)(),
+        localTripIds: trips.map((trip) => trip.id),
         memberProfile: getSyncMemberProfile()
     });
-    (0, trip_store_1.clearDeletedItemIds)();
+    if (options?.clearDeleted !== false) {
+        (0, trip_store_1.clearDeletedItemIds)();
+    }
     updateLastSyncAt(result.updatedAt || Date.now());
     return result;
 }
@@ -78,16 +81,34 @@ async function downloadTripsFromCloud() {
     const result = await callCloudFunction("syncTrips", {
         action: "download"
     });
-    if (Array.isArray(result.trips) && result.trips.length > 0) {
-        (0, trip_store_1.importTripsFromSync)(result.trips);
+    if (Array.isArray(result.trips)) {
+        if (result.trips.length === 0) {
+            (0, trip_store_1.importTripsFromSync)([], { replace: true });
+        }
+        else {
+            (0, trip_store_1.importTripsFromSync)(result.trips);
+        }
     }
     updateLastSyncAt(result.updatedAt || Date.now());
     return result;
 }
 exports.downloadTripsFromCloud = downloadTripsFromCloud;
 async function syncTripsWithCloud() {
-    await uploadTripsToCloud();
-    return downloadTripsFromCloud();
+    (0, trip_store_1.reconcileClearedPlanState)();
+    await uploadTripsToCloud({ clearDeleted: false });
+    const result = await callCloudFunction("syncTrips", {
+        action: "download"
+    });
+    const cloudTrips = Array.isArray(result.trips) ? result.trips : [];
+    if ((0, trip_store_1.isLocalTripsCleared)() && cloudTrips.length > 0) {
+        (0, trip_store_1.importTripsFromSync)([], { replace: true });
+    }
+    else {
+        (0, trip_store_1.importTripsFromSync)(cloudTrips, { replace: true });
+    }
+    (0, trip_store_1.clearDeletedItemIds)();
+    updateLastSyncAt(result.updatedAt || Date.now());
+    return result;
 }
 exports.syncTripsWithCloud = syncTripsWithCloud;
 async function resetMyCloudData() {

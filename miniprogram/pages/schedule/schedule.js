@@ -6,7 +6,7 @@ Page({
     data: {
         safeTopStyle: (0, ui_1.getSafeTopStyle)(14),
         customNavStyle: (0, ui_1.getCustomNavStyle)(),
-        trip: undefined,
+        trip: null,
         trips: [],
         tripOptions: [],
         activeTripIndex: 0,
@@ -28,6 +28,7 @@ Page({
         this.loadTrip();
     },
     loadTrip() {
+        (0, trip_store_1.reconcileClearedPlanState)();
         const trips = (0, trip_store_1.listTrips)();
         const trip = (0, trip_store_1.getActiveTrip)();
         if (!trip) {
@@ -99,17 +100,8 @@ Page({
             success: (result) => {
                 if (!result.confirm)
                     return;
-                const nextTrip = (0, trip_store_1.deleteTrip)(trip.id, { clearActive: true });
-                const latestTrips = (0, trip_store_1.listTrips)();
-                if (nextTrip) {
-                    this.applyTripState(nextTrip, latestTrips);
-                }
-                else {
-                    this.setData({
-                        ...this.getEmptyScheduleState(),
-                        trips: latestTrips,
-                    });
-                }
+                (0, trip_store_1.deleteTrip)(trip.id, { clearActive: true });
+                this.loadTrip();
                 wx.showToast({ title: "已删除", icon: "success" });
             },
         });
@@ -222,7 +214,7 @@ Page({
     },
     getEmptyScheduleState() {
         return {
-            trip: undefined,
+            trip: null,
             trips: [],
             tripOptions: [],
             activeTripIndex: 0,

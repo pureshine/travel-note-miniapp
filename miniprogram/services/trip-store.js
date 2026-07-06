@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getNoteCategories = exports.getScheduleCategories = exports.clearActiveTripId = exports.setActiveTripId = exports.getActiveTrip = exports.getDefaultTrip = exports.importTripsFromSync = exports.getDeletedTripIdsForSync = exports.clearDeletedItemIds = exports.exportTripsForSync = exports.resetDemoData = exports.getExpenseByCategory = exports.getSummary = exports.deleteExpense = exports.updateExpense = exports.addExpense = exports.deleteNote = exports.toggleNoteItem = exports.updateNote = exports.addNote = exports.toggleChecklistItem = exports.addChecklistItem = exports.deleteSchedule = exports.updateSchedule = exports.addSchedule = exports.deleteTrip = exports.updateTripBudget = exports.updateTripInfo = exports.createTrip = exports.getTrip = exports.listTrips = void 0;
+exports.getNoteCategories = exports.getScheduleCategories = exports.clearActiveTripId = exports.setActiveTripId = exports.getActiveTrip = exports.getDefaultTrip = exports.importTripsFromSync = exports.reconcileClearedPlanState = exports.isLocalTripsCleared = exports.getDeletedTripIdsForSync = exports.clearDeletedItemIds = exports.exportTripsForSync = exports.resetDemoData = exports.getExpenseByCategory = exports.getSummary = exports.getDataUpdatedAt = exports.deleteExpense = exports.updateExpense = exports.addExpense = exports.deleteNote = exports.toggleNoteItem = exports.updateNote = exports.addNote = exports.toggleChecklistItem = exports.addChecklistItem = exports.deleteSchedule = exports.updateSchedule = exports.addSchedule = exports.deleteTrip = exports.updateTripBudget = exports.updateTripInfo = exports.createTrip = exports.getTrip = exports.listTrips = void 0;
 const id_1 = require("../utils/id");
 const date_1 = require("../utils/date");
 const STORAGE_KEY = "travel-note-trips";
@@ -117,8 +117,8 @@ function createTrip(input) {
         notes: [],
         expenses: []
     };
-    writeTrips([trip, ...readTrips()]);
     setActiveTripId(trip.id);
+    writeTrips([trip, ...readTrips()]);
     return trip;
 }
 exports.createTrip = createTrip;
@@ -143,8 +143,12 @@ function deleteTrip(tripId, options) {
     markDeletedTrip(tripId);
     const activeTripId = wx.getStorageSync(ACTIVE_TRIP_KEY);
     const trips = readTrips().filter((trip) => trip.id !== tripId);
-    if (options?.clearActive || !activeTripId || activeTripId === tripId)
+    if (trips.length === 0) {
         clearActiveTripId();
+    }
+    else if (!activeTripId || activeTripId === tripId) {
+        setActiveTripId(trips[0].id);
+    }
     writeTrips(trips);
     return getActiveTrip();
 }
@@ -252,13 +256,20 @@ function deleteExpense(tripId, expenseId) {
     }));
 }
 exports.deleteExpense = deleteExpense;
+function getDataUpdatedAt() {
+    return wx.getStorageSync(DATA_UPDATED_AT_KEY) || 0;
+}
+exports.getDataUpdatedAt = getDataUpdatedAt;
 function getSummary() {
     const trips = listTrips();
     const expenses = trips.flatMap((trip) => trip.expenses);
     const checklist = trips.flatMap((trip) => trip.checklist);
+    const notes = trips.flatMap((trip) => trip.notes);
     return {
         tripCount: trips.length,
         expenseTotal: expenses.reduce((total, item) => total + item.amount, 0),
+        noteCount: notes.length,
+        scheduleCount: trips.reduce((total, trip) => total + trip.schedules.length, 0),
         checklistDone: checklist.filter((item) => item.done).length,
         checklistTotal: checklist.length
     };
@@ -301,13 +312,33 @@ function getDeletedTripIdsForSync() {
     return readDeletedTripIds();
 }
 exports.getDeletedTripIdsForSync = getDeletedTripIdsForSync;
-function importTripsFromSync(trips) {
+function isLocalTripsCleared() {
+    return Boolean(wx.getStorageSync(ACTIVE_TRIP_CLEARED_KEY));
+}
+exports.isLocalTripsCleared = isLocalTripsCleared;
+function reconcileClearedPlanState() {
+    if (!isLocalTripsCleared())
+        return;
+    const trips = readTrips();
+    if (trips.length === 0)
+        return;
+    const activeTripId = wx.getStorageSync(ACTIVE_TRIP_KEY);
+    if (activeTripId && trips.some((trip) => trip.id === activeTripId))
+        return;
+    writeTrips([], { skipAutoSync: true });
+}
+exports.reconcileClearedPlanState = reconcileClearedPlanState;
+function importTripsFromSync(trips, options) {
     const activeTripId = wx.getStorageSync(ACTIVE_TRIP_KEY);
     const activeTripWasCleared = Boolean(wx.getStorageSync(ACTIVE_TRIP_CLEARED_KEY));
     const deletedTripIds = new Set(readDeletedTripIds());
     const normalizedTrips = trips.filter((trip) => !deletedTripIds.has(trip.id)).map(normalizeTrip);
     const localTrips = readTrips().map(normalizeTrip);
-    const mergedTrips = mergeTrips(localTrips, normalizedTrips);
+    const mergedTrips = options?.replace
+        ? normalizedTrips
+        : localTrips.length === 0 && activeTripWasCleared
+            ? []
+            : mergeTrips(localTrips, normalizedTrips);
     writeTrips(mergedTrips, { skipAutoSync: true });
     const stillActiveTrip = activeTripId ? mergedTrips.find((trip) => trip.id === activeTripId) : undefined;
     if (stillActiveTrip) {
@@ -381,11 +412,18 @@ function normalizeTrip(trip) {
     };
 }
 function mergeTrips(localTrips, cloudTrips) {
+    const allowCloudBootstrap = localTrips.length === 0 && !wx.getStorageSync(ACTIVE_TRIP_CLEARED_KEY);
     const tripMap = new Map();
     localTrips.forEach((trip) => tripMap.set(trip.id, normalizeTrip(trip)));
     cloudTrips.forEach((trip) => {
         const localTrip = tripMap.get(trip.id);
-        tripMap.set(trip.id, localTrip ? mergeTrip(localTrip, normalizeTrip(trip)) : normalizeTrip(trip));
+        if (!localTrip) {
+            if (allowCloudBootstrap) {
+                tripMap.set(trip.id, normalizeTrip(trip));
+            }
+            return;
+        }
+        tripMap.set(trip.id, mergeTrip(localTrip, normalizeTrip(trip)));
     });
     return Array.from(tripMap.values()).sort((a, b) => {
         const aTime = new Date(a.startDate || "1970-01-01").getTime();
@@ -394,29 +432,36 @@ function mergeTrips(localTrips, cloudTrips) {
     });
 }
 function mergeTrip(localTrip, cloudTrip) {
+    const deletedItems = readDeletedItemIds()[localTrip.id] || {};
     return normalizeTrip({
-        ...localTrip,
         ...cloudTrip,
-        schedules: mergeById(localTrip.schedules, cloudTrip.schedules).sort(compareSchedule),
-        checklist: mergeById(localTrip.checklist, cloudTrip.checklist),
-        notes: mergeById(localTrip.notes, cloudTrip.notes).sort((a, b) => b.createdAt - a.createdAt),
-        expenses: mergeById(localTrip.expenses, cloudTrip.expenses).sort((a, b) => b.createdAt - a.createdAt),
+        ...localTrip,
+        schedules: removeDeletedItems(mergeById(localTrip.schedules, cloudTrip.schedules).sort(compareSchedule), deletedItems.schedules || []),
+        checklist: removeDeletedItems(mergeById(localTrip.checklist, cloudTrip.checklist), deletedItems.checklist || []),
+        notes: removeDeletedItems(mergeById(localTrip.notes, cloudTrip.notes).sort((a, b) => b.createdAt - a.createdAt), deletedItems.notes || []),
+        expenses: removeDeletedItems(mergeById(localTrip.expenses, cloudTrip.expenses).sort((a, b) => b.createdAt - a.createdAt), deletedItems.expenses || []),
         sharedMembers: mergeById(localTrip.sharedMembers || [], cloudTrip.sharedMembers || [])
     });
 }
 function mergeById(localItems, cloudItems) {
     const itemMap = new Map();
-    localItems.forEach((item) => {
-        const key = item.id || item.openid;
-        if (key)
-            itemMap.set(key, item);
-    });
     cloudItems.forEach((item) => {
         const key = item.id || item.openid;
         if (key)
             itemMap.set(key, item);
     });
+    localItems.forEach((item) => {
+        const key = item.id || item.openid;
+        if (key)
+            itemMap.set(key, item);
+    });
     return Array.from(itemMap.values());
+}
+function removeDeletedItems(items, deletedIds) {
+    if (!deletedIds.length)
+        return items;
+    const deletedIdSet = new Set(deletedIds);
+    return items.filter((item) => !item.id || !deletedIdSet.has(item.id));
 }
 function readDeletedItemIds() {
     const stored = wx.getStorageSync(DELETED_ITEMS_KEY);

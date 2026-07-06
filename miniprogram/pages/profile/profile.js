@@ -29,7 +29,7 @@ Page({
         syncing: false,
         inviteLoading: false,
         tripCount: 0,
-        expenseTotal: "0",
+        scheduleCount: 0,
         currentTripId: "",
         currentTripName: "暂无旅行",
         memberNamesText: "",
@@ -54,9 +54,28 @@ Page({
     onShow() {
         this.applyProfile((0, cloud_sync_1.getSavedProfile)());
         this.refreshLocalStats();
-        if (this.data.loggedIn && !this.data.autoSynced) {
-            this.autoSyncCloudData();
+        if (this.data.loggedIn && !this.data.syncing) {
+            void this.reconcileWithCloud();
         }
+    },
+    async reconcileWithCloud() {
+        if (this.data.syncing)
+            return;
+        this.setData({ syncing: true, syncStatus: "同步中", syncTip: "正在与云端对齐数据" });
+        try {
+            const result = await (0, cloud_sync_1.syncTripsWithCloud)();
+            this.applySyncResult(result.tripCount || 0, result.updatedAt);
+            this.refreshLocalStats();
+        }
+        catch (error) {
+            console.error("云端对齐失败", error);
+        }
+        finally {
+            this.setData({ syncing: false, autoSynced: true });
+        }
+    },
+    async pushLocalChanges() {
+        return this.reconcileWithCloud();
     },
     async loginWithWechat() {
         if (this.data.syncing)
@@ -230,9 +249,6 @@ Page({
         }
     },
     async restoreOrUploadTrips() {
-        const cloudResult = await (0, cloud_sync_1.downloadTripsFromCloud)();
-        if ((cloudResult.tripCount || 0) > 0)
-            return cloudResult;
         return (0, cloud_sync_1.syncTripsWithCloud)();
     },
     async createInvite() {
@@ -368,6 +384,7 @@ Page({
         });
     },
     refreshLocalStats() {
+        (0, trip_store_1.reconcileClearedPlanState)();
         const trips = (0, trip_store_1.listTrips)();
         const summary = (0, trip_store_1.getSummary)();
         const currentTrip = (0, trip_store_1.getActiveTrip)();
@@ -378,14 +395,15 @@ Page({
             .filter((name) => name && name !== "未设置名字");
         this.setData({
             tripCount: trips.length,
-            expenseTotal: `${summary.expenseTotal}`,
+            scheduleCount: summary.scheduleCount,
             currentTripId: currentTrip ? currentTrip.id : "",
             currentTripName: currentTrip ? currentTrip.name : "暂无旅行",
             memberNamesText: memberNames.length > 0 ? memberNames.join("、") : "",
             inviteStatus: this.data.inviteCode ? this.data.inviteStatus : currentTrip ? `${currentTrip.name} 可生成好友邀请` : "新建旅行后可邀请好友共同记录"
         });
     },
-    applySyncResult(tripCount, updatedAt) {
+    applySyncResult(_tripCount, updatedAt) {
+        const tripCount = (0, trip_store_1.listTrips)().length;
         this.setData({
             syncStatus: "已同步",
             syncTip: `${tripCount} 个旅行已保存到云端`,

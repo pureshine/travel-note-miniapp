@@ -47,7 +47,7 @@ Page({
     onEndDateChange(event) {
         this.setData({ endDate: event.detail.value });
     },
-    async saveTrip() {
+    saveTrip() {
         if (this.data.saving)
             return;
         const destination = this.data.destination.trim();
@@ -63,20 +63,28 @@ Page({
             startDate: this.data.startDate,
             endDate: this.data.endDate
         };
+        let saved = false;
         if (this.data.isEditing) {
-            (0, trip_store_1.updateTripInfo)(this.data.tripId, input);
+            saved = Boolean((0, trip_store_1.updateTripInfo)(this.data.tripId, input));
         }
         else {
             (0, trip_store_1.createTrip)(input);
+            saved = true;
+        }
+        if (!saved) {
+            this.setData({ saving: false });
+            wx.showToast({ title: "保存失败", icon: "none" });
+            return;
         }
         if ((0, cloud_sync_1.getSavedProfile)()) {
-            try {
-                await (0, cloud_sync_1.syncTripsWithCloud)();
-            }
-            catch (error) {
-                console.error("旅行同步失败", error);
-            }
+            (0, cloud_sync_1.syncTripsWithCloud)().catch((error) => console.error("旅行同步失败", error));
         }
-        wx.navigateBack();
+        this.setData({ saving: false });
+        wx.showToast({ title: "已保存", icon: "success" });
+        if (getCurrentPages().length > 1) {
+            wx.navigateBack();
+            return;
+        }
+        wx.switchTab({ url: "/pages/schedule/schedule" });
     }
 });

@@ -3,6 +3,7 @@ import {
   deleteTrip as removeTrip,
   getActiveTrip,
   listTrips,
+  reconcileClearedPlanState,
   setActiveTripId,
 } from "../../services/trip-store";
 import { ScheduleItem, Trip } from "../../types/trip";
@@ -32,7 +33,7 @@ Page({
   data: {
     safeTopStyle: getSafeTopStyle(14),
     customNavStyle: getCustomNavStyle(),
-    trip: undefined as Trip | undefined,
+    trip: null,
     trips: [] as Trip[],
     tripOptions: [] as string[],
     activeTripIndex: 0,
@@ -56,6 +57,7 @@ Page({
   },
 
   loadTrip() {
+    reconcileClearedPlanState();
     const trips = listTrips();
     const trip = getActiveTrip();
     if (!trip) {
@@ -130,16 +132,8 @@ Page({
       confirmColor: "#dc2626",
       success: (result) => {
         if (!result.confirm) return;
-        const nextTrip = removeTrip(trip.id, { clearActive: true });
-        const latestTrips = listTrips();
-        if (nextTrip) {
-          this.applyTripState(nextTrip, latestTrips);
-        } else {
-          this.setData({
-            ...this.getEmptyScheduleState(),
-            trips: latestTrips,
-          });
-        }
+        removeTrip(trip.id, { clearActive: true });
+        this.loadTrip();
         wx.showToast({ title: "已删除", icon: "success" });
       },
     });
@@ -276,7 +270,7 @@ Page({
 
   getEmptyScheduleState() {
     return {
-      trip: undefined,
+      trip: null,
       trips: [] as Trip[],
       tripOptions: [] as string[],
       activeTripIndex: 0,
