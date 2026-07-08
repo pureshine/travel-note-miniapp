@@ -139,6 +139,7 @@ Page({
         title: "",
         day: (0, date_1.today)(),
         time: "09:00",
+        endTime: "10:00",
         place: "",
         note: "",
         category: "景点",
@@ -170,6 +171,7 @@ Page({
             title: schedule ? schedule.title : "",
             day: schedule ? schedule.day : trip ? trip.startDate : (0, date_1.today)(),
             time: schedule ? schedule.time : this.data.time,
+            endTime: schedule ? schedule.endTime || schedule.time : this.data.endTime,
             place: schedule ? schedule.place : trip ? trip.destination : "",
             note: schedule ? schedule.note : "",
             categories,
@@ -188,6 +190,9 @@ Page({
     },
     onTimeChange(event) {
         this.setData({ time: event.detail.value });
+    },
+    onEndTimeChange(event) {
+        this.setData({ endTime: event.detail.value });
     },
     onPlaceInput(event) {
         this.setData({ place: event.detail.value });
@@ -259,6 +264,10 @@ Page({
             wx.showToast({ title: "图片还在上传", icon: "none" });
             return;
         }
+        if (this.data.endTime && this.data.endTime < this.data.time) {
+            wx.showToast({ title: "结束时间需晚于开始", icon: "none" });
+            return;
+        }
         this.setData({ saving: true });
         let images = this.data.images;
         if (hasLocalImage(images)) {
@@ -287,6 +296,7 @@ Page({
         const input = {
             day: this.data.day,
             time: this.data.time,
+            endTime: this.data.endTime,
             category: this.data.category,
             title,
             place: this.data.place || this.data.trip?.destination || "",

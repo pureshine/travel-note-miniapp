@@ -17,7 +17,20 @@ Page({
         openScheduleId: "",
         clipScheduleId: "",
         schedules: [],
+        filteredSchedules: [],
         scheduleGroups: [],
+        dateFilterOptions: [{ label: "全部日期", value: "all" }],
+        dateFilterLabels: ["全部日期"],
+        dateFilterIndex: 0,
+        statusFilters: ["全部", "待出发", "进行中", "已完成"],
+        statusFilterIndex: 0,
+        activeStatusFilter: "全部",
+        categoryFilterOptions: ["全部类型"],
+        categoryFilterIndex: 0,
+        activeCategoryFilter: "全部类型",
+        filterDocked: false,
+        filterDockTop: 0,
+        filterDockStyle: "",
         travelTip: {
             icon: "鸭",
             title: "准备冲鸭",
@@ -28,6 +41,17 @@ Page({
     },
     onShow() {
         this.loadTrip();
+    },
+    onReady() {
+        this.measureFilterAnchor();
+    },
+    onPageScroll(event) {
+        if (!this.data.trip || this.data.schedules.length === 0)
+            return;
+        const shouldDock = this.data.filterDockTop > 0 && event.scrollTop >= this.data.filterDockTop;
+        if (shouldDock !== this.data.filterDocked) {
+            this.setData({ filterDocked: shouldDock });
+        }
     },
     loadTrip() {
         (0, trip_store_1.reconcileClearedPlanState)();
@@ -42,6 +66,11 @@ Page({
             return;
         }
         const schedules = this.sortScheduleViews(this.toScheduleViews(trip ? trip.schedules : []));
+        const dateFilterOptions = createDateFilterOptions(schedules);
+        const categoryFilterOptions = createCategoryFilterOptions(schedules);
+        const nextDateFilterIndex = Math.max(dateFilterOptions.findIndex((item) => item.value === this.data.dateFilterOptions[this.data.dateFilterIndex]?.value), 0);
+        const nextCategoryFilterIndex = Math.max(categoryFilterOptions.findIndex((item) => item === this.data.activeCategoryFilter), 0);
+        const filteredSchedules = this.filterSchedules(schedules, dateFilterOptions[nextDateFilterIndex]?.value || "all", this.data.activeStatusFilter, categoryFilterOptions[nextCategoryFilterIndex] || "全部类型");
         const tripStatus = trip ? (0, trip_view_1.getTripStatus)(trip) : "待出发";
         this.setData({
             trip,
@@ -55,11 +84,40 @@ Page({
             openScheduleId: "",
             clipScheduleId: "",
             schedules,
-            scheduleGroups: this.groupSchedulesByYear(schedules),
+            filteredSchedules,
+            scheduleGroups: this.groupSchedulesByYear(filteredSchedules),
+            dateFilterOptions,
+            dateFilterLabels: dateFilterOptions.map((item) => item.label),
+            dateFilterIndex: nextDateFilterIndex,
+            categoryFilterOptions,
+            categoryFilterIndex: nextCategoryFilterIndex,
+            activeCategoryFilter: categoryFilterOptions[nextCategoryFilterIndex] || "全部类型",
             travelTip: trip
                 ? createTravelTip(trip, schedules.length)
                 : createEmptyTravelTip(),
+        }, () => {
+            this.measureFilterAnchor();
         });
+    },
+    measureFilterAnchor() {
+        setTimeout(() => {
+            const wxApi = wx;
+            const query = wxApi.createSelectorQuery?.();
+            if (!query)
+                return;
+            query
+                .select(".sch-filter-anchor")
+                .boundingClientRect((rect) => {
+                if (!rect)
+                    return;
+                const dockTop = getFilterDockTop();
+                this.setData({
+                    filterDockTop: Math.max(rect.top - dockTop, 0),
+                    filterDockStyle: `top:${dockTop}px;`,
+                });
+            })
+                .exec();
+        }, 0);
     },
     goTripForm() {
         wx.navigateTo({ url: "/pages/trip-form/trip-form" });
@@ -206,15 +264,88 @@ Page({
             },
         });
     },
+    onDateFilterChange(event) {
+        const dateFilterIndex = Number(event.detail.value);
+        const dateValue = this.data.dateFilterOptions[dateFilterIndex]?.value || "all";
+        const filteredSchedules = this.filterSchedules(this.data.schedules, dateValue, this.data.activeStatusFilter, this.data.activeCategoryFilter);
+        this.closeScheduleSwipe();
+        this.setData({
+            dateFilterIndex,
+            filteredSchedules,
+            scheduleGroups: this.groupSchedulesByYear(filteredSchedules),
+        });
+    },
+    clearDateFilter() {
+        const filteredSchedules = this.filterSchedules(this.data.schedules, "all", this.data.activeStatusFilter, this.data.activeCategoryFilter);
+        this.closeScheduleSwipe();
+        this.setData({
+            dateFilterIndex: 0,
+            filteredSchedules,
+            scheduleGroups: this.groupSchedulesByYear(filteredSchedules),
+        });
+    },
+    onCategoryFilterChange(event) {
+        const categoryFilterIndex = Number(event.detail.value);
+        const activeCategoryFilter = this.data.categoryFilterOptions[categoryFilterIndex] || "全部类型";
+        const dateValue = this.data.dateFilterOptions[this.data.dateFilterIndex]?.value || "all";
+        const filteredSchedules = this.filterSchedules(this.data.schedules, dateValue, this.data.activeStatusFilter, activeCategoryFilter);
+        this.closeScheduleSwipe();
+        this.setData({
+            categoryFilterIndex,
+            activeCategoryFilter,
+            filteredSchedules,
+            scheduleGroups: this.groupSchedulesByYear(filteredSchedules),
+        });
+    },
+    clearCategoryFilter() {
+        const dateValue = this.data.dateFilterOptions[this.data.dateFilterIndex]?.value || "all";
+        const filteredSchedules = this.filterSchedules(this.data.schedules, dateValue, this.data.activeStatusFilter, "全部类型");
+        this.closeScheduleSwipe();
+        this.setData({
+            categoryFilterIndex: 0,
+            activeCategoryFilter: "全部类型",
+            filteredSchedules,
+            scheduleGroups: this.groupSchedulesByYear(filteredSchedules),
+        });
+    },
+    onStatusFilterChange(event) {
+        const statusFilterIndex = Number(event.detail.value);
+        const activeStatusFilter = this.data.statusFilters[statusFilterIndex] || "全部";
+        const dateValue = this.data.dateFilterOptions[this.data.dateFilterIndex]?.value || "all";
+        const filteredSchedules = this.filterSchedules(this.data.schedules, dateValue, activeStatusFilter, this.data.activeCategoryFilter);
+        this.closeScheduleSwipe();
+        this.setData({
+            statusFilterIndex,
+            activeStatusFilter,
+            filteredSchedules,
+            scheduleGroups: this.groupSchedulesByYear(filteredSchedules),
+        });
+    },
+    clearStatusFilter() {
+        const dateValue = this.data.dateFilterOptions[this.data.dateFilterIndex]?.value || "all";
+        const filteredSchedules = this.filterSchedules(this.data.schedules, dateValue, "全部", this.data.activeCategoryFilter);
+        this.closeScheduleSwipe();
+        this.setData({
+            statusFilterIndex: 0,
+            activeStatusFilter: "全部",
+            filteredSchedules,
+            scheduleGroups: this.groupSchedulesByYear(filteredSchedules),
+        });
+    },
     toScheduleViews(items) {
         return items.map((item) => {
             const status = getScheduleStatus(item);
+            const startTime = item.time || "00:00";
+            const endTimeText = item.endTime && item.endTime !== startTime ? item.endTime : "";
             return {
                 ...item,
                 ...(0, trip_view_1.formatScheduleDate)(item.day),
                 status,
                 statusClass: getStatusClass(status),
                 active: status === "进行中",
+                startTime,
+                endTimeText,
+                timeRange: endTimeText ? `${startTime} - ${endTimeText}` : startTime,
             };
         });
     },
@@ -225,6 +356,14 @@ Page({
             if (aDone !== bDone)
                 return aDone ? 1 : -1;
             return `${a.day} ${a.time}`.localeCompare(`${b.day} ${b.time}`);
+        });
+    },
+    filterSchedules(items, dateValue, statusValue, categoryValue) {
+        return items.filter((item) => {
+            const dateMatched = dateValue === "all" || item.day === dateValue;
+            const statusMatched = statusValue === "全部" || item.status === statusValue;
+            const categoryMatched = categoryValue === "全部类型" || item.category === categoryValue;
+            return dateMatched && statusMatched && categoryMatched;
         });
     },
     groupSchedulesByYear(items) {
@@ -250,21 +389,40 @@ Page({
             openScheduleId: "",
             clipScheduleId: "",
             schedules: [],
+            filteredSchedules: [],
             scheduleGroups: [],
+            dateFilterOptions: [{ label: "全部日期", value: "all" }],
+            dateFilterLabels: ["全部日期"],
+            dateFilterIndex: 0,
+            statusFilters: ["全部", "待出发", "进行中", "已完成"],
+            statusFilterIndex: 0,
+            activeStatusFilter: "全部",
+            categoryFilterOptions: ["全部类型"],
+            categoryFilterIndex: 0,
+            activeCategoryFilter: "全部类型",
+            filterDocked: false,
             travelTip: createEmptyTravelTip(),
         };
     },
 });
 function getScheduleStatus(item) {
-    const scheduleTime = new Date(`${item.day}T${item.time || "00:00"}:00`).getTime();
+    const startTime = new Date(`${item.day}T${item.time || "00:00"}:00`).getTime();
+    const endTime = new Date(`${item.day}T${item.endTime || item.time || "00:00"}:00`).getTime();
     const now = Date.now();
-    if (Number.isNaN(scheduleTime))
-        return "待进行";
-    if (now >= scheduleTime)
-        return "已完成";
-    if (scheduleTime - now <= 30 * 60 * 1000)
+    if (Number.isNaN(startTime))
+        return "待出发";
+    if (now < startTime)
+        return "待出发";
+    if (!Number.isNaN(endTime) && endTime > startTime && now <= endTime) {
         return "进行中";
-    return "待进行";
+    }
+    return "已完成";
+}
+function getFilterDockTop() {
+    const wxApi = wx;
+    const statusBarHeight = wxApi.getSystemInfoSync?.().statusBarHeight || 0;
+    const menuBottom = wxApi.getMenuButtonBoundingClientRect?.().bottom || statusBarHeight + 44;
+    return Math.ceil(menuBottom + 8);
 }
 function getStatusClass(status) {
     if (status === "已完成")
@@ -272,6 +430,23 @@ function getStatusClass(status) {
     if (status === "进行中")
         return "active";
     return "pending";
+}
+function createDateFilterOptions(items) {
+    const dates = Array.from(new Set(items.map((item) => item.day))).sort();
+    return [
+        { label: "全部日期", value: "all" },
+        ...dates.map((date) => {
+            const formatted = (0, trip_view_1.formatScheduleDate)(date);
+            return {
+                label: `${formatted.monthDay} ${formatted.year}`,
+                value: date,
+            };
+        }),
+    ];
+}
+function createCategoryFilterOptions(items) {
+    const categories = Array.from(new Set(items.map((item) => item.category))).sort();
+    return ["全部类型", ...categories];
 }
 function createTravelTip(trip, scheduleCount) {
     const destination = trip.destination || "待定目的地";

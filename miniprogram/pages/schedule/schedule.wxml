@@ -67,10 +67,77 @@
 
   <view wx:if="{{trip}}" class="sch-head">
     <text>行程时间轴</text>
+    <text class="sch-head-count">{{filteredSchedules.length}}/{{schedules.length}}</text>
+  </view>
+  <view wx:if="{{trip && schedules.length > 0}}" class="sch-filter-anchor {{filterDocked ? 'is-docked' : ''}}">
+    <view class="sch-filter panel {{filterDocked ? 'is-fixed' : ''}}" style="{{filterDocked ? filterDockStyle : ''}}">
+      <view class="sch-filter-grid">
+        <view class="sch-filter-cell">
+          <picker
+            class="sch-filter-pick"
+            mode="selector"
+            range="{{dateFilterLabels}}"
+            value="{{dateFilterIndex}}"
+            bindchange="onDateFilterChange"
+          >
+            <view class="sch-filter-chip {{dateFilterIndex > 0 ? 'has-clear' : ''}}">
+              <text class="sch-filter-label">日期</text>
+              <text class="sch-filter-value">{{dateFilterLabels[dateFilterIndex]}}</text>
+              <text wx:if="{{dateFilterIndex === 0}}" class="sch-filter-caret">▾</text>
+            </view>
+          </picker>
+          <view
+            wx:if="{{dateFilterIndex > 0}}"
+            class="sch-filter-clear"
+            catchtap="clearDateFilter"
+          >×</view>
+        </view>
+        <view class="sch-filter-cell">
+          <picker
+            class="sch-filter-pick"
+            mode="selector"
+            range="{{categoryFilterOptions}}"
+            value="{{categoryFilterIndex}}"
+            bindchange="onCategoryFilterChange"
+          >
+            <view class="sch-filter-chip {{categoryFilterIndex > 0 ? 'has-clear' : ''}}">
+              <text class="sch-filter-label">类型</text>
+              <text class="sch-filter-value">{{categoryFilterOptions[categoryFilterIndex]}}</text>
+              <text wx:if="{{categoryFilterIndex === 0}}" class="sch-filter-caret">▾</text>
+            </view>
+          </picker>
+          <view
+            wx:if="{{categoryFilterIndex > 0}}"
+            class="sch-filter-clear"
+            catchtap="clearCategoryFilter"
+          >×</view>
+        </view>
+        <view class="sch-filter-cell">
+          <picker
+            class="sch-filter-pick"
+            mode="selector"
+            range="{{statusFilters}}"
+            value="{{statusFilterIndex}}"
+            bindchange="onStatusFilterChange"
+          >
+            <view class="sch-filter-chip {{statusFilterIndex > 0 ? 'has-clear' : ''}}">
+              <text class="sch-filter-label">状态</text>
+              <text class="sch-filter-value">{{activeStatusFilter}}</text>
+              <text wx:if="{{statusFilterIndex === 0}}" class="sch-filter-caret">▾</text>
+            </view>
+          </picker>
+          <view
+            wx:if="{{statusFilterIndex > 0}}"
+            class="sch-filter-clear"
+            catchtap="clearStatusFilter"
+          >×</view>
+        </view>
+      </view>
+    </view>
   </view>
   <view wx:if="{{trip}}" class="sch-board panel">
     <image
-      wx:if="{{schedules.length > 0}}"
+      wx:if="{{filteredSchedules.length > 0}}"
       class="time-duck"
       src="/assets/design3d/timeline-duck-right.png"
       mode="aspectFit"
@@ -82,11 +149,11 @@
         wx:for-item="item"
         wx:for-index="itemIndex"
         wx:key="id"
-        class="sch-row {{item.active ? 'is-active' : ''}} {{groupIndex === 0 && itemIndex === 0 && schedules.length > 0 ? 'duck-gap' : ''}}"
+        class="sch-row is-{{item.statusClass}} {{item.active ? 'is-active' : ''}} {{groupIndex === 0 && itemIndex === 0 && filteredSchedules.length > 0 ? 'duck-gap' : ''}}"
       >
         <view class="sch-time">
           <text class="sch-day">{{item.monthDay}}</text>
-          <text class="sch-hour">{{item.time}}</text>
+          <text class="sch-hour {{item.endTimeText ? 'is-range' : ''}}">{{item.timeRange}}</text>
           <text class="sch-state {{item.statusClass}}">{{item.status}}</text>
         </view>
         <view class="sch-line">
@@ -94,7 +161,7 @@
         </view>
         <view class="sch-wrap {{clipScheduleId === item.id ? 'is-wrap-open' : ''}}">
           <view
-            class="sch-card {{item.images.length > 0 ? 'is-pic' : ''}} {{item.active ? 'is-active' : ''}} {{openScheduleId === item.id ? 'is-slide' : ''}}"
+            class="sch-card is-{{item.statusClass}} {{item.images.length > 0 ? 'is-pic' : ''}} {{item.active ? 'is-active' : ''}} {{openScheduleId === item.id ? 'is-slide' : ''}}"
             bindtouchstart="onScheduleTouchStart"
             bindtouchmove="onScheduleTouchMove"
             data-id="{{item.id}}"
@@ -143,6 +210,11 @@
       <view class="sch-board-icon">+</view>
       <view class="sch-empty-title">还没有日程安排</view>
       <view class="sch-empty-desc">先添加一个行程，时间轴就会自动生成</view>
+    </view>
+    <view wx:elif="{{filteredSchedules.length === 0}}" class="sch-board-empty sch-filter-empty">
+      <view class="sch-board-icon">⌕</view>
+      <view class="sch-empty-title">没有符合条件的日程</view>
+      <view class="sch-empty-desc">换个日期或状态看看</view>
     </view>
   </view>
 </view>

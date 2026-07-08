@@ -412,6 +412,8 @@ function normalizeTrip(trip) {
         schedules: trip.schedules.map((item) => ({
             ...item,
             category: item.category || "其他",
+            time: item.time || "09:00",
+            endTime: item.endTime || "",
             images: item.images || []
         })).sort(compareSchedule),
         notes: trip.notes.map((item) => ({

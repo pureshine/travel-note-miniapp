@@ -6,6 +6,7 @@ export interface ScheduleItem {
   id: string;
   day: string;
   time: string;
+  endTime?: string;
   category: ScheduleCategory;
   title: string;
   place: string;

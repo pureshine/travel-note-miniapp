@@ -4,9 +4,24 @@
     <picker mode="date" value="{{day}}" bindchange="onDayChange">
       <view class="picker-field">{{day}}</view>
     </picker>
-    <picker mode="time" value="{{time}}" bindchange="onTimeChange">
-      <view class="picker-field">{{time}}</view>
-    </picker>
+  </view>
+  <view class="time-range-panel">
+    <view class="time-range-label">日程时间段</view>
+    <view class="time-range-grid">
+      <picker mode="time" value="{{time}}" bindchange="onTimeChange">
+        <view class="time-chip">
+          <text class="time-chip-kicker">开始</text>
+          <text class="time-chip-value">{{time}}</text>
+        </view>
+      </picker>
+      <view class="time-range-arrow">→</view>
+      <picker mode="time" value="{{endTime}}" bindchange="onEndTimeChange">
+        <view class="time-chip">
+          <text class="time-chip-kicker">结束</text>
+          <text class="time-chip-value">{{endTime}}</text>
+        </view>
+      </picker>
+    </view>
   </view>
   <picker mode="selector" range="{{categories}}" value="{{categoryIndex}}" bindchange="onCategoryChange">
     <view class="picker-field">类型：{{category}}</view>
