@@ -26,6 +26,15 @@
   margin-top: 26rpx;
 }
 
+.form-page .form-plain {
+  display: block;
+  margin-top: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
 .form-page .picker-field {
   display: flex;
   align-items: center;

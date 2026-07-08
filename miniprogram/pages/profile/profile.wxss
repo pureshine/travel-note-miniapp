@@ -1,8 +1,59 @@
 @import "../../styles/tab/profile-dashboard.wxss";
 
+/* Hero / invite layout skeleton — do not drop during polish merges */
+
+.pf-record-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6rpx;
+}
+
+.pf-record-num {
+  transform: translateY(-1rpx);
+}
+
+.pf-topline {
+  position: relative;
+  z-index: 3;
+}
+
+.pf-avatar,
+.pf-mark {
+  flex: 0 0 1rpx;
+  width: 1rpx;
+  min-width: 1rpx;
+  max-width: 1rpx;
+  height: 1rpx;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pf-avatar-img,
+.pf-avatar-ph,
+.pf-mark-img {
+  width: 1rpx;
+  height: 1rpx;
+}
+
+.pf-login-box {
+  position: relative;
+  z-index: 4;
+  margin-left: 342rpx;
+}
+
+.pf-login-btn {
+  background: linear-gradient(135deg, #ff9a1f 0%, #ff6500 100%);
+  box-shadow: 0 16rpx 30rpx rgba(255, 101, 0, 0.22);
+}
+
+.pf-login-btn::after {
+  border: 0;
+}
+
 /* Setup sheet — page polish lives in profile-dashboard.wxss */
 
-.profile-mask {
+.pf-mask {
   position: fixed;
   inset: 0;
   z-index: 20;
@@ -13,7 +64,7 @@
   background: rgba(52, 39, 26, 0.28);
 }
 
-.profile-sheet {
+.pf-sheet {
   width: 100%;
   padding: 34rpx 30rpx 28rpx;
   border-radius: 36rpx;
@@ -21,21 +72,21 @@
   box-shadow: 0 24rpx 60rpx rgba(86, 61, 39, 0.18);
 }
 
-.sheet-title {
+.pf-sheet-title {
   color: #2f2f2a;
   font-size: 34rpx;
   font-weight: 900;
   text-align: center;
 }
 
-.sheet-subtitle {
+.pf-sheet-sub {
   margin-top: 8rpx;
   color: #8f8171;
   font-size: 24rpx;
   text-align: center;
 }
 
-.setup-avatar {
+.pf-setup-avatar {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -50,18 +101,18 @@
   font-weight: 900;
 }
 
-.setup-avatar::after,
-.setup-save::after,
-.setup-skip::after {
+.pf-setup-avatar::after,
+.pf-setup-save::after,
+.pf-setup-skip::after {
   border: 0;
 }
 
-.setup-avatar-image {
+.pf-setup-pic {
   width: 100%;
   height: 100%;
 }
 
-.setup-nickname {
+.pf-setup-name {
   width: 100%;
   height: 82rpx;
   padding: 0 24rpx;
@@ -72,7 +123,7 @@
   font-weight: 800;
 }
 
-.setup-save {
+.pf-setup-save {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -85,7 +136,7 @@
   font-weight: 900;
 }
 
-.setup-skip {
+.pf-setup-skip {
   display: flex;
   align-items: center;
   justify-content: center;

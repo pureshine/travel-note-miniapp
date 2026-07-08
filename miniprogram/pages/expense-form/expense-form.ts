@@ -2,6 +2,11 @@ import { addExpense, getTrip, updateExpense } from "../../services/trip-store";
 import { getSavedProfile } from "../../services/cloud-sync";
 import { ExpenseCategory, Trip } from "../../types/trip";
 
+function getCategoryIndex(category: ExpenseCategory, categories: ExpenseCategory[]) {
+  const index = categories.indexOf(category);
+  return index >= 0 ? index : 0;
+}
+
 function getDefaultPaidBy(): string {
   return getSavedProfile()?.nickname?.trim() || "我";
 }
@@ -28,6 +33,7 @@ Page({
     amount: "",
     date: formatDateKey(new Date()),
     category: "餐饮" as ExpenseCategory,
+    categoryIndex: 0,
     paidBy: "我",
     categories: ["餐饮", "交通", "住宿", "购物", "门票", "其他"] as ExpenseCategory[],
     saving: false
@@ -42,6 +48,8 @@ Page({
       return;
     }
     const expense = trip?.expenses.find((item) => item.id === options.expenseId);
+    const categories = this.data.categories;
+    const category = expense ? expense.category : this.data.category;
     this.setData({
       tripId: options.tripId,
       expenseId: options.expenseId || "",
@@ -52,7 +60,8 @@ Page({
       title: expense ? expense.title : "",
       amount: expense ? String(expense.amount) : "",
       date: expense ? formatDateKey(new Date(expense.createdAt)) : options.date || formatDateKey(new Date()),
-      category: expense ? expense.category : this.data.category,
+      category,
+      categoryIndex: getCategoryIndex(category, categories),
       paidBy: expense ? expense.paidBy : getDefaultPaidBy()
     });
     if (expense) wx.setNavigationBarTitle({ title: "编辑消费" });
@@ -76,7 +85,10 @@ Page({
 
   onCategoryChange(event: { detail: { value: string } }) {
     const index = Number(event.detail.value);
-    this.setData({ category: this.data.categories[index] });
+    this.setData({
+      categoryIndex: index,
+      category: this.data.categories[index],
+    });
   },
 
   saveExpense() {

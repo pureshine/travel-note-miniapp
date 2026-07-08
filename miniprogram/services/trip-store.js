@@ -212,7 +212,7 @@ function toggleChecklistItem(tripId, itemId) {
         checklist: trip.checklist.map((item) => (item.id === itemId ? { ...item, done: !item.done } : item))
     }));
 }
-function addNote(tripId, title, content, category = "事项") {
+function addNote(tripId, title, content, category = "物品") {
     return updateTrip(tripId, (trip) => ({
         ...trip,
         notes: [{ id: (0, id_1.createId)("note"), title, content, category, done: false, createdAt: Date.now() }, ...trip.notes]
@@ -392,7 +392,18 @@ function getScheduleCategories() {
     return ["景点", "交通", "住宿", "餐饮", "其他"];
 }
 function getNoteCategories() {
-    return ["财务", "物品", "预订", "事项"];
+    return ["物品", "事项", "预订", "攻略"];
+}
+function normalizeNoteCategory(category) {
+    if (category === "财务")
+        return "事项";
+    if (category === "证件")
+        return "物品";
+    const categories = getNoteCategories();
+    if (categories.includes(category)) {
+        return category;
+    }
+    return "物品";
 }
 function normalizeTrip(trip) {
     return {
@@ -405,7 +416,7 @@ function normalizeTrip(trip) {
         })).sort(compareSchedule),
         notes: trip.notes.map((item) => ({
             ...item,
-            category: item.category || "事项",
+            category: normalizeNoteCategory(String(item.category || "")),
             done: Boolean(item.done)
         })),
         sharedMembers: Array.isArray(trip.sharedMembers) ? trip.sharedMembers : []

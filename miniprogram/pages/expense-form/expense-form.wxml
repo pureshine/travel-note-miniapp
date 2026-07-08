@@ -4,7 +4,7 @@
   <picker mode="date" value="{{date}}" bindchange="onDateChange">
     <view class="picker-field">日期：{{date}}</view>
   </picker>
-  <picker mode="selector" range="{{categories}}" bindchange="onCategoryChange">
+  <picker mode="selector" range="{{categories}}" value="{{categoryIndex}}" bindchange="onCategoryChange">
     <view class="picker-field">分类：{{category}}</view>
   </picker>
   <input class="field" placeholder="付款人" value="{{paidBy}}" bindinput="onPaidByInput" />

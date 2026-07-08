@@ -37,27 +37,6 @@
     0 16rpx 48rpx rgba(255, 122, 0, 0.05);
 }
 
-.budget-panel {
-  position: relative;
-  display: flex;
-  align-items: center;
-  min-height: 300rpx;
-  padding: 38rpx 196rpx 38rpx 34rpx;
-  overflow: visible;
-  background:
-    radial-gradient(
-      circle at 92% 58%,
-      rgba(255, 171, 77, 0.18) 0,
-      rgba(255, 171, 77, 0) 220rpx
-    ),
-    linear-gradient(180deg, #ffffff 0%, #fffdf9 100%);
-}
-
-.budget-left {
-  flex: 1;
-  min-width: 0;
-}
-
 .budget-block {
   display: flex;
   flex-direction: column;
@@ -130,60 +109,6 @@
   font-size: 22rpx;
   font-weight: 800;
   background: #f3f4f6;
-}
-
-.ring-box {
-  position: absolute;
-  right: 152rpx;
-  top: 50%;
-  z-index: 2;
-  transform: translateY(-50%);
-}
-
-.budget-ring {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 176rpx;
-  height: 176rpx;
-  border-radius: 50%;
-}
-
-.ring-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 132rpx;
-  height: 132rpx;
-  border-radius: 50%;
-  background: #ffffff;
-}
-
-.ring-value {
-  color: #ff6500;
-  font-size: 44rpx;
-  font-weight: 950;
-  line-height: 1;
-}
-
-.ring-label {
-  margin-top: 8rpx;
-  color: #6b7280;
-  font-size: 20rpx;
-  font-weight: 750;
-  line-height: 1;
-  white-space: nowrap;
-}
-
-.budget-duck {
-  position: absolute;
-  right: -8rpx;
-  bottom: -18rpx;
-  z-index: 3;
-  width: 168rpx;
-  height: 324rpx;
-  pointer-events: none;
 }
 
 .hero-actions {
@@ -310,42 +235,12 @@
 }
 
 @media (max-width: 340px) {
-  .budget-panel {
-    min-height: 272rpx;
-    padding: 32rpx 168rpx 32rpx 28rpx;
-  }
-
   .spend-total {
     font-size: 54rpx;
   }
 
   .remain-total {
     font-size: 44rpx;
-  }
-
-  .ring-box {
-    right: 128rpx;
-  }
-
-  .budget-ring {
-    width: 152rpx;
-    height: 152rpx;
-  }
-
-  .ring-inner {
-    width: 114rpx;
-    height: 114rpx;
-  }
-
-  .ring-value {
-    font-size: 36rpx;
-  }
-
-  .budget-duck {
-    right: -4rpx;
-    bottom: -14rpx;
-    width: 144rpx;
-    height: 278rpx;
   }
 
   .hero-add {
@@ -363,6 +258,9 @@
 }
 
 .stats-page .budget-panel {
+  position: relative;
+  display: flex;
+  align-items: center;
   min-height: 352rpx;
   padding: 40rpx 268rpx 34rpx 40rpx;
   overflow: hidden;
@@ -377,6 +275,7 @@
   z-index: 5;
   flex: 0 0 244rpx;
   width: 244rpx;
+  min-width: 0;
 }
 
 .stats-page .budget-tag {
@@ -421,42 +320,6 @@
   padding: 0 12rpx;
   font-size: 22rpx;
   line-height: 34rpx;
-}
-
-.stats-page .ring-box {
-  right: 188rpx;
-  top: 104rpx;
-  transform: none;
-  z-index: 5;
-}
-
-.stats-page .budget-ring {
-  width: 212rpx;
-  height: 212rpx;
-}
-
-.stats-page .ring-inner {
-  width: 148rpx;
-  height: 148rpx;
-}
-
-.stats-page .ring-value {
-  font-size: 46rpx;
-  line-height: 1;
-}
-
-.stats-page .ring-label {
-  margin-top: 10rpx;
-  font-size: 20rpx;
-  line-height: 1.1;
-}
-
-.stats-page .budget-duck {
-  right: -14rpx;
-  bottom: -18rpx;
-  z-index: 3;
-  width: 290rpx;
-  height: 324rpx;
 }
 
 .stats-page .hero-actions {
@@ -526,6 +389,7 @@
 
 /* Ring/duck refinement: larger ring overlays coin edge. */
 .stats-page .ring-box {
+  position: absolute;
   right: 188rpx;
   top: 104rpx;
   transform: none;
@@ -538,6 +402,7 @@
   justify-content: center;
   width: 212rpx;
   height: 212rpx;
+  border-radius: 50%;
 }
 
 .stats-page .ring-inner {
@@ -549,7 +414,10 @@
   width: 148rpx;
   height: 148rpx;
   padding: 4rpx 0 0;
+  border-radius: 50%;
   text-align: center;
+  background: #ffffff;
+  box-shadow: 0 0 0 2rpx #ffffff;
 }
 
 .stats-page .ring-value,
@@ -559,22 +427,31 @@
 }
 
 .stats-page .ring-value {
+  color: #ff6500;
   font-size: 46rpx;
+  line-height: 1;
+}
+
+.stats-page .ring-label {
+  margin-top: 8rpx;
+  color: #6b7280;
+  font-size: 20rpx;
+  font-weight: 750;
+  line-height: 1.1;
+  white-space: nowrap;
 }
 
 .stats-page .budget-duck {
+  position: absolute;
   right: -42rpx;
   bottom: -22rpx;
   z-index: 3;
   width: 318rpx;
   height: 340rpx;
+  pointer-events: none;
 }
 
 /* Opaque ring track masks coin edge even at 0% usage. */
-.stats-page .ring-inner {
-  background: #ffffff;
-  box-shadow: 0 0 0 2rpx #ffffff;
-}
 
 @media (max-width: 340px) {
   .stats-page .ring-box {

@@ -7,6 +7,10 @@ Component({
     subtitle: {
       type: String,
       value: ""
+    },
+    plain: {
+      type: Boolean,
+      value: false
     }
   }
 });

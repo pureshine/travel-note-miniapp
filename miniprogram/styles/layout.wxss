@@ -20,7 +20,7 @@
 .sch-page,
 .notes-page,
 .stats-page,
-.profile-page,
+.pf-page,
 .home-page {
   padding-top: calc(132rpx + env(safe-area-inset-top));
 }

@@ -39,8 +39,9 @@ miniprogram/
 
 - 全局原子样式只在 `styles/components.wxss` 定义，页面禁止复制 `Shared design refresh` 块。
 - CSS 类名 kebab-case，最多 3 段（`-` 分割 ≤ 3）。
-- **禁止** `.parent .child` 类名嵌套；页面元素用唯一类名（如 `sch-tip`、`time-duck`），状态用 `.is-*` 挂在同一元素。
-- 共用样式可抽成同一类（如 `panel`、`u-hide`），但不做多层选择器叠加以压优先级。
+- 类选择器嵌套**最多 2 层**（如 `.page .card`、`.card.is-done .title` 允许；再深需用唯一类名或 `.is-*` 状态修饰）。
+- 已扁平化的 Tab（日程 `sch-*`、我的 `pf-*`）不再改动；其余页面优先控嵌套层数，不必强行零嵌套。
+- 共用样式可抽成同一类（如 `panel`、`u-hide`），但避免多层选择器叠加以压优先级。
 - Tab 大页 polish 放在 `styles/tab/*.wxss`，页面 wxss 只保留布局骨架并 `@import`。
 - `npm run style:check` 会检查类名段数、嵌套选择器、`!important` 与超长文件。
 

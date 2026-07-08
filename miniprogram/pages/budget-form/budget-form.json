@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "设置预算"
+  "navigationBarTitleText": "设置预算",
+  "usingComponents": {
+    "form-shell": "/components/form-shell/index"
+  }
 }

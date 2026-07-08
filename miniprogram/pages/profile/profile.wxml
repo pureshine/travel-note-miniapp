@@ -1,132 +1,123 @@
-<view class="page profile-page" style="{{safeTopStyle}}">
-  <brand-nav customNavStyle="{{customNavStyle}}" />
-  <view class="profile-brand u-hide"><text class="profile-brand-hot">冲鸭</text>去旅行</view>
-  <view class="profile-hero">
-    <image class="profile-hero-duck" src="/assets/design3d/profile-duck-camera-full.png" mode="aspectFit" />
-    <view class="hero-topline" bindtap="openProfileEdit">
-      <view wx:if="{{loggedIn}}" class="avatar-button">
-        <image wx:if="{{avatarUrl}}" class="avatar-image" src="{{avatarUrl}}" mode="aspectFill" />
-        <image wx:else class="avatar-placeholder" src="/assets/illustrations/duck-avatar.png" mode="aspectFit" />
+<view class="page pf-page" style="{{safeTopStyle}}">
+  <brand-nav customNavStyle="{{customNavStyle}}" nav-class="pf-nav" logo-class="pf-nav-logo" />
+  <view class="pf-hero">
+    <image class="pf-hero-duck" src="/assets/design3d/profile-duck-camera-full.png" mode="aspectFit" />
+    <view class="pf-topline" bindtap="openProfileEdit">
+      <view wx:if="{{loggedIn}}" class="pf-avatar">
+        <image wx:if="{{avatarUrl}}" class="pf-avatar-img" src="{{avatarUrl}}" mode="aspectFill" />
+        <image wx:else class="pf-avatar-ph" src="/assets/illustrations/duck-avatar.png" mode="aspectFit" />
       </view>
-      <view wx:else class="brand-mark">
-        <image class="brand-duck" src="/assets/illustrations/duck-avatar.png" mode="aspectFit" />
+      <view wx:else class="pf-mark">
+        <image class="pf-mark-img" src="/assets/illustrations/duck-avatar.png" mode="aspectFit" />
       </view>
-      <view class="hero-copy">
-        <view class="profile-name-row">
-          <view wx:if="{{loggedIn}}" class="profile-name">{{nickname}}</view>
-          <view wx:else class="profile-name">未登录旅行者</view>
+      <view class="pf-copy">
+        <view class="pf-name-row">
+          <view wx:if="{{loggedIn}}" class="pf-name">{{nickname}}</view>
+          <view wx:else class="pf-name">未登录旅行者</view>
         </view>
-        <view class="profile-location">
-          <text class="profile-location-icon">●</text>
+        <view class="pf-location">
+          <text class="pf-loc-icon">●</text>
           <text>探索世界的每个角落</text>
         </view>
-        <view class="profile-record-pill">
-          <text class="profile-record-star">★</text>
-          <text>已记录 </text>
-          <text class="profile-record-number">{{tripCount}}</text>
-          <text> 次旅行</text>
+        <view class="pf-record-pill">
+          <view class="pf-record-star">★</view>
+          <view class="pf-record-copy">
+            <view class="pf-record-text">已记录</view>
+            <view class="pf-record-num">{{tripCount}}</view>
+            <view class="pf-record-text">次旅行</view>
+          </view>
         </view>
       </view>
-      <view wx:if="{{loggedIn}}" class="profile-arrow">›</view>
     </view>
-    <view wx:if="{{!loggedIn}}" class="login-actions">
-      <button class="login-button" loading="{{syncing}}" bindtap="loginWithWechat">微信一键登录</button>
-    </view>
-  </view>
-
-  <view class="overview-grid">
-    <view class="stat-item">
-      <view class="stat-icon-box">
-        <image class="stat-icon" src="/assets/design3d/profile-stat-trip.png" mode="aspectFit" />
-      </view>
-      <view class="stat-copy">
-        <view class="stat-value {{tripCount > 99 ? 'is-compact' : ''}}">{{tripCount}}</view>
-        <view class="stat-title">旅行</view>
-        <view class="stat-desc">已记录</view>
-      </view>
-    </view>
-    <view class="stat-item">
-      <view class="stat-icon-box">
-        <image class="stat-icon" src="/assets/design3d/profile-stat-schedule.png" mode="aspectFit" />
-      </view>
-      <view class="stat-copy">
-        <view class="stat-value {{scheduleCount > 99 ? 'is-compact' : ''}}">{{scheduleCount}}</view>
-        <view class="stat-title">日程</view>
-        <view class="stat-desc">项日程</view>
-      </view>
-    </view>
-    <view class="stat-item stat-sync">
-      <view class="stat-icon-box">
-        <image class="stat-icon" src="/assets/design3d/profile-stat-sync.png" mode="aspectFit" />
-      </view>
-      <view class="stat-copy">
-        <view class="stat-value is-time">{{lastSyncText}}</view>
-        <view class="stat-title">同步</view>
-        <view class="stat-desc">最近同步</view>
-      </view>
+    <view wx:if="{{!loggedIn}}" class="pf-login-box">
+      <button class="pf-login-btn" loading="{{syncing}}" bindtap="loginWithWechat">微信一键登录</button>
     </view>
   </view>
 
-  <view class="sync-card panel {{memberNamesText ? 'has-members' : ''}}">
-    <image class="invite-bg-duck" src="/assets/design3d/profile-invite-scene-crop.png" mode="aspectFill" />
-    <view class="card-head">
-      <view>
-        <view class="sync-title">邀请好友一起记录</view>
-        <view class="sync-desc">一起探索世界，留下美好回忆</view>
+  <view class="pf-overview">
+    <view class="pf-stat">
+      <view class="pf-stat-icon">
+        <image class="pf-stat-pic" src="/assets/design3d/profile-stat-trip.png" mode="aspectFit" />
       </view>
-      <view class="sync-badge">
-        <image class="sync-badge-duck" src="/assets/illustrations/duck-spark-icon.png" mode="aspectFit" />
-      </view>
-    </view>
-    <view class="sync-tip" bindtap="copySyncTip">{{syncTip}}</view>
-
-    <view class="invite-strip">
-      <view class="invite-icon">↗</view>
-      <view class="invite-copy">
-        <view class="invite-title">邀请好友同行</view>
-        <view class="invite-desc">{{inviteStatus}}</view>
+      <view class="pf-stat-copy">
+        <view class="pf-stat-val {{tripCount > 99 ? 'is-compact' : ''}}">{{tripCount}}</view>
+        <view class="pf-stat-title">旅行</view>
+        <view class="pf-stat-desc">已记录</view>
       </view>
     </view>
-    <view wx:if="{{memberNamesText}}" class="member-row">
-      <text class="member-label">同行</text>
-      <text class="member-names">{{memberNamesText}}</text>
+    <view class="pf-stat">
+      <view class="pf-stat-icon">
+        <image class="pf-stat-pic" src="/assets/design3d/profile-stat-schedule.png" mode="aspectFit" />
+      </view>
+      <view class="pf-stat-copy">
+        <view class="pf-stat-val {{scheduleCount > 99 ? 'is-compact' : ''}}">{{scheduleCount}}</view>
+        <view class="pf-stat-title">日程</view>
+        <view class="pf-stat-desc">项日程</view>
+      </view>
     </view>
-
-    <button wx:if="{{!memberNamesText}}" class="soft-action full" loading="{{inviteLoading}}" bindtap="createInvite">生成邀请</button>
-    <button wx:if="{{inviteCode}}" class="share-action" open-type="share">分享给好友</button>
-  </view>
-
-  <view class="tool-grid">
-    <view class="tool-card panel">
-      <view class="tool-icon">☁</view>
-      <view class="tool-title">账号数据</view>
-      <view class="tool-desc">换手机后登录微信即可恢复</view>
-    </view>
-    <view class="tool-card panel">
-      <view class="tool-icon">✦</view>
-      <view class="tool-title">同行共享</view>
-      <view class="tool-desc">好友加入后维护同一份旅行</view>
+    <view class="pf-stat is-sync">
+      <view class="pf-stat-icon">
+        <image class="pf-stat-pic" src="/assets/design3d/profile-stat-sync.png" mode="aspectFit" />
+      </view>
+      <view class="pf-stat-copy">
+        <view class="pf-stat-val is-time">{{lastSyncText}}</view>
+        <view class="pf-stat-title">同步</view>
+        <view class="pf-stat-desc">最近同步</view>
+      </view>
     </view>
   </view>
 
-  <view wx:if="{{showProfileSetup}}" class="profile-mask">
-    <view class="profile-sheet">
-      <view class="sheet-title">设置显示名字</view>
-      <view class="sheet-subtitle">好友共享和记录人都会显示这个名字</view>
-      <button class="setup-avatar" open-type="chooseAvatar" bindchooseavatar="onSetupChooseAvatar">
-        <image wx:if="{{draftAvatarUrl}}" class="setup-avatar-image" src="{{draftAvatarUrl}}" mode="aspectFill" />
+  <view class="pf-sync-card panel {{memberNamesText ? 'is-members' : ''}}">
+    <image class="pf-invite-bg" src="/assets/design3d/profile-invite-scene-crop.png" mode="aspectFill" />
+    <view class="pf-card-head">
+      <view class="pf-card-copy">
+        <view class="pf-sync-title">邀请好友一起记录</view>
+        <view class="pf-sync-desc">一起探索世界，留下美好回忆</view>
+        <view
+          wx:if="{{!memberNamesText}}"
+          class="pf-invite-btn {{inviteLoading ? 'is-busy' : ''}}"
+          bindtap="createInvite"
+        >{{inviteLoading ? '生成中...' : '生成邀请'}}</view>
+        <button wx:if="{{inviteCode}}" class="pf-share-btn" open-type="share">分享给好友</button>
+      </view>
+    </view>
+    <view wx:if="{{memberNamesText}}" class="pf-member-row">
+      <text class="pf-member-tag">同行</text>
+      <text class="pf-member-names">{{memberNamesText}}</text>
+    </view>
+  </view>
+
+  <view class="pf-tool-grid">
+    <view class="pf-tool-card panel">
+      <view class="pf-tool-icon">☁</view>
+      <view class="pf-tool-title">账号数据</view>
+      <view class="pf-tool-desc">换手机后登录微信即可恢复</view>
+    </view>
+    <view class="pf-tool-card panel">
+      <view class="pf-tool-icon">✦</view>
+      <view class="pf-tool-title">同行共享</view>
+      <view class="pf-tool-desc">好友加入后维护同一份旅行</view>
+    </view>
+  </view>
+
+  <view wx:if="{{showProfileSetup}}" class="pf-mask">
+    <view class="pf-sheet">
+      <view class="pf-sheet-title">设置显示名字</view>
+      <view class="pf-sheet-sub">好友共享和记录人都会显示这个名字</view>
+      <button class="pf-setup-avatar" open-type="chooseAvatar" bindchooseavatar="onSetupChooseAvatar">
+        <image wx:if="{{draftAvatarUrl}}" class="pf-setup-pic" src="{{draftAvatarUrl}}" mode="aspectFill" />
         <text wx:else>选头像</text>
       </button>
       <input
-        class="setup-nickname"
+        class="pf-setup-name"
         type="text"
         value="{{draftNickname}}"
         bindinput="onSetupNicknameInput"
         bindblur="onSetupNicknameBlur"
         placeholder="比如 小陈、阿圆、旅行搭子"
       />
-      <button class="setup-save" bindtap="saveProfileSetup">保存资料</button>
-      <button class="setup-skip" bindtap="skipProfileSetup">稍后再说</button>
+      <button class="pf-setup-save" bindtap="saveProfileSetup">保存资料</button>
+      <button class="pf-setup-skip" bindtap="skipProfileSetup">稍后再说</button>
     </view>
   </view>
 </view>

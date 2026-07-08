@@ -1,6 +1,5 @@
 /* Secondary pages: duck travel visual system backgrounds and typography. */
 .form-page,
-.budget-page,
 .profile-edit-page,
 .settings-page,
 .trip-detail-page,
@@ -14,7 +13,6 @@
 }
 
 .form-page .form-title,
-.budget-page .page-title,
 .profile-edit-page .page-title,
 .settings-page .page-title,
 .trip-detail-page .page-title,
@@ -29,7 +27,6 @@
 }
 
 .form-page .form-subtitle,
-.budget-page .page-subtitle,
 .profile-edit-page .page-subtitle,
 .settings-page .page-subtitle,
 .trip-detail-page .page-subtitle,
@@ -43,8 +40,8 @@
 }
 
 .form-page .form-card,
-.budget-page .budget-card,
-.budget-page .preset-card,
+.form-page .budget-card,
+.form-page .preset-card,
 .profile-edit-page .form-card,
 .settings-page .card,
 .trip-detail-page .card,
@@ -57,9 +54,8 @@
   box-shadow: var(--shadow-panel);
 }
 
-.budget-page .save-button,
-.form-page .primary-button,
 .form-page .save-button,
+.form-page .primary-button,
 .profile-edit-page .save-button,
 .settings-page .save-button,
 .trip-detail-page .save-button,
@@ -74,18 +70,10 @@
   box-shadow: var(--shadow-button);
 }
 
-.budget-page .preset-button,
 .form-page .preset-button,
 .ghost-button,
 .secondary-button {
   border-radius: 26rpx;
   background: #fff0e5;
   color: var(--color-brand);
-}
-
-.home-page {
-  background:
-    radial-gradient(circle at 84% 6%, rgba(255, 255, 255, 0.96) 0, rgba(255, 255, 255, 0) 230rpx),
-    radial-gradient(circle at 72% 20%, rgba(255, 122, 0, 0.055) 0, rgba(255, 122, 0, 0) 220rpx),
-    linear-gradient(180deg, #fbfdff 0%, #f5f8fd 48%, #eef4fb 100%);
 }

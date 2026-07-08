@@ -1,6 +1,11 @@
 import { addNote, getNoteCategories, getTrip, updateNote } from "../../services/trip-store";
 import { NoteCategory, Trip } from "../../types/trip";
 
+function getCategoryIndex(category: NoteCategory, categories: NoteCategory[]) {
+  const index = categories.indexOf(category);
+  return index >= 0 ? index : categories.length - 1;
+}
+
 Page({
   data: {
     tripId: "",
@@ -11,7 +16,8 @@ Page({
     trip: undefined as Trip | undefined,
     title: "",
     content: "",
-    category: "事项" as NoteCategory,
+    category: "物品" as NoteCategory,
+    categoryIndex: 0,
     categories: getNoteCategories(),
     saving: false
   },
@@ -25,6 +31,8 @@ Page({
       return;
     }
     const note = trip?.notes.find((item) => item.id === options.noteId);
+    const categories = getNoteCategories();
+    const category = note ? note.category : "物品";
     this.setData({
       tripId: options.tripId,
       noteId: options.noteId || "",
@@ -34,7 +42,9 @@ Page({
       trip,
       title: note ? note.title : "",
       content: note ? note.content : "",
-      category: note ? note.category : this.data.category
+      categories,
+      category,
+      categoryIndex: getCategoryIndex(category, categories)
     });
     if (note) wx.setNavigationBarTitle({ title: "编辑备忘" });
   },
@@ -49,7 +59,10 @@ Page({
 
   onCategoryChange(event: { detail: { value: string } }) {
     const index = Number(event.detail.value);
-    this.setData({ category: this.data.categories[index] });
+    this.setData({
+      categoryIndex: index,
+      category: this.data.categories[index]
+    });
   },
 
   saveNote() {

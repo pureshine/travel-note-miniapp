@@ -1,14 +1,17 @@
 .c-plan {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
   padding: 20rpx 22rpx;
   margin-top: 24rpx;
 }
 
 .c-plan-picker {
-  flex: 1;
-  min-width: 0;
+  width: 100%;
+}
+
+.c-plan-ops {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8rpx;
 }
 
 .c-plan-pill {
@@ -55,29 +58,73 @@
 
 .c-plan-status {
   flex-shrink: 0;
-  padding: 6rpx 14rpx;
-  border-radius: 999rpx;
-  font-size: 22rpx;
-  font-weight: 700;
+  display: flex;
+  align-items: center;
+  font-size: 23rpx;
+  font-weight: 900;
+  line-height: 1;
 }
 
-.c-plan-status.upcoming {
-  background: #fff0e5;
-  color: #ff6500;
-}
-
-.c-plan-change {
+.c-plan-tail {
+  display: flex;
   flex-shrink: 0;
+  align-items: center;
+  gap: 8rpx;
+  padding: 9rpx 14rpx 9rpx 18rpx;
+  border-radius: 999rpx;
+}
+
+.c-plan-tail.upcoming {
+  background: linear-gradient(135deg, rgba(255, 245, 223, 0.98) 0%, rgba(255, 237, 204, 0.96) 100%);
+  box-shadow:
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.88),
+    inset 0 0 0 1rpx rgba(255, 122, 0, 0.14);
+}
+
+.c-plan-tail.upcoming .c-plan-status {
   color: #ff6500;
-  font-size: 24rpx;
+}
+
+.c-plan-tail.done {
+  background: rgba(243, 244, 246, 0.96);
+  box-shadow: inset 0 0 0 1rpx rgba(209, 213, 219, 0.76);
+}
+
+.c-plan-tail.done .c-plan-status {
+  color: #6b7280;
+}
+
+.c-plan-tail .c-plan-change {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff6500;
+  font-size: 26rpx;
+  font-weight: 900;
+  line-height: 1;
+  background: transparent;
+  box-shadow: none;
+}
+
+.c-plan-tail.done .c-plan-change {
+  color: #6b7280;
 }
 
 .c-plan-menu {
   flex-shrink: 0;
-  padding: 12rpx 18rpx;
-  border-radius: 20rpx;
-  background: #fff0e5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
   color: #ff6500;
-  font-size: 24rpx;
-  font-weight: 700;
+  font-size: 22rpx;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -1rpx;
+  background: linear-gradient(135deg, rgba(255, 245, 223, 0.98) 0%, rgba(255, 237, 204, 0.96) 100%);
+  box-shadow:
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.88),
+    inset 0 0 0 1rpx rgba(255, 122, 0, 0.14);
 }

@@ -1,6 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const trip_store_1 = require("../../services/trip-store");
+function getCategoryIndex(category, categories) {
+    const index = categories.indexOf(category);
+    return index >= 0 ? index : categories.length - 1;
+}
 Page({
     data: {
         tripId: "",
@@ -11,7 +15,8 @@ Page({
         trip: undefined,
         title: "",
         content: "",
-        category: "事项",
+        category: "物品",
+        categoryIndex: 0,
         categories: (0, trip_store_1.getNoteCategories)(),
         saving: false
     },
@@ -25,6 +30,8 @@ Page({
             return;
         }
         const note = trip?.notes.find((item) => item.id === options.noteId);
+        const categories = (0, trip_store_1.getNoteCategories)();
+        const category = note ? note.category : "物品";
         this.setData({
             tripId: options.tripId,
             noteId: options.noteId || "",
@@ -34,7 +41,9 @@ Page({
             trip,
             title: note ? note.title : "",
             content: note ? note.content : "",
-            category: note ? note.category : this.data.category
+            categories,
+            category,
+            categoryIndex: getCategoryIndex(category, categories)
         });
         if (note)
             wx.setNavigationBarTitle({ title: "编辑备忘" });
@@ -47,7 +56,10 @@ Page({
     },
     onCategoryChange(event) {
         const index = Number(event.detail.value);
-        this.setData({ category: this.data.categories[index] });
+        this.setData({
+            categoryIndex: index,
+            category: this.data.categories[index]
+        });
     },
     saveNote() {
         if (this.data.saving)

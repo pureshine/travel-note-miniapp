@@ -30,20 +30,13 @@ Page({
     nickname: "冲鸭旅行者",
     avatarUrl: "",
     openid: "",
-    profileSubtitle: "登录后可开启账号同步",
-    friendCount: 0,
-    syncStatus: "未登录",
-    syncTip: "登录后自动同步旅行数据",
     lastSyncText: "暂未同步",
     syncing: false,
     inviteLoading: false,
     tripCount: 0,
     scheduleCount: 0,
-    currentTripId: "",
-    currentTripName: "暂无旅行",
     memberNamesText: "",
     inviteCode: "",
-    inviteStatus: "选择一个旅行后，可邀请好友共同记录",
     sharePath: "/pages/profile/profile",
     shareTitle: "邀请你一起冲鸭去旅行",
     pendingInviteCode: "",
@@ -55,10 +48,7 @@ Page({
 
   onLoad(options?: { inviteCode?: string }) {
     if (options?.inviteCode) {
-      this.setData({
-        pendingInviteCode: options.inviteCode,
-        inviteStatus: "收到好友邀请，登录后即可加入"
-      });
+      this.setData({ pendingInviteCode: options.inviteCode });
     }
   },
 
@@ -72,7 +62,7 @@ Page({
 
   async reconcileWithCloud() {
     if (this.data.syncing) return;
-    this.setData({ syncing: true, syncStatus: "同步中", syncTip: "正在与云端对齐数据", lastSyncText: "同步中..." });
+    this.setData({ syncing: true, lastSyncText: "同步中..." });
     try {
       const result = await syncTripsWithCloud();
       this.applySyncResult(result.tripCount || 0, result.updatedAt);
@@ -90,7 +80,7 @@ Page({
 
   async loginWithWechat() {
     if (this.data.syncing) return;
-    this.setData({ syncing: true, syncStatus: "登录中", syncTip: "正在连接微信云开发", lastSyncText: "同步中..." });
+    this.setData({ syncing: true, lastSyncText: "同步中..." });
     try {
       const profile = await loginByCloud();
       this.applyProfile(profile);
@@ -157,7 +147,7 @@ Page({
       wx.showToast({ title: "请先微信登录", icon: "none" });
       return;
     }
-    this.setData({ syncing: true, syncStatus: "同步中", syncTip: "正在上传并拉取共享数据", lastSyncText: "同步中..." });
+    this.setData({ syncing: true, lastSyncText: "同步中..." });
     try {
       const result = await syncTripsWithCloud();
       this.applySyncResult(result.tripCount || 0, result.updatedAt);
@@ -190,7 +180,7 @@ Page({
   },
 
   async restoreFromCloud() {
-    this.setData({ syncing: true, syncStatus: "刷新中", syncTip: "正在拉取好友更新", lastSyncText: "同步中..." });
+    this.setData({ syncing: true, lastSyncText: "同步中..." });
     try {
       const result = await downloadTripsFromCloud();
       this.applySyncResult(result.tripCount || 0, result.updatedAt);
@@ -206,7 +196,7 @@ Page({
 
   async autoSyncCloudData() {
     if (this.data.syncing) return;
-    this.setData({ syncing: true, syncStatus: "自动同步", syncTip: "正在同步你的旅行数据", lastSyncText: "同步中..." });
+    this.setData({ syncing: true, lastSyncText: "同步中..." });
     try {
       const result = await this.restoreOrUploadTrips();
       this.applySyncResult(result.tripCount || 0, result.updatedAt);
@@ -228,7 +218,7 @@ Page({
   },
 
   async restoreOrSyncCloudData() {
-    this.setData({ syncing: true, syncStatus: "同步中", syncTip: "正在恢复你的旅行数据", lastSyncText: "同步中..." });
+    this.setData({ syncing: true, lastSyncText: "同步中..." });
     try {
       const result = await this.restoreOrUploadTrips();
       this.applySyncResult(result.tripCount || 0, result.updatedAt);
@@ -271,12 +261,7 @@ Page({
       wx.showToast({ title: "请先新建旅行", icon: "none" });
       return;
     }
-    this.setData({
-      inviteLoading: true,
-      syncStatus: "生成中",
-      syncTip: "正在准备好友邀请",
-      inviteStatus: "正在准备共享邀请"
-    });
+    this.setData({ inviteLoading: true });
     try {
       await syncTripsWithCloud();
       const invite = await createTripInvite(trip.id);
@@ -292,13 +277,10 @@ Page({
 
   async acceptInvite(inviteCode: string) {
     if (!this.data.loggedIn) {
-      this.setData({
-        pendingInviteCode: inviteCode,
-        inviteStatus: "收到好友邀请，登录后即可加入"
-      });
+      this.setData({ pendingInviteCode: inviteCode });
       return;
     }
-    this.setData({ syncing: true, syncStatus: "加入中", syncTip: "正在加入好友共享旅行", lastSyncText: "同步中..." });
+    this.setData({ syncing: true, lastSyncText: "同步中..." });
     try {
       const result = await acceptTripInvite(inviteCode);
       this.applyAcceptedInvite(result);
@@ -319,9 +301,6 @@ Page({
         nickname: "冲鸭旅行者",
         avatarUrl: "",
         openid: "",
-        profileSubtitle: "登录后可开启账号同步",
-        syncStatus: "未登录",
-        syncTip: "登录后自动同步旅行数据",
         lastSyncText: "暂未同步",
         autoSynced: false
       });
@@ -332,9 +311,6 @@ Page({
       nickname: profile.nickname?.trim() || "设置名字",
       avatarUrl: profile.avatarUrl || "",
       openid: profile.openid,
-      profileSubtitle: "",
-      syncStatus: profile.lastAutoSyncFailedAt ? "同步待检查" : "自动同步",
-      syncTip: profile.lastAutoSyncError || "数据变更会自动同步",
       lastSyncText: formatSyncTime(profile.lastSyncAt)
     });
   },
@@ -378,14 +354,6 @@ Page({
     this.setData({ showProfileSetup: false });
   },
 
-  copySyncTip() {
-    if (!this.data.syncTip) return;
-    wx.setClipboardData({
-      data: this.data.syncTip,
-      success: () => wx.showToast({ title: "已复制同步提示", icon: "success" })
-    });
-  },
-
   refreshLocalStats() {
     reconcileClearedPlanState();
     const trips = listTrips();
@@ -399,18 +367,13 @@ Page({
     this.setData({
       tripCount: trips.length,
       scheduleCount: summary.scheduleCount,
-      currentTripId: currentTrip ? currentTrip.id : "",
-      currentTripName: currentTrip ? currentTrip.name : "暂无旅行",
-      memberNamesText: memberNames.length > 0 ? memberNames.join("、") : "",
-      inviteStatus: this.data.inviteCode ? this.data.inviteStatus : currentTrip ? `${currentTrip.name} 可生成好友邀请` : "新建旅行后可邀请好友共同记录"
+      memberNamesText: memberNames.length > 0 ? memberNames.join("、") : ""
     });
   },
 
   applySyncResult(_tripCount: number, updatedAt?: number) {
     const tripCount = listTrips().length;
     this.setData({
-      syncStatus: "已同步",
-      syncTip: `${tripCount} 个旅行已保存到云端`,
       lastSyncText: formatSyncTime(updatedAt || Date.now())
     });
   },
@@ -418,19 +381,12 @@ Page({
   applyInvite(invite: InviteResult) {
     this.setData({
       inviteCode: invite.inviteCode,
-      inviteStatus: `${invite.tripName} 已准备好分享`,
       shareTitle: `邀请你一起冲鸭记录「${invite.tripName}」`,
       sharePath: `/pages/profile/profile?inviteCode=${invite.inviteCode}`
     });
   },
 
-  applyAcceptedInvite(result: AcceptInviteResult) {
-    this.setData({
-      inviteStatus: `已加入「${result.tripName}」，共 ${result.memberCount} 人`,
-      syncStatus: "已加入",
-      syncTip: "好友旅行已同步"
-    });
-  },
+  applyAcceptedInvite(_result: AcceptInviteResult) {},
 
   onShareAppMessage() {
     return {

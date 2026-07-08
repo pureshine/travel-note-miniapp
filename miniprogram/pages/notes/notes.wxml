@@ -30,11 +30,7 @@
     bind:change="onTripChange"
   />
 
-  <view class="memo-title-row legacy-title-row">
-    <view>
-      <view class="title">备忘</view>
-      <view class="muted" wx:if="{{!trip || tripNames.length <= 1}}">{{trip.name || '暂无计划'}}</view>
-    </view>
+  <view class="memo-title-row">
     <view class="memo-actions">
       <button class="memo-add" bindtap="goNoteForm">
         <image
@@ -42,7 +38,7 @@
           src="/assets/illustrations/duck-travel-sticker.png"
           mode="aspectFit"
         />
-        <text class="memo-add-text">写备忘</text>
+        <text class="memo-add-text"><text class="memo-plus">+</text>写备忘</text>
         <image class="memo-foot" src="/assets/illustrations/duck-foot-icon.png" mode="aspectFit" />
       </button>
     </view>
@@ -64,14 +60,14 @@
     <view
       wx:for="{{filteredNotes}}"
       wx:key="id"
-      class="note-card panel {{item.done ? 'done' : ''}} {{openNoteId === item.id ? 'open' : ''}}"
+      class="note-card panel {{item.done ? 'is-done' : ''}} {{openNoteId === item.id ? 'is-open' : ''}}"
     >
       <view class="note-actions">
         <button class="note-action edit" catchtap="editNoteItem" data-id="{{item.id}}">编辑</button>
         <button class="note-action danger" catchtap="deleteNoteItem" data-id="{{item.id}}">删除</button>
       </view>
       <view
-        class="note-swipe {{openNoteId === item.id ? 'open' : ''}}"
+        class="note-swipe {{openNoteId === item.id ? 'is-open' : ''}}"
         bindtouchstart="onNoteTouchStart"
         bindtouchmove="onNoteTouchMove"
         data-id="{{item.id}}"

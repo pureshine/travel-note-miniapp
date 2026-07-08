@@ -8,7 +8,7 @@
       <view class="picker-field">{{time}}</view>
     </picker>
   </view>
-  <picker mode="selector" range="{{categories}}" bindchange="onCategoryChange">
+  <picker mode="selector" range="{{categories}}" value="{{categoryIndex}}" bindchange="onCategoryChange">
     <view class="picker-field">类型：{{category}}</view>
   </picker>
   <input class="field" placeholder="地点，如 鼓浪屿 / 厦门北站" value="{{place}}" bindinput="onPlaceInput" />

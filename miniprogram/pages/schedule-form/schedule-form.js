@@ -4,6 +4,10 @@ const trip_store_1 = require("../../services/trip-store");
 const cloud_1 = require("../../config/cloud");
 const date_1 = require("../../utils/date");
 const id_1 = require("../../utils/id");
+function getCategoryIndex(category, categories) {
+    const index = categories.indexOf(category);
+    return index >= 0 ? index : 0;
+}
 let cloudReady = false;
 function getFileExt(filePath) {
     const match = filePath.match(/\.([a-zA-Z0-9]+)(?:\?|$)/);
@@ -138,6 +142,7 @@ Page({
         place: "",
         note: "",
         category: "景点",
+        categoryIndex: 0,
         categories: (0, trip_store_1.getScheduleCategories)(),
         images: [],
         uploadingImages: false,
@@ -153,6 +158,8 @@ Page({
             return;
         }
         const schedule = trip?.schedules.find((item) => item.id === options.scheduleId);
+        const categories = (0, trip_store_1.getScheduleCategories)();
+        const category = schedule ? schedule.category : this.data.category;
         this.setData({
             tripId: options.tripId,
             scheduleId: options.scheduleId || "",
@@ -165,7 +172,9 @@ Page({
             time: schedule ? schedule.time : this.data.time,
             place: schedule ? schedule.place : trip ? trip.destination : "",
             note: schedule ? schedule.note : "",
-            category: schedule ? schedule.category : this.data.category,
+            categories,
+            category,
+            categoryIndex: getCategoryIndex(category, categories),
             images: schedule ? schedule.images : [],
         });
         if (schedule)
@@ -188,7 +197,10 @@ Page({
     },
     onCategoryChange(event) {
         const index = Number(event.detail.value);
-        this.setData({ category: this.data.categories[index] });
+        this.setData({
+            categoryIndex: index,
+            category: this.data.categories[index],
+        });
     },
     chooseImages() {
         if (this.data.uploadingImages)

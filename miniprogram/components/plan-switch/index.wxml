@@ -12,9 +12,13 @@
         <view class="c-plan-label">当前计划</view>
         <view class="c-plan-name">{{tripName}}</view>
       </view>
-      <view wx:if="{{statusText}}" class="c-plan-status {{statusClass}}">{{statusText}}</view>
-      <view class="c-plan-change">▾</view>
+      <view class="c-plan-ops">
+        <view class="c-plan-tail {{statusClass}}">
+          <view wx:if="{{statusText}}" class="c-plan-status">{{statusText}}</view>
+          <view class="c-plan-change">▾</view>
+        </view>
+        <view wx:if="{{showMenu}}" class="c-plan-menu" catchtap="onMenuTap">⋮</view>
+      </view>
     </view>
   </picker>
-  <view wx:if="{{showMenu}}" class="c-plan-menu" catchtap="onMenuTap">操作</view>
 </view>

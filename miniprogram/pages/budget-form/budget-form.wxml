@@ -1,7 +1,9 @@
-<view class="page budget-page" wx:if="{{trip}}">
-  <view class="form-title">设置预算金额</view>
-  <view class="form-subtitle">{{trip.name}} · 控制这次旅行花费</view>
-
+<form-shell
+  wx:if="{{trip}}"
+  plain
+  title="设置预算金额"
+  subtitle="{{trip.name}} · 控制这次旅行花费"
+>
   <view class="budget-card panel">
     <view class="paw-wrap">
       <image class="paw" src="/assets/illustrations/duck-foot-icon.png" mode="aspectFit" />
@@ -21,4 +23,4 @@
   </view>
 
   <button class="save-button" loading="{{saving}}" disabled="{{saving}}" bindtap="saveBudget">保存预算</button>
-</view>
+</form-shell>

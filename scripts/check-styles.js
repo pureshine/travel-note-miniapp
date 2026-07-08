@@ -7,17 +7,7 @@ let importantCount = 0;
 const longClassViolations = [];
 const longFileViolations = [];
 const nestedViolations = [];
-const nestedAllowlist = new Set([
-  path.join(root, "styles/shared-secondary.wxss"),
-  path.join(root, "styles/components.wxss"),
-  path.join(root, "styles/form-base.wxss"),
-  path.join(root, "styles/tab/profile-dashboard.wxss"),
-  path.join(root, "styles/tab/notes-memo.wxss"),
-  path.join(root, "styles/tab/stats-ledger.wxss"),
-  path.join(root, "pages/profile-edit/profile-edit.wxss"),
-  path.join(root, "pages/stats/stats.wxss"),
-  path.join(root, "pages/checklist/checklist.wxss"),
-]);
+const MAX_NEST_DEPTH = 2;
 
 function walk(dir) {
   for (const name of fs.readdirSync(dir)) {
@@ -36,6 +26,14 @@ function countSegments(className) {
   return className.split("-").length;
 }
 
+function getClassNestDepth(selector) {
+  const trimmed = selector.trim();
+  if (!trimmed || trimmed.startsWith("@")) return 0;
+  const classes = trimmed.match(/\.[a-z][\w-]*/g);
+  if (!classes) return 0;
+  return classes.length - 1;
+}
+
 function findNestedSelectors(content, file) {
   const withoutComments = content.replace(/\/\*[\s\S]*?\*\//g, "");
   const blocks = withoutComments.split("}");
@@ -43,10 +41,9 @@ function findNestedSelectors(content, file) {
     const selectorPart = block.split("{")[0];
     if (!selectorPart) return;
     selectorPart.split(",").forEach((selector) => {
-      const trimmed = selector.trim();
-      if (!trimmed || trimmed.startsWith("@")) return;
-      if (/\.[a-z][\w-]*\s+\.[a-z][\w-]*/.test(trimmed)) {
-        nestedViolations.push(`${path.relative(root, file)}: ${trimmed}`);
+      const depth = getClassNestDepth(selector);
+      if (depth > MAX_NEST_DEPTH) {
+        nestedViolations.push(`${path.relative(root, file)}: ${selector.trim()}`);
       }
     });
   });
@@ -68,9 +65,7 @@ for (const file of wxssFiles) {
       longClassViolations.push(`${path.relative(root, file)}: .${className}`);
     }
   });
-  if (!nestedAllowlist.has(file)) {
-    findNestedSelectors(content, file);
-  }
+  findNestedSelectors(content, file);
 }
 
 console.log(`WXSS files: ${wxssFiles.length}`);
@@ -83,11 +78,9 @@ if (longFileViolations.length) {
   longFileViolations.forEach((item) => console.warn(`- ${item}`));
 }
 if (nestedViolations.length) {
-  console.warn(`Nested class selectors (${nestedViolations.length}, allowlist migration pending):`);
-  [...new Set(nestedViolations)].slice(0, 8).forEach((item) => console.warn(`- ${item}`));
-  if (nestedViolations.length > 8) {
-    console.warn(`- ... and ${nestedViolations.length - 8} more`);
-  }
+  console.error(`Nested selectors over ${MAX_NEST_DEPTH} levels (max ${MAX_NEST_DEPTH + 1} classes):`);
+  [...new Set(nestedViolations)].forEach((item) => console.error(`- ${item}`));
+  process.exit(1);
 }
 if (longClassViolations.length) {
   console.error("Class names over 3 segments:");

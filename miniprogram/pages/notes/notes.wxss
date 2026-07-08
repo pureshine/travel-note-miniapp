@@ -2,18 +2,8 @@
 
 /* Page skeleton only — visual polish lives in notes-memo.wxss */
 
-.memo-title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24rpx;
-  margin-bottom: 24rpx;
-}
-
-.title {
-  color: #2f2f2a;
-  font-size: 48rpx;
-  font-weight: 850;
+.notes-page .memo-title-row {
+  margin-bottom: 18rpx;
 }
 
 .memo-actions {

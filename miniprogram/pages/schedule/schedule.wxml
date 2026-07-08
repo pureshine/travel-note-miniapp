@@ -34,11 +34,15 @@
             <view class="sch-plan-label">当前计划</view>
             <view class="sch-plan-name">{{trip.name}}</view>
           </view>
-          <view class="sch-status {{tripStatusClass}}">{{tripStatus}}</view>
-          <view class="sch-plan-more">▾</view>
+          <view class="sch-plan-ops">
+            <view class="sch-plan-tail {{tripStatusClass}}">
+              <view class="sch-status">{{tripStatus}}</view>
+              <view class="sch-plan-more">▾</view>
+            </view>
+            <view class="sch-plan-menu" catchtap="manageTrip">⋮</view>
+          </view>
         </view>
       </picker>
-      <view class="sch-plan-menu" catchtap="manageTrip">操作</view>
     </view>
     <button class="sch-quick-add" bindtap="goScheduleForm">+ 添加日程</button>
   </view>

@@ -1,6 +1,6 @@
 export type ExpenseCategory = "交通" | "住宿" | "餐饮" | "门票" | "购物" | "其他";
 export type ScheduleCategory = "景点" | "交通" | "住宿" | "餐饮" | "其他";
-export type NoteCategory = "证件" | "财务" | "物品" | "预订" | "事项";
+export type NoteCategory = "物品" | "事项" | "预订" | "攻略";
 
 export interface ScheduleItem {
   id: string;

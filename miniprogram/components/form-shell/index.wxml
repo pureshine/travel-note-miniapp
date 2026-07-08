@@ -1,7 +1,7 @@
 <view class="page form-page">
   <view class="form-title">{{title}}</view>
   <view class="form-subtitle">{{subtitle}}</view>
-  <view class="form-card panel">
+  <view class="{{plain ? 'form-plain' : 'form-card panel'}}">
     <slot></slot>
   </view>
 </view>

@@ -9,6 +9,11 @@ import { CLOUD_ENV_ID } from "../../config/cloud";
 import { today } from "../../utils/date";
 import { createId } from "../../utils/id";
 
+function getCategoryIndex(category: ScheduleCategory, categories: ScheduleCategory[]) {
+  const index = categories.indexOf(category);
+  return index >= 0 ? index : 0;
+}
+
 let cloudReady = false;
 
 function getFileExt(filePath: string): string {
@@ -161,6 +166,7 @@ Page({
     place: "",
     note: "",
     category: "景点" as ScheduleCategory,
+    categoryIndex: 0,
     categories: getScheduleCategories(),
     images: [] as string[],
     uploadingImages: false,
@@ -178,6 +184,8 @@ Page({
     const schedule = trip?.schedules.find(
       (item) => item.id === options.scheduleId,
     );
+    const categories = getScheduleCategories();
+    const category = schedule ? schedule.category : this.data.category;
     this.setData({
       tripId: options.tripId,
       scheduleId: options.scheduleId || "",
@@ -190,7 +198,9 @@ Page({
       time: schedule ? schedule.time : this.data.time,
       place: schedule ? schedule.place : trip ? trip.destination : "",
       note: schedule ? schedule.note : "",
-      category: schedule ? schedule.category : this.data.category,
+      categories,
+      category,
+      categoryIndex: getCategoryIndex(category, categories),
       images: schedule ? schedule.images : [],
     });
     if (schedule) wx.setNavigationBarTitle({ title: "编辑日程" });
@@ -218,7 +228,10 @@ Page({
 
   onCategoryChange(event: { detail: { value: string } }) {
     const index = Number(event.detail.value);
-    this.setData({ category: this.data.categories[index] });
+    this.setData({
+      categoryIndex: index,
+      category: this.data.categories[index],
+    });
   },
 
   chooseImages() {
