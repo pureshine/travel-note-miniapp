@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "新增备忘"
+  "navigationBarTitleText": "新增备忘",
+  "usingComponents": {
+    "form-shell": "/components/form-shell/index"
+  }
 }

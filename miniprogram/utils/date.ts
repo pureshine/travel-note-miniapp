@@ -10,3 +10,8 @@ export function today(): string {
   const day = `${date.getDate()}`.padStart(2, "0");
   return `${date.getFullYear()}-${month}-${day}`;
 }
+
+export function isTripDateRangeValid(startDate: string, endDate: string): boolean {
+  if (!startDate || !endDate) return false;
+  return startDate <= endDate;
+}

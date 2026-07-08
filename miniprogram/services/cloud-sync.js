@@ -1,8 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.acceptTripInvite = exports.createTripInvite = exports.resetMyCloudData = exports.syncTripsWithCloud = exports.downloadTripsFromCloud = exports.uploadTripsToCloud = exports.updateSavedProfile = exports.loginByCloud = exports.getSavedProfile = exports.getCloudErrorMessage = void 0;
+exports.getCloudErrorMessage = getCloudErrorMessage;
+exports.getSavedProfile = getSavedProfile;
+exports.loginByCloud = loginByCloud;
+exports.updateSavedProfile = updateSavedProfile;
+exports.uploadTripsToCloud = uploadTripsToCloud;
+exports.downloadTripsFromCloud = downloadTripsFromCloud;
+exports.syncTripsWithCloud = syncTripsWithCloud;
+exports.resetMyCloudData = resetMyCloudData;
+exports.createTripInvite = createTripInvite;
+exports.acceptTripInvite = acceptTripInvite;
 const trip_store_1 = require("./trip-store");
-const PROFILE_KEY = "travel-note-profile";
+const storage_keys_1 = require("../constants/storage-keys");
+const PROFILE_KEY = storage_keys_1.STORAGE_KEYS.profile;
 function callCloudFunction(name, data) {
     return new Promise((resolve, reject) => {
         if (!wx.cloud) {
@@ -27,12 +37,10 @@ function getCloudErrorMessage(error) {
     }
     return "云函数调用失败";
 }
-exports.getCloudErrorMessage = getCloudErrorMessage;
 function getSavedProfile() {
     const profile = wx.getStorageSync(PROFILE_KEY);
     return profile && profile.loggedIn && profile.openid ? profile : undefined;
 }
-exports.getSavedProfile = getSavedProfile;
 async function loginByCloud() {
     const result = await callCloudFunction("login");
     if (!result.openid) {
@@ -48,7 +56,6 @@ async function loginByCloud() {
     wx.setStorageSync(PROFILE_KEY, profile);
     return profile;
 }
-exports.loginByCloud = loginByCloud;
 function updateSavedProfile(input) {
     const profile = getSavedProfile();
     if (!profile)
@@ -60,7 +67,6 @@ function updateSavedProfile(input) {
     wx.setStorageSync(PROFILE_KEY, nextProfile);
     return nextProfile;
 }
-exports.updateSavedProfile = updateSavedProfile;
 async function uploadTripsToCloud(options) {
     const trips = (0, trip_store_1.exportTripsForSync)();
     const result = await callCloudFunction("syncTrips", {
@@ -76,7 +82,6 @@ async function uploadTripsToCloud(options) {
     updateLastSyncAt(result.updatedAt || Date.now());
     return result;
 }
-exports.uploadTripsToCloud = uploadTripsToCloud;
 async function downloadTripsFromCloud() {
     const result = await callCloudFunction("syncTrips", {
         action: "download"
@@ -92,7 +97,6 @@ async function downloadTripsFromCloud() {
     updateLastSyncAt(result.updatedAt || Date.now());
     return result;
 }
-exports.downloadTripsFromCloud = downloadTripsFromCloud;
 async function syncTripsWithCloud() {
     (0, trip_store_1.reconcileClearedPlanState)();
     await uploadTripsToCloud({ clearDeleted: false });
@@ -110,13 +114,11 @@ async function syncTripsWithCloud() {
     updateLastSyncAt(result.updatedAt || Date.now());
     return result;
 }
-exports.syncTripsWithCloud = syncTripsWithCloud;
 async function resetMyCloudData() {
     return callCloudFunction("syncTrips", {
         action: "resetMyData"
     });
 }
-exports.resetMyCloudData = resetMyCloudData;
 async function createTripInvite(tripId) {
     return callCloudFunction("syncTrips", {
         action: "createInvite",
@@ -124,7 +126,6 @@ async function createTripInvite(tripId) {
         memberProfile: getSyncMemberProfile()
     });
 }
-exports.createTripInvite = createTripInvite;
 async function acceptTripInvite(inviteCode) {
     const result = await callCloudFunction("syncTrips", {
         action: "acceptInvite",
@@ -134,7 +135,6 @@ async function acceptTripInvite(inviteCode) {
     await downloadTripsFromCloud();
     return result;
 }
-exports.acceptTripInvite = acceptTripInvite;
 function updateLastSyncAt(lastSyncAt) {
     const profile = getSavedProfile();
     if (!profile)

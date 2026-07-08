@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const trip_store_1 = require("../../services/trip-store");
-const ui_1 = require("../../utils/ui");
+const page_shell_1 = require("../../behaviors/page-shell");
+const active_trip_1 = require("../../behaviors/active-trip");
 Page({
+    behaviors: [page_shell_1.pageShellBehavior, active_trip_1.activeTripBehavior],
     data: {
-        safeTopStyle: (0, ui_1.getSafeTopStyle)(14),
-        customNavStyle: (0, ui_1.getCustomNavStyle)(),
         trips: [],
         tripNames: [],
         activeTripIndex: 0,
@@ -22,8 +22,6 @@ Page({
         budgetText: "0",
         remainingText: "0",
         budgetRingStyle: "",
-        expenseTouchStartX: 0,
-        openExpenseId: "",
         recentExpenses: [],
         weekLabels: ["日", "一", "二", "三", "四", "五", "六"],
         calendarTitle: "",
@@ -81,14 +79,6 @@ Page({
             calendarDays: buildCalendarDays(expenses, selectedDateKey, calendarMonth),
             dailyBars: buildDailyBars(expenses, calendarMonth)
         });
-    },
-    onTripChange(event) {
-        const index = Number(event.detail.value);
-        const trip = this.data.trips[index];
-        if (!trip)
-            return;
-        (0, trip_store_1.setActiveTripId)(trip.id);
-        this.loadSelectedTrip();
     },
     goExpenseForm() {
         const trip = (0, trip_store_1.getActiveTrip)();
@@ -160,22 +150,6 @@ Page({
             return;
         wx.navigateTo({ url: `/pages/expense-form/expense-form?tripId=${this.data.trip.id}&expenseId=${event.currentTarget.dataset.id}` });
     },
-    onExpenseTouchStart(event) {
-        this.setData({
-            expenseTouchStartX: event.changedTouches[0].clientX,
-            openExpenseId: this.data.openExpenseId === event.currentTarget.dataset.id ? this.data.openExpenseId : ""
-        });
-    },
-    onExpenseTouchMove(event) {
-        const distance = this.data.expenseTouchStartX - event.changedTouches[0].clientX;
-        const expenseId = event.currentTarget.dataset.id;
-        if (distance > 40) {
-            this.setData({ openExpenseId: expenseId });
-        }
-        else if (distance < -20 && this.data.openExpenseId === expenseId) {
-            this.setData({ openExpenseId: "" });
-        }
-    },
     deleteExpense(event) {
         const expense = this.data.trip?.expenses.find((item) => item.id === event.currentTarget.dataset.id);
         if (!expense || !this.data.trip)
@@ -189,7 +163,6 @@ Page({
                 if (!result.confirm || !this.data.trip)
                     return;
                 (0, trip_store_1.deleteExpense)(this.data.trip.id, expense.id);
-                this.setData({ openExpenseId: "" });
                 this.loadSelectedTrip();
             }
         });

@@ -7,6 +7,8 @@ interface IAppOption {
 declare const wx: WechatMiniprogram.Wx;
 declare const App: WechatMiniprogram.App.Constructor;
 declare const Page: WechatMiniprogram.Page.Constructor;
+declare const Component: WechatMiniprogram.Component.Constructor;
+declare const Behavior: WechatMiniprogram.Behavior.Constructor;
 declare const getApp: WechatMiniprogram.GetApp;
 declare const getCurrentPages: () => Array<Record<string, unknown>>;
 
@@ -100,6 +102,27 @@ declare namespace WechatMiniprogram {
   namespace Page {
     interface Constructor {
       <T>(options: T): void;
+    }
+    interface TrivialInstance {
+      data: Record<string, unknown>;
+      loadTrip?: (tripId: string) => void;
+      loadSelectedTrip?: () => void;
+      [key: string]: unknown;
+    }
+  }
+
+  namespace Component {
+    interface Constructor {
+      <T>(options: T): void;
+    }
+  }
+
+  namespace Behavior {
+    interface Constructor {
+      <T>(options: T): WechatMiniprogram.Behavior.BehaviorInstance;
+    }
+    interface BehaviorInstance {
+      [key: string]: unknown;
     }
   }
 

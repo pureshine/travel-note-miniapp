@@ -1,11 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const trip_store_1 = require("../../services/trip-store");
-const ui_1 = require("../../utils/ui");
+const trip_view_1 = require("../../utils/trip-view");
+const active_trip_1 = require("../../behaviors/active-trip");
+const page_shell_1 = require("../../behaviors/page-shell");
 Page({
+    behaviors: [page_shell_1.pageShellBehavior, active_trip_1.activeTripBehavior],
     data: {
-        safeTopStyle: (0, ui_1.getSafeTopStyle)(14),
-        customNavStyle: (0, ui_1.getCustomNavStyle)(),
         trip: null,
         trips: [],
         tripOptions: [],
@@ -14,6 +15,7 @@ Page({
         tripStatusClass: "upcoming",
         scheduleTouchStartX: 0,
         openScheduleId: "",
+        clipScheduleId: "",
         schedules: [],
         scheduleGroups: [],
         travelTip: {
@@ -29,6 +31,7 @@ Page({
     },
     loadTrip() {
         (0, trip_store_1.reconcileClearedPlanState)();
+        this.clearClipTimer();
         const trips = (0, trip_store_1.listTrips)();
         const trip = (0, trip_store_1.getActiveTrip)();
         if (!trip) {
@@ -38,31 +41,25 @@ Page({
             });
             return;
         }
-        const schedules = this.toScheduleViews(trip ? trip.schedules : []);
-        const tripStatus = trip ? getTripStatus(trip) : "待出发";
+        const schedules = this.sortScheduleViews(this.toScheduleViews(trip ? trip.schedules : []));
+        const tripStatus = trip ? (0, trip_view_1.getTripStatus)(trip) : "待出发";
         this.setData({
             trip,
             trips,
-            tripOptions: trips.map((item) => formatTripOption(item)),
+            tripOptions: trips.map((item) => (0, trip_view_1.formatTripOption)(item)),
             activeTripIndex: trip
                 ? Math.max(trips.findIndex((item) => item.id === trip.id), 0)
                 : 0,
             tripStatus,
-            tripStatusClass: getTripStatusClass(tripStatus),
+            tripStatusClass: (0, trip_view_1.getTripStatusClass)(tripStatus),
+            openScheduleId: "",
+            clipScheduleId: "",
             schedules,
             scheduleGroups: this.groupSchedulesByYear(schedules),
             travelTip: trip
                 ? createTravelTip(trip, schedules.length)
                 : createEmptyTravelTip(),
         });
-    },
-    onTripChange(event) {
-        const index = Number(event.detail.value);
-        const trip = this.data.trips[index];
-        if (!trip)
-            return;
-        (0, trip_store_1.setActiveTripId)(trip.id);
-        this.loadTrip();
     },
     goTripForm() {
         wx.navigateTo({ url: "/pages/trip-form/trip-form" });
@@ -128,26 +125,63 @@ Page({
         });
     },
     onScheduleTouchStart(event) {
+        const scheduleId = event.currentTarget.dataset.id;
+        if (this.data.openScheduleId &&
+            this.data.openScheduleId !== scheduleId) {
+            this.closeScheduleSwipe();
+        }
         this.setData({
             scheduleTouchStartX: event.changedTouches[0].clientX,
-            openScheduleId: this.data.openScheduleId === event.currentTarget.dataset.id
-                ? this.data.openScheduleId
-                : "",
         });
     },
     onScheduleTouchMove(event) {
         const distance = this.data.scheduleTouchStartX - event.changedTouches[0].clientX;
         const scheduleId = event.currentTarget.dataset.id;
         if (distance > 40) {
-            this.setData({ openScheduleId: scheduleId });
+            this.openScheduleSwipe(scheduleId);
         }
         else if (distance < -20 && this.data.openScheduleId === scheduleId) {
-            this.setData({ openScheduleId: "" });
+            this.closeScheduleSwipe();
         }
+    },
+    openScheduleSwipe(scheduleId) {
+        this.clearClipTimer();
+        this.setData({
+            openScheduleId: scheduleId,
+            clipScheduleId: scheduleId,
+        });
+    },
+    closeScheduleSwipe() {
+        this.clearClipTimer();
+        const closingId = this.data.clipScheduleId || this.data.openScheduleId;
+        this.setData({ openScheduleId: "" });
+        if (!closingId) {
+            this.setData({ clipScheduleId: "" });
+            return;
+        }
+        this.setData({ clipScheduleId: closingId });
+        this._clipTimer = setTimeout(() => {
+            this.setData({ clipScheduleId: "" });
+            this._clipTimer = null;
+        }, 200);
+    },
+    clearClipTimer() {
+        if (this._clipTimer) {
+            clearTimeout(this._clipTimer);
+            this._clipTimer = null;
+        }
+    },
+    clearScheduleSwipe() {
+        this.clearClipTimer();
+        this.setData({
+            openScheduleId: "",
+            clipScheduleId: "",
+        });
     },
     editSchedule(event) {
         if (!this.data.trip)
             return;
+        this.clearScheduleSwipe();
         wx.navigateTo({
             url: `/pages/schedule-form/schedule-form?tripId=${this.data.trip.id}&scheduleId=${event.currentTarget.dataset.id}`,
         });
@@ -167,7 +201,7 @@ Page({
                 if (!result.confirm || !this.data.trip)
                     return;
                 (0, trip_store_1.deleteSchedule)(this.data.trip.id, schedule.id);
-                this.setData({ openScheduleId: "" });
+                this.clearScheduleSwipe();
                 this.loadTrip();
             },
         });
@@ -177,11 +211,20 @@ Page({
             const status = getScheduleStatus(item);
             return {
                 ...item,
-                ...formatScheduleDate(item.day),
+                ...(0, trip_view_1.formatScheduleDate)(item.day),
                 status,
                 statusClass: getStatusClass(status),
                 active: status === "进行中",
             };
+        });
+    },
+    sortScheduleViews(items) {
+        return [...items].sort((a, b) => {
+            const aDone = a.status === "已完成";
+            const bDone = b.status === "已完成";
+            if (aDone !== bDone)
+                return aDone ? 1 : -1;
+            return `${a.day} ${a.time}`.localeCompare(`${b.day} ${b.time}`);
         });
     },
     groupSchedulesByYear(items) {
@@ -196,22 +239,6 @@ Page({
         });
         return groups;
     },
-    applyTripState(trip, trips) {
-        const schedules = this.toScheduleViews(trip.schedules);
-        const tripStatus = getTripStatus(trip);
-        this.setData({
-            trip,
-            trips,
-            tripOptions: trips.map((item) => formatTripOption(item)),
-            activeTripIndex: Math.max(trips.findIndex((item) => item.id === trip.id), 0),
-            tripStatus,
-            tripStatusClass: getTripStatusClass(tripStatus),
-            openScheduleId: "",
-            schedules,
-            scheduleGroups: this.groupSchedulesByYear(schedules),
-            travelTip: createTravelTip(trip, schedules.length),
-        });
-    },
     getEmptyScheduleState() {
         return {
             trip: null,
@@ -221,6 +248,7 @@ Page({
             tripStatus: "待出发",
             tripStatusClass: "upcoming",
             openScheduleId: "",
+            clipScheduleId: "",
             schedules: [],
             scheduleGroups: [],
             travelTip: createEmptyTravelTip(),
@@ -244,27 +272,6 @@ function getStatusClass(status) {
     if (status === "进行中")
         return "active";
     return "pending";
-}
-function getTripStatus(trip) {
-    const endTime = new Date(`${trip.endDate}T23:59:59`).getTime();
-    if (Number.isNaN(endTime))
-        return "待出发";
-    return Date.now() > endTime ? "已完成" : "待出发";
-}
-function getTripStatusClass(status) {
-    return status === "已完成" ? "done" : "upcoming";
-}
-function formatTripOption(trip) {
-    return `${trip.name} · ${getTripStatus(trip)}`;
-}
-function formatScheduleDate(day) {
-    const parts = day.split("-");
-    if (parts.length !== 3)
-        return { year: "", monthDay: day };
-    return {
-        year: parts[0],
-        monthDay: `${Number(parts[1])}.${Number(parts[2])}`,
-    };
 }
 function createTravelTip(trip, scheduleCount) {
     const destination = trip.destination || "待定目的地";

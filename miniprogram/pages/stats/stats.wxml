@@ -1,12 +1,18 @@
 <view class="page stats-page" style="{{safeTopStyle}}">
-  <view class="custom-nav" style="{{customNavStyle}}">
-    <view class="custom-nav-logo"></view>
-  </view>
+  <brand-nav customNavStyle="{{customNavStyle}}" />
   <!-- <view class="brand-row">
     <view class="brand-wordmark">
       <text class="brand-hot">冲鸭</text>去旅行
     </view>
   </view>-->
+
+  <plan-switch
+    wx:if="{{trip && tripNames.length > 1}}"
+    tripOptions="{{tripNames}}"
+    activeIndex="{{activeTripIndex}}"
+    tripName="{{trip.name}}"
+    bind:change="onTripChange"
+  />
 
   <view class="ledger-hero">
     <view class="budget-panel">

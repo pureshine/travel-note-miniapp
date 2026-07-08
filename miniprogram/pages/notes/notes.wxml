@@ -1,7 +1,5 @@
 <view class="page notes-page" style="{{safeTopStyle}}">
-  <view class="custom-nav" style="{{customNavStyle}}">
-    <view class="custom-nav-logo"></view>
-  </view>
+  <brand-nav customNavStyle="{{customNavStyle}}" />
   <view class="memo-hero">
     <view class="memo-hero-copy">
       <image class="memo-hero-logo" src="/assets/design3d/memo-wordmark-transparent.png" mode="aspectFit" />
@@ -24,10 +22,18 @@
     />
   </view>
 
+  <plan-switch
+    wx:if="{{trip && tripNames.length > 1}}"
+    tripOptions="{{tripNames}}"
+    activeIndex="{{activeTripIndex}}"
+    tripName="{{trip.name}}"
+    bind:change="onTripChange"
+  />
+
   <view class="memo-title-row legacy-title-row">
     <view>
       <view class="title">备忘</view>
-      <view class="muted">{{trip.name}}</view>
+      <view class="muted" wx:if="{{!trip || tripNames.length <= 1}}">{{trip.name || '暂无计划'}}</view>
     </view>
     <view class="memo-actions">
       <button class="memo-add" bindtap="goNoteForm">

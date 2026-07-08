@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "新增消费"
+  "navigationBarTitleText": "新增消费",
+  "usingComponents": {
+    "form-shell": "/components/form-shell/index"
+  }
 }

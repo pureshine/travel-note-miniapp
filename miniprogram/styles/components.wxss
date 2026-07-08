@@ -1,0 +1,89 @@
+.muted {
+  color: var(--color-muted);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 34rpx 2rpx 18rpx;
+  color: #2f2f2a;
+  font-size: 32rpx;
+  font-weight: 700;
+}
+
+.panel,
+.card {
+  border: 2rpx solid rgba(255, 255, 255, 0.92);
+  border-radius: var(--radius-card);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow-panel);
+  backdrop-filter: blur(18rpx);
+}
+
+.primary-button,
+.save-button,
+.submit-button,
+.confirm-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 88rpx;
+  border-radius: var(--radius-button);
+  background: linear-gradient(135deg, var(--color-brand-light) 0%, var(--color-brand) 100%);
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: var(--shadow-button);
+}
+
+.ghost-button,
+.preset-button,
+.secondary-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80rpx;
+  border: 2rpx solid rgba(255, 122, 0, 0.18);
+  border-radius: 26rpx;
+  background: #fff0e5;
+  color: var(--color-brand);
+  font-weight: 700;
+}
+
+.field,
+.textarea,
+.picker-field,
+input,
+textarea {
+  min-height: 84rpx;
+  width: 100%;
+  padding: 0 24rpx;
+  border: 2rpx solid rgba(226, 232, 240, 0.88);
+  border-radius: var(--radius-field);
+  background: #ffffff;
+  color: var(--color-text);
+}
+
+.textarea {
+  min-height: 180rpx;
+  padding: 22rpx 24rpx;
+  line-height: 1.55;
+}
+
+.empty {
+  padding: 48rpx 24rpx;
+  text-align: center;
+  color: #8a93a3;
+}
+
+.brand-wordmark {
+  color: var(--color-text);
+  font-size: 44rpx;
+  font-weight: 950;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.brand-wordmark .brand-hot {
+  color: var(--color-brand);
+}

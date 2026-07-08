@@ -1,5 +1,5 @@
 <view class="page budget-page" wx:if="{{trip}}">
-  <view class="form-title">设置预算</view>
+  <view class="form-title">设置预算金额</view>
   <view class="form-subtitle">{{trip.name}} · 控制这次旅行花费</view>
 
   <view class="budget-card panel">

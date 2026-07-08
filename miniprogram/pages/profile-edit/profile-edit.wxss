@@ -1,216 +1,20 @@
-.profile-edit-page {
-  background: #fff8ef;
-}
+/* Profile edit — single source (compact one-screen layout). */
 
-.profile-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 36rpx 28rpx 34rpx;
-  background: linear-gradient(135deg, #ffe6bf 0%, #fff6df 58%, #edf7e9 100%);
-}
-
-.avatar-picker {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 150rpx;
-  height: 150rpx;
-  padding: 0;
-  overflow: hidden;
-  border: 8rpx solid rgba(255, 255, 255, 0.82);
-  border-radius: 34rpx;
-  background: #ffffff;
-  color: #f0753d;
-  font-size: 48rpx;
-  font-weight: 900;
-  line-height: 150rpx;
-  box-shadow: 0 14rpx 32rpx rgba(139, 93, 54, 0.12);
-}
-
-.avatar-picker::after,
-.save-button::after,
-.logout-text::after {
-  border: 0;
-}
-
-.avatar-image {
-  width: 100%;
-  height: 100%;
-  background: #ffffff;
-}
-
-.profile-title {
-  margin-top: 22rpx;
-  color: #2f2f2a;
-  font-size: 38rpx;
-  font-weight: 900;
-}
-
-.profile-subtitle {
-  margin-top: 10rpx;
-  color: #8f8171;
-  font-size: 24rpx;
-  font-weight: 700;
-}
-
-.form-card {
-  padding: 26rpx;
-  margin-top: 24rpx;
-}
-
-.field-label {
-  color: #8f8171;
-  font-size: 24rpx;
-  font-weight: 850;
-}
-
-.name-input {
-  height: 88rpx;
-  margin-top: 14rpx;
-  padding: 0 24rpx;
-  border-radius: 26rpx;
-  background: #fff8ef;
-  color: #2f2f2a;
-  font-size: 30rpx;
-  font-weight: 850;
-}
-
-.info-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20rpx;
-  min-height: 68rpx;
-  margin-top: 16rpx;
-  color: #9b8d7c;
-  font-size: 24rpx;
-  font-weight: 750;
-}
-
-.info-row text:last-child {
-  overflow: hidden;
-  color: #5f554b;
-  text-align: right;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.save-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 86rpx;
-  margin-top: 28rpx;
-  border-radius: 30rpx;
-  background: #ff8a4c;
-  color: #ffffff;
-  font-size: 28rpx;
-  font-weight: 900;
-  line-height: 86rpx;
-  box-shadow: 0 14rpx 28rpx rgba(255, 126, 75, 0.18);
-}
-
-.logout-text {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 72rpx;
-  margin-top: 12rpx;
-  color: #a07f63;
-  font-size: 24rpx;
-  font-weight: 850;
-}
-
-/* Shared design refresh: align secondary pages with the duck travel visual system. */
-.form-page,
-.budget-page,
-.profile-edit-page,
-.settings-page,
-.trip-detail-page,
-.index-page,
-.trips-page,
-.checklist-page,
-.expenses-page {
-  background:
-    radial-gradient(circle at 76% 8%, rgba(255, 122, 0, 0.1) 0, rgba(255, 122, 0, 0) 210rpx),
-    linear-gradient(180deg, #f9fbff 0%, #f1f5fa 100%);
-}
-
-.form-title,
-.page-title,
-.title {
-  color: #111827 !important;
-  font-weight: 950 !important;
-  letter-spacing: 0 !important;
-}
-
-.form-subtitle,
-.page-subtitle,
-.subtitle,
-.desc,
-.muted {
-  color: #7d8593 !important;
-}
-
-.form-card,
-.budget-card,
-.preset-card,
-.panel,
-.card {
-  border: 2rpx solid rgba(255, 255, 255, 0.92) !important;
-  border-radius: 36rpx !important;
-  background: rgba(255, 255, 255, 0.92) !important;
-  box-shadow:
-    0 8rpx 32rpx rgba(0, 0, 0, 0.03),
-    0 16rpx 64rpx rgba(255, 122, 0, 0.05) !important;
-}
-
-.field,
-.textarea,
-.picker-field,
-input,
-textarea {
-  border: 2rpx solid rgba(226, 232, 240, 0.88) !important;
-  border-radius: 28rpx !important;
-  background: #ffffff !important;
-  color: #111827 !important;
-}
-
-.save-button,
-.primary-button,
-.submit-button,
-.confirm-button {
-  border-radius: 30rpx !important;
-  background: linear-gradient(135deg, #ff9a1f 0%, #ff6500 100%) !important;
-  color: #ffffff !important;
-  box-shadow: 0 16rpx 30rpx rgba(255, 101, 0, 0.22) !important;
-}
-
-.preset-button,
-.ghost-button,
-.secondary-button {
-  border-radius: 26rpx !important;
-  background: #fff0e5 !important;
-  color: #ff6500 !important;
-}
-
-/* Profile edit premium refresh: match the current duck travel visual system. */
 .profile-edit-page {
   position: relative;
   min-height: 100vh;
-  padding: 30rpx 30rpx calc(44rpx + env(safe-area-inset-bottom));
+  padding: 22rpx 30rpx calc(24rpx + env(safe-area-inset-bottom));
   overflow: hidden;
+  box-sizing: border-box;
   background:
     radial-gradient(circle at 86% 8%, rgba(255, 122, 0, 0.08) 0, rgba(255, 122, 0, 0) 210rpx),
-    linear-gradient(180deg, #fbfdff 0%, #f5f7fa 48%, #eef4fb 100%) !important;
-  box-sizing: border-box;
+    linear-gradient(180deg, #fbfdff 0%, #f5f7fa 48%, #eef4fb 100%);
 }
 
-.profile-edit-bg-mountain {
+.edit-bg-peak {
   position: absolute;
-  right: -110rpx;
   top: 58rpx;
+  right: -110rpx;
   width: 520rpx;
   height: 320rpx;
   opacity: 0.9;
@@ -223,27 +27,28 @@ textarea {
 
 .profile-edit-page .profile-card {
   position: relative;
-  min-height: 400rpx;
-  padding: 44rpx 34rpx 38rpx;
+  min-height: 286rpx;
+  padding: 30rpx 32rpx 28rpx;
   overflow: hidden;
-  border: 2rpx solid rgba(255, 255, 255, 0.92) !important;
-  border-radius: 38rpx !important;
+  box-sizing: border-box;
+  border: 2rpx solid rgba(255, 255, 255, 0.92);
+  border-radius: 34rpx;
   background:
     radial-gradient(circle at 78% 30%, rgba(255, 255, 255, 0.86) 0, rgba(255, 255, 255, 0) 130rpx),
-    linear-gradient(135deg, rgba(255, 246, 236, 0.96) 0%, rgba(255, 255, 255, 0.96) 50%, rgba(241, 246, 252, 0.96) 100%) !important;
+    linear-gradient(135deg, rgba(255, 246, 236, 0.96) 0%, rgba(255, 255, 255, 0.96) 50%, rgba(241, 246, 252, 0.96) 100%);
   box-shadow:
     0 8rpx 32rpx rgba(0, 0, 0, 0.03),
-    0 18rpx 58rpx rgba(17, 24, 39, 0.045) !important;
-  box-sizing: border-box;
+    0 18rpx 58rpx rgba(17, 24, 39, 0.045);
 }
 
 .profile-edit-page .profile-card::before {
   position: absolute;
-  right: -90rpx;
-  bottom: -76rpx;
+  right: -120rpx;
+  bottom: -112rpx;
   width: 430rpx;
   height: 210rpx;
   border-radius: 58% 42% 0 0;
+  opacity: 0.68;
   background:
     radial-gradient(ellipse at 54% 100%, rgba(197, 208, 222, 0.18) 0, rgba(197, 208, 222, 0.18) 48%, rgba(197, 208, 222, 0) 49%),
     radial-gradient(ellipse at 82% 98%, rgba(216, 224, 235, 0.38) 0, rgba(216, 224, 235, 0.38) 56%, rgba(216, 224, 235, 0) 57%);
@@ -251,44 +56,51 @@ textarea {
 }
 
 .profile-edit-page .profile-card-duck {
-  position: absolute;
-  left: -34rpx;
-  bottom: -10rpx;
-  width: 250rpx;
-  height: 270rpx;
-  opacity: 0.98;
-  pointer-events: none;
+  display: none;
 }
 
 .profile-edit-page .avatar-picker {
   position: relative;
   z-index: 2;
-  width: 172rpx !important;
-  height: 172rpx !important;
-  padding: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 132rpx;
+  height: 132rpx;
+  padding: 0;
   overflow: hidden;
-  border: 8rpx solid rgba(255, 255, 255, 0.92) !important;
-  border-radius: 44rpx !important;
+  border: 6rpx solid rgba(255, 255, 255, 0.92);
+  border-radius: 34rpx;
   background:
-    radial-gradient(circle at 50% 28%, #ffffff 0, #ffffff 40%, #fff4e7 100%) !important;
+    radial-gradient(circle at 50% 28%, #ffffff 0, #ffffff 40%, #fff4e7 100%);
+  color: #f0753d;
+  font-size: 48rpx;
+  font-weight: 900;
+  line-height: 132rpx;
   box-shadow:
     0 12rpx 28rpx rgba(17, 24, 39, 0.06),
-    0 18rpx 42rpx rgba(255, 122, 0, 0.08) !important;
+    0 18rpx 42rpx rgba(255, 122, 0, 0.08);
+}
+
+.profile-edit-page .avatar-picker::after,
+.profile-edit-page .save-button::after,
+.profile-edit-page .logout-text::after {
+  border: 0;
 }
 
 .profile-edit-page .avatar-image {
-  width: 100% !important;
-  height: 100% !important;
-  background: transparent !important;
+  width: 100%;
+  height: 100%;
+  background: transparent;
 }
 
 .profile-edit-page .profile-title {
   position: relative;
   z-index: 2;
-  margin-top: 28rpx !important;
-  color: #111827 !important;
-  font-size: 42rpx !important;
-  font-weight: 850 !important;
+  margin-top: 20rpx;
+  color: #111827;
+  font-size: 38rpx;
+  font-weight: 850;
   line-height: 1.15;
 }
 
@@ -296,10 +108,10 @@ textarea {
   position: relative;
   z-index: 2;
   max-width: 520rpx;
-  margin-top: 14rpx !important;
-  color: #7d8593 !important;
-  font-size: 25rpx !important;
-  font-weight: 500 !important;
+  margin-top: 10rpx;
+  color: #7d8593;
+  font-size: 23rpx;
+  font-weight: 500;
   line-height: 1.35;
   text-align: center;
 }
@@ -307,45 +119,49 @@ textarea {
 .profile-edit-page .form-card {
   position: relative;
   z-index: 2;
-  margin-top: 26rpx !important;
-  padding: 34rpx 30rpx !important;
-  border-radius: 36rpx !important;
-  background: rgba(255, 255, 255, 0.96) !important;
+  margin-top: 22rpx;
+  padding: 28rpx 28rpx 22rpx;
+  border-radius: 34rpx;
+  background: rgba(255, 255, 255, 0.96);
   box-shadow:
     0 8rpx 30rpx rgba(17, 24, 39, 0.035),
-    0 16rpx 54rpx rgba(17, 24, 39, 0.035) !important;
+    0 16rpx 54rpx rgba(17, 24, 39, 0.035);
 }
 
 .profile-edit-page .field-label {
-  color: #7d8593 !important;
-  font-size: 25rpx !important;
-  font-weight: 750 !important;
+  color: #7d8593;
+  font-size: 25rpx;
+  font-weight: 750;
 }
 
 .profile-edit-page .name-input {
-  height: 92rpx !important;
-  margin-top: 16rpx !important;
-  padding: 0 28rpx !important;
-  border: 2rpx solid #e4eaf2 !important;
-  border-radius: 28rpx !important;
-  background: #ffffff !important;
-  color: #111827 !important;
-  font-size: 31rpx !important;
-  font-weight: 750 !important;
+  height: 84rpx;
+  margin-top: 14rpx;
+  padding: 0 28rpx;
+  border: 2rpx solid #e4eaf2;
+  border-radius: 28rpx;
+  background: #ffffff;
+  color: #111827;
+  font-size: 30rpx;
+  font-weight: 750;
   box-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.86);
 }
 
 .profile-edit-page .info-row {
-  min-height: 82rpx !important;
-  margin-top: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  min-height: 72rpx;
+  margin-top: 0;
   border-bottom: 1rpx solid #edf0f5;
-  color: #8b95a4 !important;
-  font-size: 25rpx !important;
-  font-weight: 650 !important;
+  color: #8b95a4;
+  font-size: 24rpx;
+  font-weight: 650;
 }
 
 .profile-edit-page .name-input + .info-row {
-  margin-top: 22rpx !important;
+  margin-top: 18rpx;
 }
 
 .profile-edit-page .info-row:last-child {
@@ -353,207 +169,106 @@ textarea {
 }
 
 .profile-edit-page .info-row text:last-child {
-  color: #4b5563 !important;
-  font-weight: 750 !important;
+  overflow: hidden;
+  color: #4b5563;
+  font-weight: 750;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .profile-edit-page .save-button {
   position: relative;
   z-index: 2;
-  width: 420rpx !important;
-  height: 88rpx !important;
-  min-height: 88rpx !important;
-  margin: 30rpx auto 0 !important;
-  border-radius: 34rpx !important;
-  background: linear-gradient(135deg, #ff9319 0%, #ff6500 100%) !important;
-  color: #ffffff !important;
-  font-size: 29rpx !important;
-  font-weight: 850 !important;
-  line-height: 88rpx !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 396rpx;
+  height: 82rpx;
+  min-height: 82rpx;
+  margin: 26rpx auto 0;
+  border-radius: 32rpx;
+  background: linear-gradient(135deg, #ff9319 0%, #ff6500 100%);
+  color: #ffffff;
+  font-size: 28rpx;
+  font-weight: 850;
+  line-height: 82rpx;
   box-shadow:
     0 16rpx 32rpx rgba(255, 101, 0, 0.22),
-    0 24rpx 58rpx rgba(255, 101, 0, 0.12) !important;
+    0 24rpx 58rpx rgba(255, 101, 0, 0.12);
 }
 
 .profile-edit-page .logout-text {
   position: relative;
   z-index: 2;
-  width: 220rpx !important;
-  height: 72rpx !important;
-  min-height: 72rpx !important;
-  margin: 18rpx auto 0 !important;
-  color: #8f7b6a !important;
-  font-size: 25rpx !important;
-  font-weight: 750 !important;
-  line-height: 72rpx !important;
-  background: transparent !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 220rpx;
+  height: 62rpx;
+  min-height: 62rpx;
+  margin: 10rpx auto 0;
+  color: #8f7b6a;
+  font-size: 24rpx;
+  font-weight: 750;
+  line-height: 62rpx;
+  background: transparent;
 }
 
 @media (max-width: 340px) {
   .profile-edit-page {
+    padding-top: 16rpx;
     padding-right: 24rpx;
     padding-left: 24rpx;
   }
 
   .profile-edit-page .profile-card {
-    min-height: 360rpx;
-    padding-top: 36rpx;
-  }
-
-  .profile-edit-page .profile-card-duck {
-    left: -58rpx;
-    width: 224rpx;
-    height: 246rpx;
+    min-height: 258rpx;
+    padding-top: 24rpx;
+    padding-bottom: 24rpx;
   }
 
   .profile-edit-page .avatar-picker {
-    width: 150rpx !important;
-    height: 150rpx !important;
-    border-radius: 38rpx !important;
+    width: 116rpx;
+    height: 116rpx;
+    border-radius: 30rpx;
+    line-height: 116rpx;
   }
 
   .profile-edit-page .profile-title {
-    font-size: 36rpx !important;
+    margin-top: 16rpx;
+    font-size: 34rpx;
   }
 
   .profile-edit-page .profile-subtitle {
-    font-size: 22rpx !important;
-  }
-
-  .profile-edit-page .save-button {
-    width: 360rpx !important;
-  }
-}
-
-/* Compact profile edit: avoid duplicate large mascot and keep the page within one screen. */
-.profile-edit-page {
-  padding-top: 22rpx !important;
-  padding-bottom: calc(24rpx + env(safe-area-inset-bottom)) !important;
-}
-
-.profile-edit-page .profile-card {
-  min-height: 286rpx !important;
-  padding: 30rpx 32rpx 28rpx !important;
-  border-radius: 34rpx !important;
-}
-
-.profile-edit-page .profile-card-duck {
-  display: none !important;
-}
-
-.profile-edit-page .profile-card::before {
-  right: -120rpx;
-  bottom: -112rpx;
-  opacity: 0.68;
-}
-
-.profile-edit-page .avatar-picker {
-  width: 132rpx !important;
-  height: 132rpx !important;
-  border-width: 6rpx !important;
-  border-radius: 34rpx !important;
-}
-
-.profile-edit-page .profile-title {
-  margin-top: 20rpx !important;
-  font-size: 38rpx !important;
-}
-
-.profile-edit-page .profile-subtitle {
-  margin-top: 10rpx !important;
-  font-size: 23rpx !important;
-}
-
-.profile-edit-page .form-card {
-  margin-top: 22rpx !important;
-  padding: 28rpx 28rpx 22rpx !important;
-  border-radius: 34rpx !important;
-}
-
-.profile-edit-page .name-input {
-  height: 84rpx !important;
-  margin-top: 14rpx !important;
-  font-size: 30rpx !important;
-}
-
-.profile-edit-page .info-row {
-  min-height: 72rpx !important;
-  font-size: 24rpx !important;
-}
-
-.profile-edit-page .name-input + .info-row {
-  margin-top: 18rpx !important;
-}
-
-.profile-edit-page .save-button {
-  width: 396rpx !important;
-  height: 82rpx !important;
-  min-height: 82rpx !important;
-  margin-top: 26rpx !important;
-  border-radius: 32rpx !important;
-  font-size: 28rpx !important;
-  line-height: 82rpx !important;
-}
-
-.profile-edit-page .logout-text {
-  height: 62rpx !important;
-  min-height: 62rpx !important;
-  margin-top: 10rpx !important;
-  font-size: 24rpx !important;
-  line-height: 62rpx !important;
-}
-
-@media (max-width: 340px) {
-  .profile-edit-page {
-    padding-top: 16rpx !important;
-  }
-
-  .profile-edit-page .profile-card {
-    min-height: 258rpx !important;
-    padding-top: 24rpx !important;
-    padding-bottom: 24rpx !important;
-  }
-
-  .profile-edit-page .avatar-picker {
-    width: 116rpx !important;
-    height: 116rpx !important;
-    border-radius: 30rpx !important;
-  }
-
-  .profile-edit-page .profile-title {
-    margin-top: 16rpx !important;
-    font-size: 34rpx !important;
-  }
-
-  .profile-edit-page .profile-subtitle {
-    font-size: 21rpx !important;
+    font-size: 21rpx;
   }
 
   .profile-edit-page .form-card {
-    margin-top: 18rpx !important;
-    padding: 24rpx 24rpx 18rpx !important;
+    margin-top: 18rpx;
+    padding: 24rpx 24rpx 18rpx;
   }
 
   .profile-edit-page .name-input {
-    height: 76rpx !important;
+    height: 76rpx;
   }
 
   .profile-edit-page .info-row {
-    min-height: 64rpx !important;
-    font-size: 22rpx !important;
+    min-height: 64rpx;
+    font-size: 22rpx;
   }
 
   .profile-edit-page .save-button {
-    width: 340rpx !important;
-    height: 76rpx !important;
-    min-height: 76rpx !important;
-    margin-top: 20rpx !important;
-    line-height: 76rpx !important;
+    width: 340rpx;
+    height: 76rpx;
+    min-height: 76rpx;
+    margin-top: 20rpx;
+    line-height: 76rpx;
   }
 
   .profile-edit-page .logout-text {
-    height: 56rpx !important;
-    min-height: 56rpx !important;
-    line-height: 56rpx !important;
+    height: 56rpx;
+    min-height: 56rpx;
+    line-height: 56rpx;
   }
 }

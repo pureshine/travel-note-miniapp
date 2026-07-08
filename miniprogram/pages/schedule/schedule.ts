@@ -7,10 +7,18 @@ import {
   setActiveTripId,
 } from "../../services/trip-store";
 import { ScheduleItem, Trip } from "../../types/trip";
-import { getCustomNavStyle, getSafeTopStyle } from "../../utils/ui";
+import {
+  formatScheduleDate,
+  formatTripOption,
+  getTripStatus,
+  getTripStatusClass,
+  TripStatus,
+} from "../../utils/trip-view";
+import { activeTripBehavior } from "../../behaviors/active-trip";
+import { pageShellBehavior } from "../../behaviors/page-shell";
 
 type ScheduleStatus = "已完成" | "进行中" | "待进行";
-type TripStatus = "待出发" | "已完成";
+type TripStatusView = TripStatus;
 type ScheduleView = ScheduleItem & {
   year: string;
   monthDay: string;
@@ -30,17 +38,17 @@ type TravelTipView = {
   metaBottom: string;
 };
 Page({
+  behaviors: [pageShellBehavior, activeTripBehavior],
   data: {
-    safeTopStyle: getSafeTopStyle(14),
-    customNavStyle: getCustomNavStyle(),
     trip: null,
     trips: [] as Trip[],
     tripOptions: [] as string[],
     activeTripIndex: 0,
-    tripStatus: "待出发" as TripStatus,
+    tripStatus: "待出发" as TripStatusView,
     tripStatusClass: "upcoming",
     scheduleTouchStartX: 0,
     openScheduleId: "",
+    clipScheduleId: "",
     schedules: [] as ScheduleView[],
     scheduleGroups: [] as ScheduleYearGroup[],
     travelTip: {
@@ -58,6 +66,7 @@ Page({
 
   loadTrip() {
     reconcileClearedPlanState();
+    this.clearClipTimer();
     const trips = listTrips();
     const trip = getActiveTrip();
     if (!trip) {
@@ -67,7 +76,9 @@ Page({
       });
       return;
     }
-    const schedules = this.toScheduleViews(trip ? trip.schedules : []);
+    const schedules = this.sortScheduleViews(
+      this.toScheduleViews(trip ? trip.schedules : []),
+    );
     const tripStatus = trip ? getTripStatus(trip) : "待出发";
     this.setData({
       trip,
@@ -81,20 +92,14 @@ Page({
         : 0,
       tripStatus,
       tripStatusClass: getTripStatusClass(tripStatus),
+      openScheduleId: "",
+      clipScheduleId: "",
       schedules,
       scheduleGroups: this.groupSchedulesByYear(schedules),
       travelTip: trip
         ? createTravelTip(trip, schedules.length)
         : createEmptyTravelTip(),
     });
-  },
-
-  onTripChange(event: { detail: { value: string } }) {
-    const index = Number(event.detail.value);
-    const trip = this.data.trips[index];
-    if (!trip) return;
-    setActiveTripId(trip.id);
-    this.loadTrip();
   },
 
   goTripForm() {
@@ -172,12 +177,15 @@ Page({
     changedTouches: Array<{ clientX: number }>;
     currentTarget: { dataset: { id: string } };
   }) {
+    const scheduleId = event.currentTarget.dataset.id;
+    if (
+      this.data.openScheduleId &&
+      this.data.openScheduleId !== scheduleId
+    ) {
+      this.closeScheduleSwipe();
+    }
     this.setData({
       scheduleTouchStartX: event.changedTouches[0].clientX,
-      openScheduleId:
-        this.data.openScheduleId === event.currentTarget.dataset.id
-          ? this.data.openScheduleId
-          : "",
     });
   },
 
@@ -189,14 +197,53 @@ Page({
       this.data.scheduleTouchStartX - event.changedTouches[0].clientX;
     const scheduleId = event.currentTarget.dataset.id;
     if (distance > 40) {
-      this.setData({ openScheduleId: scheduleId });
+      this.openScheduleSwipe(scheduleId);
     } else if (distance < -20 && this.data.openScheduleId === scheduleId) {
-      this.setData({ openScheduleId: "" });
+      this.closeScheduleSwipe();
     }
+  },
+
+  openScheduleSwipe(scheduleId: string) {
+    this.clearClipTimer();
+    this.setData({
+      openScheduleId: scheduleId,
+      clipScheduleId: scheduleId,
+    });
+  },
+
+  closeScheduleSwipe() {
+    this.clearClipTimer();
+    const closingId = this.data.clipScheduleId || this.data.openScheduleId;
+    this.setData({ openScheduleId: "" });
+    if (!closingId) {
+      this.setData({ clipScheduleId: "" });
+      return;
+    }
+    this.setData({ clipScheduleId: closingId });
+    this._clipTimer = setTimeout(() => {
+      this.setData({ clipScheduleId: "" });
+      this._clipTimer = null;
+    }, 200);
+  },
+
+  clearClipTimer() {
+    if (this._clipTimer) {
+      clearTimeout(this._clipTimer);
+      this._clipTimer = null;
+    }
+  },
+
+  clearScheduleSwipe() {
+    this.clearClipTimer();
+    this.setData({
+      openScheduleId: "",
+      clipScheduleId: "",
+    });
   },
 
   editSchedule(event: { currentTarget: { dataset: { id: string } } }) {
     if (!this.data.trip) return;
+    this.clearScheduleSwipe();
     wx.navigateTo({
       url: `/pages/schedule-form/schedule-form?tripId=${this.data.trip.id}&scheduleId=${event.currentTarget.dataset.id}`,
     });
@@ -216,7 +263,7 @@ Page({
       success: (result) => {
         if (!result.confirm || !this.data.trip) return;
         deleteSchedule(this.data.trip.id, schedule.id);
-        this.setData({ openScheduleId: "" });
+        this.clearScheduleSwipe();
         this.loadTrip();
       },
     });
@@ -235,6 +282,15 @@ Page({
     });
   },
 
+  sortScheduleViews(items: ScheduleView[]): ScheduleView[] {
+    return [...items].sort((a, b) => {
+      const aDone = a.status === "已完成";
+      const bDone = b.status === "已完成";
+      if (aDone !== bDone) return aDone ? 1 : -1;
+      return `${a.day} ${a.time}`.localeCompare(`${b.day} ${b.time}`);
+    });
+  },
+
   groupSchedulesByYear(items: ScheduleView[]): ScheduleYearGroup[] {
     const groups: ScheduleYearGroup[] = [];
     items.forEach((item) => {
@@ -248,35 +304,16 @@ Page({
     return groups;
   },
 
-  applyTripState(trip: Trip, trips: Trip[]) {
-    const schedules = this.toScheduleViews(trip.schedules);
-    const tripStatus = getTripStatus(trip);
-    this.setData({
-      trip,
-      trips,
-      tripOptions: trips.map((item) => formatTripOption(item)),
-      activeTripIndex: Math.max(
-        trips.findIndex((item) => item.id === trip.id),
-        0,
-      ),
-      tripStatus,
-      tripStatusClass: getTripStatusClass(tripStatus),
-      openScheduleId: "",
-      schedules,
-      scheduleGroups: this.groupSchedulesByYear(schedules),
-      travelTip: createTravelTip(trip, schedules.length),
-    });
-  },
-
   getEmptyScheduleState() {
     return {
       trip: null,
       trips: [] as Trip[],
       tripOptions: [] as string[],
       activeTripIndex: 0,
-      tripStatus: "待出发" as TripStatus,
+      tripStatus: "待出发" as TripStatusView,
       tripStatusClass: "upcoming",
       openScheduleId: "",
+      clipScheduleId: "",
       schedules: [] as ScheduleView[],
       scheduleGroups: [] as ScheduleYearGroup[],
       travelTip: createEmptyTravelTip(),
@@ -299,29 +336,6 @@ function getStatusClass(status: ScheduleStatus): string {
   if (status === "已完成") return "done";
   if (status === "进行中") return "active";
   return "pending";
-}
-
-function getTripStatus(trip: Trip): TripStatus {
-  const endTime = new Date(`${trip.endDate}T23:59:59`).getTime();
-  if (Number.isNaN(endTime)) return "待出发";
-  return Date.now() > endTime ? "已完成" : "待出发";
-}
-
-function getTripStatusClass(status: TripStatus): string {
-  return status === "已完成" ? "done" : "upcoming";
-}
-
-function formatTripOption(trip: Trip): string {
-  return `${trip.name} · ${getTripStatus(trip)}`;
-}
-
-function formatScheduleDate(day: string): { year: string; monthDay: string } {
-  const parts = day.split("-");
-  if (parts.length !== 3) return { year: "", monthDay: day };
-  return {
-    year: parts[0],
-    monthDay: `${Number(parts[1])}.${Number(parts[2])}`,
-  };
 }
 
 function createTravelTip(trip: Trip, scheduleCount: number): TravelTipView {

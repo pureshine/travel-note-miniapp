@@ -8,7 +8,9 @@ import {
 } from "./trip-store";
 import { Trip } from "../types/trip";
 
-const PROFILE_KEY = "travel-note-profile";
+import { STORAGE_KEYS } from "../constants/storage-keys";
+
+const PROFILE_KEY = STORAGE_KEYS.profile;
 
 export interface CloudProfile {
   loggedIn: boolean;

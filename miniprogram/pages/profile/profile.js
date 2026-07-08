@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const cloud_sync_1 = require("../../services/cloud-sync");
 const trip_store_1 = require("../../services/trip-store");
-const ui_1 = require("../../utils/ui");
+const page_shell_1 = require("../../behaviors/page-shell");
 function formatSyncTime(timestamp) {
     if (!timestamp)
         return "暂未同步";
@@ -14,9 +14,8 @@ function formatSyncTime(timestamp) {
     return `${month}-${day} ${hour}:${minute}`;
 }
 Page({
+    behaviors: [page_shell_1.pageShellBehavior],
     data: {
-        safeTopStyle: (0, ui_1.getSafeTopStyle)(14),
-        customNavStyle: (0, ui_1.getCustomNavStyle)(),
         loggedIn: false,
         nickname: "冲鸭旅行者",
         avatarUrl: "",
@@ -61,7 +60,7 @@ Page({
     async reconcileWithCloud() {
         if (this.data.syncing)
             return;
-        this.setData({ syncing: true, syncStatus: "同步中", syncTip: "正在与云端对齐数据" });
+        this.setData({ syncing: true, syncStatus: "同步中", syncTip: "正在与云端对齐数据", lastSyncText: "同步中..." });
         try {
             const result = await (0, cloud_sync_1.syncTripsWithCloud)();
             this.applySyncResult(result.tripCount || 0, result.updatedAt);
@@ -80,7 +79,7 @@ Page({
     async loginWithWechat() {
         if (this.data.syncing)
             return;
-        this.setData({ syncing: true, syncStatus: "登录中", syncTip: "正在连接微信云开发" });
+        this.setData({ syncing: true, syncStatus: "登录中", syncTip: "正在连接微信云开发", lastSyncText: "同步中..." });
         try {
             const profile = await (0, cloud_sync_1.loginByCloud)();
             this.applyProfile(profile);
@@ -151,7 +150,7 @@ Page({
             wx.showToast({ title: "请先微信登录", icon: "none" });
             return;
         }
-        this.setData({ syncing: true, syncStatus: "同步中", syncTip: "正在上传并拉取共享数据" });
+        this.setData({ syncing: true, syncStatus: "同步中", syncTip: "正在上传并拉取共享数据", lastSyncText: "同步中..." });
         try {
             const result = await (0, cloud_sync_1.syncTripsWithCloud)();
             this.applySyncResult(result.tripCount || 0, result.updatedAt);
@@ -186,7 +185,7 @@ Page({
         });
     },
     async restoreFromCloud() {
-        this.setData({ syncing: true, syncStatus: "刷新中", syncTip: "正在拉取好友更新" });
+        this.setData({ syncing: true, syncStatus: "刷新中", syncTip: "正在拉取好友更新", lastSyncText: "同步中..." });
         try {
             const result = await (0, cloud_sync_1.downloadTripsFromCloud)();
             this.applySyncResult(result.tripCount || 0, result.updatedAt);
@@ -204,7 +203,7 @@ Page({
     async autoSyncCloudData() {
         if (this.data.syncing)
             return;
-        this.setData({ syncing: true, syncStatus: "自动同步", syncTip: "正在同步你的旅行数据" });
+        this.setData({ syncing: true, syncStatus: "自动同步", syncTip: "正在同步你的旅行数据", lastSyncText: "同步中..." });
         try {
             const result = await this.restoreOrUploadTrips();
             this.applySyncResult(result.tripCount || 0, result.updatedAt);
@@ -227,7 +226,7 @@ Page({
         }
     },
     async restoreOrSyncCloudData() {
-        this.setData({ syncing: true, syncStatus: "同步中", syncTip: "正在恢复你的旅行数据" });
+        this.setData({ syncing: true, syncStatus: "同步中", syncTip: "正在恢复你的旅行数据", lastSyncText: "同步中..." });
         try {
             const result = await this.restoreOrUploadTrips();
             this.applySyncResult(result.tripCount || 0, result.updatedAt);
@@ -299,7 +298,7 @@ Page({
             });
             return;
         }
-        this.setData({ syncing: true, syncStatus: "加入中", syncTip: "正在加入好友共享旅行" });
+        this.setData({ syncing: true, syncStatus: "加入中", syncTip: "正在加入好友共享旅行", lastSyncText: "同步中..." });
         try {
             const result = await (0, cloud_sync_1.acceptTripInvite)(inviteCode);
             this.applyAcceptedInvite(result);

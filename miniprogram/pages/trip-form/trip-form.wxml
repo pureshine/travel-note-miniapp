@@ -1,16 +1,11 @@
-<view class="page form-page">
-  <view class="form-title">{{formTitle}}</view>
-  <view class="form-subtitle">{{formSubtitle}}</view>
-
-  <view class="form-card panel">
-    <input class="field" placeholder="旅行名称，如 厦门周末小旅行" value="{{name}}" bindinput="onNameInput" />
-    <input class="field" placeholder="目的地，如 厦门" value="{{destination}}" bindinput="onDestinationInput" />
-    <picker mode="date" value="{{startDate}}" bindchange="onStartDateChange">
-      <view class="picker-field">开始日期：{{startDate}}</view>
-    </picker>
-    <picker mode="date" value="{{endDate}}" bindchange="onEndDateChange">
-      <view class="picker-field">结束日期：{{endDate}}</view>
-    </picker>
-    <button class="primary-button" loading="{{saving}}" disabled="{{saving}}" bindtap="saveTrip">{{saveLabel}}</button>
-  </view>
-</view>
+<form-shell title="{{formTitle}}" subtitle="{{formSubtitle}}">
+  <input class="field" placeholder="旅行名称，如 厦门周末小旅行" value="{{name}}" bindinput="onNameInput" />
+  <input class="field" placeholder="目的地，如 厦门" value="{{destination}}" bindinput="onDestinationInput" />
+  <picker mode="date" value="{{startDate}}" end="{{endDate}}" bindchange="onStartDateChange">
+    <view class="picker-field">开始日期：{{startDate}}</view>
+  </picker>
+  <picker mode="date" value="{{endDate}}" start="{{startDate}}" bindchange="onEndDateChange">
+    <view class="picker-field">结束日期：{{endDate}}</view>
+  </picker>
+  <button class="primary-button" loading="{{saving}}" disabled="{{saving}}" bindtap="saveTrip">{{saveLabel}}</button>
+</form-shell>

@@ -1,0 +1,83 @@
+.c-plan {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 20rpx 22rpx;
+  margin-top: 24rpx;
+}
+
+.c-plan-picker {
+  flex: 1;
+  min-width: 0;
+}
+
+.c-plan-pill {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  min-width: 0;
+}
+
+.c-plan-dot {
+  flex-shrink: 0;
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: #ff6500;
+}
+
+.c-plan-dot.upcoming {
+  background: #ff6500;
+}
+
+.c-plan-dot.done {
+  background: #22c55e;
+}
+
+.c-plan-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.c-plan-label {
+  color: #8a93a3;
+  font-size: 22rpx;
+}
+
+.c-plan-name {
+  overflow: hidden;
+  color: #111827;
+  font-size: 30rpx;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.c-plan-status {
+  flex-shrink: 0;
+  padding: 6rpx 14rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  font-weight: 700;
+}
+
+.c-plan-status.upcoming {
+  background: #fff0e5;
+  color: #ff6500;
+}
+
+.c-plan-change {
+  flex-shrink: 0;
+  color: #ff6500;
+  font-size: 24rpx;
+}
+
+.c-plan-menu {
+  flex-shrink: 0;
+  padding: 12rpx 18rpx;
+  border-radius: 20rpx;
+  background: #fff0e5;
+  color: #ff6500;
+  font-size: 24rpx;
+  font-weight: 700;
+}

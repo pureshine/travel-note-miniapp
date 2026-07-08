@@ -7,8 +7,8 @@ Page({
     data: {
         tripId: "",
         isEditing: false,
-        formTitle: "新建旅行计划",
-        formSubtitle: "比如：厦门三日游，后续日程、备忘和消费都会归到这个计划里。",
+        formTitle: "填写出行信息",
+        formSubtitle: "目的地、日期和名称会用于后续日程、备忘与消费统计。",
         saveLabel: "保存旅行",
         name: "",
         destination: "",
@@ -26,7 +26,7 @@ Page({
         this.setData({
             tripId: trip.id,
             isEditing: true,
-            formTitle: "编辑旅行计划",
+            formTitle: "调整出行信息",
             formSubtitle: `${trip.destination} · ${trip.startDate} - ${trip.endDate}`,
             saveLabel: "保存修改",
             name: trip.name,
@@ -54,6 +54,10 @@ Page({
         const name = this.data.name.trim() || `${destination || "新的"}旅行`;
         if (!destination) {
             wx.showToast({ title: "先写目的地", icon: "none" });
+            return;
+        }
+        if (!(0, date_1.isTripDateRangeValid)(this.data.startDate, this.data.endDate)) {
+            wx.showToast({ title: "开始日期不能晚于结束日期", icon: "none" });
             return;
         }
         this.setData({ saving: true });

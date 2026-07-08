@@ -1,17 +1,51 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getNoteCategories = exports.getScheduleCategories = exports.clearActiveTripId = exports.setActiveTripId = exports.getActiveTrip = exports.getDefaultTrip = exports.importTripsFromSync = exports.reconcileClearedPlanState = exports.isLocalTripsCleared = exports.getDeletedTripIdsForSync = exports.clearDeletedItemIds = exports.exportTripsForSync = exports.resetDemoData = exports.getExpenseByCategory = exports.getSummary = exports.getDataUpdatedAt = exports.deleteExpense = exports.updateExpense = exports.addExpense = exports.deleteNote = exports.toggleNoteItem = exports.updateNote = exports.addNote = exports.toggleChecklistItem = exports.addChecklistItem = exports.deleteSchedule = exports.updateSchedule = exports.addSchedule = exports.deleteTrip = exports.updateTripBudget = exports.updateTripInfo = exports.createTrip = exports.getTrip = exports.listTrips = void 0;
+exports.listTrips = listTrips;
+exports.getTrip = getTrip;
+exports.createTrip = createTrip;
+exports.updateTripInfo = updateTripInfo;
+exports.updateTripBudget = updateTripBudget;
+exports.deleteTrip = deleteTrip;
+exports.addSchedule = addSchedule;
+exports.updateSchedule = updateSchedule;
+exports.deleteSchedule = deleteSchedule;
+exports.addChecklistItem = addChecklistItem;
+exports.toggleChecklistItem = toggleChecklistItem;
+exports.addNote = addNote;
+exports.updateNote = updateNote;
+exports.toggleNoteItem = toggleNoteItem;
+exports.deleteNote = deleteNote;
+exports.addExpense = addExpense;
+exports.updateExpense = updateExpense;
+exports.deleteExpense = deleteExpense;
+exports.getDataUpdatedAt = getDataUpdatedAt;
+exports.getSummary = getSummary;
+exports.getExpenseByCategory = getExpenseByCategory;
+exports.resetDemoData = resetDemoData;
+exports.exportTripsForSync = exportTripsForSync;
+exports.clearDeletedItemIds = clearDeletedItemIds;
+exports.getDeletedTripIdsForSync = getDeletedTripIdsForSync;
+exports.isLocalTripsCleared = isLocalTripsCleared;
+exports.reconcileClearedPlanState = reconcileClearedPlanState;
+exports.importTripsFromSync = importTripsFromSync;
+exports.getDefaultTrip = getDefaultTrip;
+exports.getActiveTrip = getActiveTrip;
+exports.setActiveTripId = setActiveTripId;
+exports.clearActiveTripId = clearActiveTripId;
+exports.getScheduleCategories = getScheduleCategories;
+exports.getNoteCategories = getNoteCategories;
 const id_1 = require("../utils/id");
 const date_1 = require("../utils/date");
-const STORAGE_KEY = "travel-note-trips";
-const ACTIVE_TRIP_KEY = "travel-note-active-trip-id";
-const ACTIVE_TRIP_CLEARED_KEY = "travel-note-active-trip-cleared";
-const PROFILE_KEY = "travel-note-profile";
-const DELETED_ITEMS_KEY = "travel-note-deleted-item-ids";
-const DELETED_TRIPS_KEY = "travel-note-deleted-trip-ids";
-const DATA_UPDATED_AT_KEY = "travel-note-data-updated-at";
-const DATA_RESET_VERSION_KEY = "travel-note-data-reset-version";
-const CURRENT_DATA_RESET_VERSION = 3;
+const storage_keys_1 = require("../constants/storage-keys");
+const trip_sync_notify_1 = require("./trip-sync-notify");
+const STORAGE_KEY = storage_keys_1.STORAGE_KEYS.trips;
+const ACTIVE_TRIP_KEY = storage_keys_1.STORAGE_KEYS.activeTripId;
+const ACTIVE_TRIP_CLEARED_KEY = storage_keys_1.STORAGE_KEYS.activeTripCleared;
+const PROFILE_KEY = storage_keys_1.STORAGE_KEYS.profile;
+const DELETED_ITEMS_KEY = storage_keys_1.STORAGE_KEYS.deletedItems;
+const DELETED_TRIPS_KEY = storage_keys_1.STORAGE_KEYS.deletedTrips;
+const DATA_UPDATED_AT_KEY = storage_keys_1.STORAGE_KEYS.dataUpdatedAt;
+const DATA_RESET_VERSION_KEY = storage_keys_1.STORAGE_KEYS.dataResetVersion;
 let autoSyncTimer;
 function seedTrips() {
     return [];
@@ -29,19 +63,19 @@ function writeTrips(trips, options) {
     wx.setStorageSync(STORAGE_KEY, trips);
     if (!options?.skipAutoSync)
         scheduleAutoSync(trips.map(normalizeTrip));
-    notifyTripDataChanged();
+    (0, trip_sync_notify_1.notifyTripDataChanged)();
     return trips;
 }
 function resetLocalDataOnce() {
     const resetVersion = wx.getStorageSync(DATA_RESET_VERSION_KEY) || 0;
-    if (resetVersion >= CURRENT_DATA_RESET_VERSION)
+    if (resetVersion >= storage_keys_1.CURRENT_DATA_RESET_VERSION)
         return;
     wx.setStorageSync(STORAGE_KEY, []);
     wx.removeStorageSync(ACTIVE_TRIP_KEY);
     wx.removeStorageSync(ACTIVE_TRIP_CLEARED_KEY);
     wx.removeStorageSync(DELETED_ITEMS_KEY);
     wx.removeStorageSync(DELETED_TRIPS_KEY);
-    wx.setStorageSync(DATA_RESET_VERSION_KEY, CURRENT_DATA_RESET_VERSION);
+    wx.setStorageSync(DATA_RESET_VERSION_KEY, storage_keys_1.CURRENT_DATA_RESET_VERSION);
 }
 function scheduleAutoSync(trips) {
     const profile = wx.getStorageSync(PROFILE_KEY);
@@ -97,11 +131,9 @@ function updateTrip(tripId, updater) {
 function listTrips() {
     return readTrips().map(normalizeTrip);
 }
-exports.listTrips = listTrips;
 function getTrip(tripId) {
     return listTrips().find((trip) => trip.id === tripId);
 }
-exports.getTrip = getTrip;
 function createTrip(input) {
     const current = (0, date_1.today)();
     const trip = {
@@ -121,7 +153,6 @@ function createTrip(input) {
     writeTrips([trip, ...readTrips()]);
     return trip;
 }
-exports.createTrip = createTrip;
 function updateTripInfo(tripId, input) {
     return updateTrip(tripId, (trip) => ({
         ...trip,
@@ -131,15 +162,13 @@ function updateTripInfo(tripId, input) {
         endDate: input.endDate
     }));
 }
-exports.updateTripInfo = updateTripInfo;
 function updateTripBudget(tripId, budget) {
     return updateTrip(tripId, (trip) => ({
         ...trip,
         budget
     }));
 }
-exports.updateTripBudget = updateTripBudget;
-function deleteTrip(tripId, options) {
+function deleteTrip(tripId, _options) {
     markDeletedTrip(tripId);
     const activeTripId = wx.getStorageSync(ACTIVE_TRIP_KEY);
     const trips = readTrips().filter((trip) => trip.id !== tripId);
@@ -152,21 +181,18 @@ function deleteTrip(tripId, options) {
     writeTrips(trips);
     return getActiveTrip();
 }
-exports.deleteTrip = deleteTrip;
 function addSchedule(tripId, item) {
     return updateTrip(tripId, (trip) => ({
         ...trip,
         schedules: [{ ...item, id: (0, id_1.createId)("schedule") }, ...trip.schedules].sort(compareSchedule)
     }));
 }
-exports.addSchedule = addSchedule;
 function updateSchedule(tripId, scheduleId, input) {
     return updateTrip(tripId, (trip) => ({
         ...trip,
         schedules: trip.schedules.map((item) => (item.id === scheduleId ? { ...input, id: item.id } : item)).sort(compareSchedule)
     }));
 }
-exports.updateSchedule = updateSchedule;
 function deleteSchedule(tripId, scheduleId) {
     markDeletedItem(tripId, "schedules", scheduleId);
     return updateTrip(tripId, (trip) => ({
@@ -174,28 +200,24 @@ function deleteSchedule(tripId, scheduleId) {
         schedules: trip.schedules.filter((item) => item.id !== scheduleId)
     }));
 }
-exports.deleteSchedule = deleteSchedule;
 function addChecklistItem(tripId, title) {
     return updateTrip(tripId, (trip) => ({
         ...trip,
         checklist: [...trip.checklist, { id: (0, id_1.createId)("check"), title, done: false }]
     }));
 }
-exports.addChecklistItem = addChecklistItem;
 function toggleChecklistItem(tripId, itemId) {
     return updateTrip(tripId, (trip) => ({
         ...trip,
         checklist: trip.checklist.map((item) => (item.id === itemId ? { ...item, done: !item.done } : item))
     }));
 }
-exports.toggleChecklistItem = toggleChecklistItem;
 function addNote(tripId, title, content, category = "事项") {
     return updateTrip(tripId, (trip) => ({
         ...trip,
         notes: [{ id: (0, id_1.createId)("note"), title, content, category, done: false, createdAt: Date.now() }, ...trip.notes]
     }));
 }
-exports.addNote = addNote;
 function updateNote(tripId, noteId, input) {
     return updateTrip(tripId, (trip) => ({
         ...trip,
@@ -209,14 +231,12 @@ function updateNote(tripId, noteId, input) {
             : item)
     }));
 }
-exports.updateNote = updateNote;
 function toggleNoteItem(tripId, itemId) {
     return updateTrip(tripId, (trip) => ({
         ...trip,
         notes: trip.notes.map((item) => (item.id === itemId ? { ...item, done: !item.done } : item))
     }));
 }
-exports.toggleNoteItem = toggleNoteItem;
 function deleteNote(tripId, itemId) {
     markDeletedItem(tripId, "notes", itemId);
     return updateTrip(tripId, (trip) => ({
@@ -224,14 +244,12 @@ function deleteNote(tripId, itemId) {
         notes: trip.notes.filter((item) => item.id !== itemId)
     }));
 }
-exports.deleteNote = deleteNote;
 function addExpense(tripId, title, amount, category, paidBy, createdAt = Date.now()) {
     return updateTrip(tripId, (trip) => ({
         ...trip,
         expenses: [{ id: (0, id_1.createId)("expense"), title, amount, category, paidBy, createdAt }, ...trip.expenses]
     }));
 }
-exports.addExpense = addExpense;
 function updateExpense(tripId, expenseId, input) {
     return updateTrip(tripId, (trip) => ({
         ...trip,
@@ -247,7 +265,6 @@ function updateExpense(tripId, expenseId, input) {
             : item)
     }));
 }
-exports.updateExpense = updateExpense;
 function deleteExpense(tripId, expenseId) {
     markDeletedItem(tripId, "expenses", expenseId);
     return updateTrip(tripId, (trip) => ({
@@ -255,11 +272,9 @@ function deleteExpense(tripId, expenseId) {
         expenses: trip.expenses.filter((item) => item.id !== expenseId)
     }));
 }
-exports.deleteExpense = deleteExpense;
 function getDataUpdatedAt() {
     return wx.getStorageSync(DATA_UPDATED_AT_KEY) || 0;
 }
-exports.getDataUpdatedAt = getDataUpdatedAt;
 function getSummary() {
     const trips = listTrips();
     const expenses = trips.flatMap((trip) => trip.expenses);
@@ -274,7 +289,6 @@ function getSummary() {
         checklistTotal: checklist.length
     };
 }
-exports.getSummary = getSummary;
 function getExpenseByCategory() {
     const categories = ["交通", "住宿", "餐饮", "门票", "购物", "其他"];
     const expenses = listTrips().flatMap((trip) => trip.expenses);
@@ -283,18 +297,16 @@ function getExpenseByCategory() {
         amount: expenses.filter((item) => item.category === category).reduce((total, item) => total + item.amount, 0)
     }));
 }
-exports.getExpenseByCategory = getExpenseByCategory;
 function resetDemoData() {
     wx.setStorageSync(STORAGE_KEY, []);
     wx.removeStorageSync(ACTIVE_TRIP_KEY);
     wx.removeStorageSync(ACTIVE_TRIP_CLEARED_KEY);
     wx.removeStorageSync(DELETED_ITEMS_KEY);
     wx.removeStorageSync(DELETED_TRIPS_KEY);
-    wx.setStorageSync(DATA_RESET_VERSION_KEY, CURRENT_DATA_RESET_VERSION);
+    wx.setStorageSync(DATA_RESET_VERSION_KEY, storage_keys_1.CURRENT_DATA_RESET_VERSION);
     scheduleAutoSync([]);
-    notifyTripDataChanged();
+    (0, trip_sync_notify_1.notifyTripDataChanged)();
 }
-exports.resetDemoData = resetDemoData;
 function exportTripsForSync() {
     const deletedItems = readDeletedItemIds();
     return listTrips().map((trip) => {
@@ -302,20 +314,16 @@ function exportTripsForSync() {
         return syncDeletedIds ? { ...trip, syncDeletedIds } : trip;
     });
 }
-exports.exportTripsForSync = exportTripsForSync;
 function clearDeletedItemIds() {
     wx.removeStorageSync(DELETED_ITEMS_KEY);
     wx.removeStorageSync(DELETED_TRIPS_KEY);
 }
-exports.clearDeletedItemIds = clearDeletedItemIds;
 function getDeletedTripIdsForSync() {
     return readDeletedTripIds();
 }
-exports.getDeletedTripIdsForSync = getDeletedTripIdsForSync;
 function isLocalTripsCleared() {
     return Boolean(wx.getStorageSync(ACTIVE_TRIP_CLEARED_KEY));
 }
-exports.isLocalTripsCleared = isLocalTripsCleared;
 function reconcileClearedPlanState() {
     if (!isLocalTripsCleared())
         return;
@@ -327,7 +335,6 @@ function reconcileClearedPlanState() {
         return;
     writeTrips([], { skipAutoSync: true });
 }
-exports.reconcileClearedPlanState = reconcileClearedPlanState;
 function importTripsFromSync(trips, options) {
     const activeTripId = wx.getStorageSync(ACTIVE_TRIP_KEY);
     const activeTripWasCleared = Boolean(wx.getStorageSync(ACTIVE_TRIP_CLEARED_KEY));
@@ -355,7 +362,6 @@ function importTripsFromSync(trips, options) {
     }
     return mergedTrips;
 }
-exports.importTripsFromSync = importTripsFromSync;
 function getDefaultTrip() {
     const activeTripId = wx.getStorageSync(ACTIVE_TRIP_KEY);
     const trips = listTrips();
@@ -366,7 +372,6 @@ function getDefaultTrip() {
         return trips[0];
     return createTrip();
 }
-exports.getDefaultTrip = getDefaultTrip;
 function getActiveTrip() {
     const activeTripId = wx.getStorageSync(ACTIVE_TRIP_KEY);
     const trips = listTrips();
@@ -375,25 +380,20 @@ function getActiveTrip() {
     }
     return trips.find((trip) => trip.id === activeTripId);
 }
-exports.getActiveTrip = getActiveTrip;
 function setActiveTripId(tripId) {
     wx.setStorageSync(ACTIVE_TRIP_KEY, tripId);
     wx.removeStorageSync(ACTIVE_TRIP_CLEARED_KEY);
 }
-exports.setActiveTripId = setActiveTripId;
 function clearActiveTripId() {
     wx.removeStorageSync(ACTIVE_TRIP_KEY);
     wx.setStorageSync(ACTIVE_TRIP_CLEARED_KEY, true);
 }
-exports.clearActiveTripId = clearActiveTripId;
 function getScheduleCategories() {
     return ["景点", "交通", "住宿", "餐饮", "其他"];
 }
-exports.getScheduleCategories = getScheduleCategories;
 function getNoteCategories() {
     return ["财务", "物品", "预订", "事项"];
 }
-exports.getNoteCategories = getNoteCategories;
 function normalizeTrip(trip) {
     return {
         ...trip,
@@ -480,32 +480,6 @@ function markDeletedTrip(tripId) {
         delete nextDeletedItems[tripId];
         wx.setStorageSync(DELETED_ITEMS_KEY, nextDeletedItems);
     }
-}
-function notifyTripDataChanged() {
-    wx.setStorageSync(DATA_UPDATED_AT_KEY, Date.now());
-    const pages = typeof getCurrentPages === "function" ? getCurrentPages() : [];
-    pages.forEach((page) => {
-        const route = typeof page.route === "string" ? page.route : "";
-        if (route === "pages/index/index" && typeof page.refreshHomeData === "function") {
-            page.refreshHomeData();
-            return;
-        }
-        if (route === "pages/trips/trips" && typeof page.refreshTripList === "function") {
-            page.refreshTripList();
-            return;
-        }
-        if (route === "pages/schedule/schedule" && typeof page.loadTrip === "function") {
-            page.loadTrip();
-            return;
-        }
-        if ((route === "pages/notes/notes" || route === "pages/stats/stats" || route === "pages/expenses/expenses") && typeof page.loadSelectedTrip === "function") {
-            page.loadSelectedTrip();
-            return;
-        }
-        if (route === "pages/profile/profile" && typeof page.refreshLocalStats === "function") {
-            page.refreshLocalStats();
-        }
-    });
 }
 function markDeletedItem(tripId, collection, itemId) {
     const deletedItems = readDeletedItemIds();

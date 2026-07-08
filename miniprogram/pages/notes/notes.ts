@@ -8,7 +8,8 @@ import {
   toggleNoteItem,
 } from "../../services/trip-store";
 import { NoteItem, Trip } from "../../types/trip";
-import { getCustomNavStyle, getSafeTopStyle } from "../../utils/ui";
+import { pageShellBehavior } from "../../behaviors/page-shell";
+import { activeTripBehavior } from "../../behaviors/active-trip";
 
 function getNoteProgress(trip?: Trip) {
   const noteCount = trip ? trip.notes.length : 0;
@@ -26,9 +27,8 @@ function getNoteProgress(trip?: Trip) {
 }
 
 Page({
+  behaviors: [pageShellBehavior, activeTripBehavior],
   data: {
-    safeTopStyle: getSafeTopStyle(14),
-    customNavStyle: getCustomNavStyle(),
     tripId: "",
     trip: undefined as Trip | undefined,
     trips: [] as Trip[],
@@ -94,14 +94,6 @@ Page({
         this.data.selectedFilter,
       ),
     });
-  },
-
-  onTripChange(event: { detail: { value: string } }) {
-    const index = Number(event.detail.value);
-    const trip = this.data.trips[index];
-    if (!trip) return;
-    setActiveTripId(trip.id);
-    this.loadTrip(trip.id);
   },
 
   selectFilter(event: { currentTarget: { dataset: { value: string } } }) {

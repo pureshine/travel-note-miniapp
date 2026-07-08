@@ -1,6 +1,7 @@
 import { deleteExpense as removeExpense, getActiveTrip, listTrips, setActiveTripId } from "../../services/trip-store";
 import { ExpenseCategory, ExpenseItem, Trip } from "../../types/trip";
-import { getCustomNavStyle, getSafeTopStyle } from "../../utils/ui";
+import { pageShellBehavior } from "../../behaviors/page-shell";
+import { activeTripBehavior } from "../../behaviors/active-trip";
 
 type CalendarDay = {
   dateKey: string;
@@ -19,9 +20,8 @@ type DailyBar = {
 };
 
 Page({
+  behaviors: [pageShellBehavior, activeTripBehavior],
   data: {
-    safeTopStyle: getSafeTopStyle(14),
-    customNavStyle: getCustomNavStyle(),
     trips: [] as Trip[],
     tripNames: [] as string[],
     activeTripIndex: 0,
@@ -38,8 +38,6 @@ Page({
     budgetText: "0",
     remainingText: "0",
     budgetRingStyle: "",
-    expenseTouchStartX: 0,
-    openExpenseId: "",
     recentExpenses: [] as ExpenseItem[],
     weekLabels: ["日", "一", "二", "三", "四", "五", "六"],
     calendarTitle: "",
@@ -99,14 +97,6 @@ Page({
       calendarDays: buildCalendarDays(expenses, selectedDateKey, calendarMonth),
       dailyBars: buildDailyBars(expenses, calendarMonth)
     });
-  },
-
-  onTripChange(event: { detail: { value: string } }) {
-    const index = Number(event.detail.value);
-    const trip = this.data.trips[index];
-    if (!trip) return;
-    setActiveTripId(trip.id);
-    this.loadSelectedTrip();
   },
 
   goExpenseForm() {
@@ -185,23 +175,6 @@ Page({
     wx.navigateTo({ url: `/pages/expense-form/expense-form?tripId=${this.data.trip.id}&expenseId=${event.currentTarget.dataset.id}` });
   },
 
-  onExpenseTouchStart(event: { changedTouches: Array<{ clientX: number }>; currentTarget: { dataset: { id: string } } }) {
-    this.setData({
-      expenseTouchStartX: event.changedTouches[0].clientX,
-      openExpenseId: this.data.openExpenseId === event.currentTarget.dataset.id ? this.data.openExpenseId : ""
-    });
-  },
-
-  onExpenseTouchMove(event: { changedTouches: Array<{ clientX: number }>; currentTarget: { dataset: { id: string } } }) {
-    const distance = this.data.expenseTouchStartX - event.changedTouches[0].clientX;
-    const expenseId = event.currentTarget.dataset.id;
-    if (distance > 40) {
-      this.setData({ openExpenseId: expenseId });
-    } else if (distance < -20 && this.data.openExpenseId === expenseId) {
-      this.setData({ openExpenseId: "" });
-    }
-  },
-
   deleteExpense(event: { currentTarget: { dataset: { id: string } } }) {
     const expense = this.data.trip?.expenses.find((item) => item.id === event.currentTarget.dataset.id);
     if (!expense || !this.data.trip) return;
@@ -213,7 +186,6 @@ Page({
       success: (result) => {
         if (!result.confirm || !this.data.trip) return;
         removeExpense(this.data.trip.id, expense.id);
-        this.setData({ openExpenseId: "" });
         this.loadSelectedTrip();
       }
     });

@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "新建旅行"
+  "navigationBarTitleText": "新建旅行",
+  "usingComponents": {
+    "form-shell": "/components/form-shell/index"
+  }
 }

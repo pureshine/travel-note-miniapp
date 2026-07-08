@@ -1,0 +1,20 @@
+<view wx:if="{{tripOptions.length > 0}}" class="c-plan panel">
+  <picker
+    class="c-plan-picker"
+    mode="selector"
+    range="{{tripOptions}}"
+    value="{{activeIndex}}"
+    bindchange="onPickerChange"
+  >
+    <view class="c-plan-pill">
+      <view class="c-plan-dot {{statusClass}}"></view>
+      <view class="c-plan-copy">
+        <view class="c-plan-label">当前计划</view>
+        <view class="c-plan-name">{{tripName}}</view>
+      </view>
+      <view wx:if="{{statusText}}" class="c-plan-status {{statusClass}}">{{statusText}}</view>
+      <view class="c-plan-change">▾</view>
+    </view>
+  </picker>
+  <view wx:if="{{showMenu}}" class="c-plan-menu" catchtap="onMenuTap">操作</view>
+</view>

@@ -1,0 +1,1103 @@
+/* Schedule tab polish — single source (page wxss keeps layout skeleton). */
+
+/* Design refresh: cold glass UI inspired by the supplied itinerary mockup. */
+.sch-page {
+  position: relative;
+  background:
+    radial-gradient(
+      circle at 84% 6%,
+      rgba(255, 255, 255, 0.96) 0,
+      rgba(255, 255, 255, 0) 230rpx
+    ),
+    radial-gradient(
+      circle at 72% 20%,
+      rgba(255, 122, 0, 0.055) 0,
+      rgba(255, 122, 0, 0) 220rpx
+    ),
+    linear-gradient(180deg, #fbfdff 0%, #f5f8fd 48%, #eef4fb 100%);
+}
+
+
+
+.sch-tip,
+.sch-plan {
+  border-radius: 38rpx;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 8rpx 32rpx rgba(0, 0, 0, 0.03),
+    0 16rpx 64rpx rgba(255, 122, 0, 0.05);
+}
+
+.sch-tip {
+  min-height: 148rpx;
+  padding: 22rpx 26rpx;
+}
+
+.sch-tip-title,
+.sch-plan-name,
+.sch-card-title {
+  color: #111827;
+  letter-spacing: 0;
+}
+
+.sch-tip-sub,
+.sch-tip-meta,
+.sch-plan-label,
+.sch-place,
+.sch-card-note {
+  color: #7d8593;
+}
+
+.sch-plan {
+  padding: 22rpx;
+  margin-top: 24rpx;
+}
+
+.sch-plan-pill {
+  min-height: 84rpx;
+  padding: 0 16rpx 0 18rpx;
+  border-radius: 28rpx;
+  background: #f8fafc;
+  box-shadow: inset 0 0 0 1rpx rgba(226, 232, 240, 0.9);
+}
+
+.sch-plan-dot {
+  background: #ff6500;
+  box-shadow: 0 0 0 8rpx rgba(255, 101, 0, 0.13);
+}
+
+.sch-status.upcoming,
+.sch-tag,
+.sch-state.active,
+.sch-state.pending {
+  background: #fff0e5;
+  color: #ff6500;
+}
+
+.sch-plan-menu {
+  background: #f8fafc;
+  color: #4b5563;
+}
+
+.sch-quick-add {
+  height: 82rpx;
+  background: linear-gradient(135deg, #ff9a1f 0%, #ff6500 100%);
+  box-shadow: 0 16rpx 30rpx rgba(255, 101, 0, 0.22);
+}
+
+.sch-board {
+  position: relative;
+  padding: 18rpx 0 16rpx;
+}
+
+.sch-year-tag {
+  background: rgba(255, 240, 229, 0.92);
+  color: #ff6500;
+}
+
+.sch-row {
+  grid-template-columns: 104rpx 32rpx minmax(0, 1fr);
+  gap: 16rpx;
+  padding: 20rpx 0;
+}
+
+.sch-card.is-active {
+  border: 4rpx solid rgba(255, 122, 0, 0.16);
+  box-shadow:
+    0 8rpx 32rpx rgba(0, 0, 0, 0.03),
+    0 18rpx 48rpx rgba(255, 122, 0, 0.11);
+}
+
+.sch-hour {
+  color: #ff6500;
+  font-size: 32rpx;
+}
+
+.sch-day {
+  color: #8a93a3;
+}
+
+.sch-line::after {
+  width: 4rpx;
+  background: linear-gradient(180deg, #ff6500 0%, rgba(255, 101, 0, 0.08) 100%);
+}
+
+.sch-dot {
+  width: 20rpx;
+  height: 20rpx;
+  border: 8rpx solid #ffffff;
+  background: #ff6500;
+  box-shadow: 0 8rpx 18rpx rgba(255, 101, 0, 0.2);
+}
+
+.sch-wrap,
+.sch-card {
+  border-radius: 34rpx;
+}
+
+.sch-card {
+  padding: 30rpx;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 8rpx 32rpx rgba(0, 0, 0, 0.03),
+    0 16rpx 64rpx rgba(255, 122, 0, 0.05);
+}
+
+.sch-card-title {
+  font-size: 34rpx;
+  font-weight: 900;
+}
+
+.sch-card-pic {
+  width: 188rpx;
+  height: 126rpx;
+  margin-right: 14rpx;
+  border-radius: 22rpx;
+  background: #eef2f7;
+}
+
+/* Premium plan summary card. */
+.sch-tip {
+  position: relative;
+  display: grid;
+  grid-template-columns: 108rpx minmax(0, 1fr) 134rpx;
+  align-items: center;
+  gap: 18rpx;
+  min-height: 168rpx;
+  padding: 28rpx 30rpx;
+  overflow: hidden;
+  border: 2rpx solid rgba(255, 255, 255, 0.96);
+  border-radius: 40rpx;
+  background:
+    radial-gradient(
+      circle at 12% 50%,
+      rgba(255, 122, 0, 0.14) 0,
+      rgba(255, 122, 0, 0) 150rpx
+    ),
+    radial-gradient(
+      circle at 92% 0%,
+      rgba(255, 215, 122, 0.14) 0,
+      rgba(255, 215, 122, 0) 170rpx
+    ),
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.98) 0%,
+      rgba(249, 252, 255, 0.95) 58%,
+      rgba(255, 246, 237, 0.92) 100%
+    );
+  box-shadow:
+    0 8rpx 28rpx rgba(15, 23, 42, 0.045),
+    0 20rpx 58rpx rgba(255, 122, 0, 0.08);
+  backdrop-filter: blur(18rpx);
+}
+
+.sch-tip-icon {
+  position: relative;
+  z-index: 1;
+  width: 108rpx;
+  height: 108rpx;
+  overflow: visible;
+  border-radius: 32rpx;
+}
+
+.sch-tip-duck {
+  width: 126rpx;
+  height: 126rpx;
+  transform: translate(-8rpx, -10rpx);
+}
+
+.sch-tip-copy {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.sch-tip-title {
+  max-width: 100%;
+  overflow: hidden;
+  color: #111827;
+  font-size: 34rpx;
+  font-weight: 950;
+  line-height: 1.24;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sch-tip-sub {
+  max-width: 100%;
+  margin-top: 8rpx;
+  overflow: visible;
+  color: #7d8593;
+  font-size: 23rpx;
+  line-height: 1.25;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+.sch-tip-meta {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  gap: 12rpx;
+  align-items: flex-end;
+  color: #7d8593;
+  font-size: 24rpx;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.sch-tip-meta text {
+  max-width: 132rpx;
+  padding: 9rpx 15rpx;
+  overflow: hidden;
+  border-radius: 999rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sch-tip-meta text:first-child {
+  color: #111827;
+  background: rgba(248, 250, 252, 0.95);
+  box-shadow: inset 0 0 0 1rpx rgba(226, 232, 240, 0.86);
+}
+
+.sch-tip-meta text:last-child {
+  color: #ff6500;
+  background: rgba(255, 240, 229, 0.95);
+  box-shadow: inset 0 0 0 1rpx rgba(255, 122, 0, 0.1);
+}
+
+@media (max-width: 340px) {
+  .sch-tip {
+    grid-template-columns: 86rpx minmax(0, 1fr) 118rpx;
+    gap: 12rpx;
+    min-height: 148rpx;
+    padding: 22rpx 22rpx;
+    border-radius: 34rpx;
+  }
+
+  .sch-tip-icon {
+    width: 90rpx;
+    height: 90rpx;
+    border-radius: 27rpx;
+  }
+
+  .sch-tip-duck {
+    width: 108rpx;
+    height: 108rpx;
+    transform: translate(-7rpx, -9rpx);
+  }
+
+  .sch-tip-title {
+    font-size: 30rpx;
+    font-weight: 700;
+  }
+
+  .sch-tip-sub,
+  .sch-tip-meta {
+    font-size: 22rpx;
+  }
+
+  .sch-tip-sub {
+    white-space: normal;
+  }
+
+  .sch-tip-meta text {
+    max-width: 112rpx;
+    padding: 7rpx 11rpx;
+  }
+}
+
+/* Premium current-plan controls. */
+.sch-plan {
+  position: relative;
+  padding: 26rpx;
+  margin-top: 26rpx;
+  overflow: hidden;
+  border: 2rpx solid rgba(255, 255, 255, 0.96);
+  border-radius: 42rpx;
+  background:
+    radial-gradient(circle at 16% 10%, rgba(255, 122, 0, 0.08) 0, rgba(255, 122, 0, 0) 180rpx),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.97) 0%, rgba(249, 252, 255, 0.94) 100%);
+  box-shadow:
+    0 10rpx 30rpx rgba(15, 23, 42, 0.04),
+    0 20rpx 60rpx rgba(255, 122, 0, 0.055);
+}
+
+.sch-plan-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 112rpx;
+  gap: 18rpx;
+  align-items: stretch;
+}
+
+.sch-plan-pick,
+.sch-plan-pill,
+.sch-plan-menu {
+  min-height: 88rpx;
+}
+
+.sch-plan-pill {
+  position: relative;
+  display: flex;
+  gap: 14rpx;
+  align-items: center;
+  min-width: 0;
+  padding: 0 16rpx 0 20rpx;
+  overflow: hidden;
+  border-radius: 30rpx;
+  background:
+    radial-gradient(circle at 0% 50%, rgba(255, 122, 0, 0.08) 0, rgba(255, 122, 0, 0) 116rpx),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(247, 250, 253, 0.94) 100%);
+  box-shadow:
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.92),
+    inset 0 0 0 1rpx rgba(241, 245, 249, 0.88),
+    0 8rpx 22rpx rgba(15, 23, 42, 0.032);
+}
+
+.sch-plan-dot {
+  flex: 0 0 auto;
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: 50%;
+  background: #ff7a00;
+  box-shadow:
+    0 0 0 10rpx rgba(255, 122, 0, 0.14),
+    0 8rpx 16rpx rgba(255, 122, 0, 0.16);
+}
+
+.sch-plan-dot.done {
+  background: #9ca3af;
+  box-shadow: 0 0 0 10rpx rgba(156, 163, 175, 0.15);
+}
+
+.sch-plan-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.sch-plan-label {
+  color: #8a93a3;
+  font-size: 21rpx;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.sch-plan-name {
+  margin-top: 4rpx;
+  overflow: hidden;
+  color: #111827;
+  font-size: 30rpx;
+  font-weight: 900;
+  line-height: 1.18;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sch-status {
+  flex: 0 0 auto;
+  padding: 9rpx 14rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  font-weight: 900;
+  line-height: 1.1;
+  white-space: nowrap;
+  box-shadow: inset 0 0 0 1rpx rgba(255, 122, 0, 0.12);
+}
+
+.sch-status.upcoming {
+  color: #ff6500;
+  background: rgba(255, 240, 229, 0.95);
+}
+
+.sch-status.done {
+  color: #6b7280;
+  background: rgba(243, 244, 246, 0.95);
+  box-shadow: inset 0 0 0 1rpx rgba(209, 213, 219, 0.76);
+}
+
+.sch-plan-more {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 38rpx;
+  height: 38rpx;
+  border-radius: 50%;
+  color: #ad7d42;
+  font-size: 20rpx;
+  font-weight: 850;
+  line-height: 1;
+  white-space: nowrap;
+  background: linear-gradient(180deg, #fff5df 0%, #ffedcc 100%);
+  box-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.9);
+}
+
+.sch-plan-pick {
+  position: relative;
+  z-index: 1;
+  max-width: 100%;
+}
+
+.sch-plan-menu {
+  position: relative;
+  z-index: 3;
+  width: 112rpx;
+  height: 88rpx;
+  color: #4b5563;
+  font-size: 24rpx;
+  font-weight: 900;
+  line-height: 88rpx;
+  text-align: center;
+  border-radius: 30rpx;
+  background:
+    linear-gradient(180deg, rgba(250, 252, 255, 0.98) 0%, rgba(244, 247, 251, 0.96) 100%);
+  box-shadow:
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1rpx 0 rgba(226, 232, 240, 0.72),
+    0 8rpx 20rpx rgba(15, 23, 42, 0.035);
+}
+
+.sch-plan-menu::after,
+.sch-quick-add::after {
+  border: 0;
+}
+
+.sch-quick-add {
+  width: 368rpx;
+  max-width: calc(100% - 80rpx);
+  height: 86rpx;
+  margin: 22rpx auto 0;
+  color: #ffffff;
+  font-size: 30rpx;
+  font-weight: 900;
+  line-height: 86rpx;
+  border-radius: 34rpx;
+  background:
+    radial-gradient(circle at 28% 18%, rgba(255, 221, 128, 0.5) 0, rgba(255, 221, 128, 0) 80rpx),
+    linear-gradient(135deg, #ff9a1f 0%, #ff6500 100%);
+  box-shadow:
+    0 14rpx 28rpx rgba(255, 101, 0, 0.22),
+    0 26rpx 50rpx rgba(255, 122, 0, 0.12);
+}
+
+@media (max-width: 340px) {
+  .sch-plan {
+    padding: 22rpx;
+    border-radius: 36rpx;
+  }
+
+  .sch-plan-main {
+    grid-template-columns: minmax(0, 1fr) 96rpx;
+    gap: 12rpx;
+  }
+
+  .sch-plan-pick,
+  .sch-plan-pill,
+  .sch-plan-menu {
+    min-height: 78rpx;
+  }
+
+  .sch-plan-pill {
+    padding: 0 12rpx 0 18rpx;
+    border-radius: 27rpx;
+  }
+
+  .sch-plan-label,
+  .sch-status {
+    font-size: 20rpx;
+  }
+
+  .sch-plan-name {
+    font-size: 27rpx;
+  }
+
+  .sch-plan-menu {
+    width: 96rpx;
+    height: 78rpx;
+    font-size: 22rpx;
+    line-height: 78rpx;
+    border-radius: 27rpx;
+  }
+
+  .sch-quick-add {
+    width: 336rpx;
+    max-width: calc(100% - 48rpx);
+    height: 78rpx;
+    font-size: 27rpx;
+    line-height: 78rpx;
+    border-radius: 30rpx;
+  }
+}
+
+/* Itinerary timeline: image-card layout matching the supplied design. */
+.sch-head {
+  display: flex;
+  align-items: center;
+  min-height: 58rpx;
+  margin: 34rpx 0 22rpx;
+}
+
+.sch-head text {
+  color: #111827;
+  font-size: 38rpx;
+  font-weight: 950;
+  line-height: 1.2;
+}
+
+.sch-board {
+  position: relative;
+  padding: 0 0 20rpx;
+  overflow: visible;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.sch-year {
+  position: relative;
+}
+
+.sch-year-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 96rpx;
+  height: 54rpx;
+  margin: 4rpx 0 10rpx;
+  padding: 0 22rpx;
+  border-radius: 999rpx;
+  color: #ff6500;
+  font-size: 28rpx;
+  font-weight: 950;
+  background: rgba(255, 240, 229, 0.96);
+}
+
+.sch-row {
+  display: grid;
+  grid-template-columns: 118rpx 42rpx minmax(0, 1fr);
+  gap: 14rpx;
+  align-items: start;
+  padding: 20rpx 0 30rpx;
+}
+
+.sch-time {
+  align-items: flex-end;
+  padding-top: 8rpx;
+}
+
+.sch-day {
+  color: #8a93a3;
+  font-size: 26rpx;
+  font-weight: 900;
+  line-height: 1.05;
+}
+
+.sch-hour {
+  margin-top: 8rpx;
+  color: #ff6500;
+  font-size: 36rpx;
+  font-weight: 950;
+  line-height: 1.05;
+}
+
+.sch-state {
+  margin-top: 18rpx;
+  padding: 8rpx 13rpx;
+  border-radius: 14rpx;
+  font-size: 22rpx;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.sch-state.done {
+  color: #23b26d;
+  background: rgba(230, 250, 240, 0.98);
+}
+
+.sch-state.active,
+.sch-state.pending {
+  color: #ff6500;
+  background: rgba(255, 240, 229, 0.98);
+}
+
+.sch-line {
+  min-height: 204rpx;
+}
+
+.sch-line::after {
+  top: 28rpx;
+  bottom: -50rpx;
+  width: 4rpx;
+  background: linear-gradient(180deg, #ff6500 0%, rgba(255, 101, 0, 0.12) 100%);
+}
+
+.sch-row:last-child .sch-line::after {
+  display: none;
+}
+
+.sch-dot {
+  width: 18rpx;
+  height: 18rpx;
+  margin-top: 9rpx;
+  border: 8rpx solid #ffffff;
+  background: #ff6500;
+  box-shadow:
+    0 0 0 2rpx rgba(255, 101, 0, 0.1),
+    0 8rpx 20rpx rgba(255, 101, 0, 0.18);
+}
+
+.sch-wrap {
+  border-radius: 34rpx;
+}
+
+.sch-wrap.is-wrap-open {
+  z-index: 2;
+  overflow: hidden;
+}
+
+.sch-card {
+  position: relative;
+  display: block;
+  min-height: 164rpx;
+  padding: 32rpx 34rpx;
+  overflow: visible;
+  border: 0;
+  border-radius: 34rpx;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow:
+    0 8rpx 30rpx rgba(15, 23, 42, 0.045),
+    0 18rpx 52rpx rgba(255, 122, 0, 0.055);
+  transition: none;
+}
+
+.sch-card.is-pic {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 176rpx;
+  gap: 22rpx;
+  align-items: center;
+  min-height: 194rpx;
+  padding: 28rpx;
+}
+
+.sch-card::before {
+  position: absolute;
+  top: 72rpx;
+  left: -13rpx;
+  width: 28rpx;
+  height: 28rpx;
+  content: "";
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 6rpx;
+  transform: rotate(45deg);
+}
+
+.sch-card-copy {
+  min-width: 0;
+}
+
+.sch-card-head {
+  gap: 12rpx;
+  margin-bottom: 16rpx;
+}
+
+.sch-tag {
+  padding: 8rpx 16rpx;
+  color: #ff6500;
+  font-size: 23rpx;
+  font-weight: 900;
+  line-height: 1.1;
+  background: rgba(255, 240, 229, 0.98);
+  border-radius: 999rpx;
+}
+
+.sch-place {
+  color: #7d8593;
+  font-size: 24rpx;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.sch-card-title {
+  overflow: hidden;
+  color: #111827;
+  font-size: 34rpx;
+  font-weight: 950;
+  line-height: 1.18;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sch-card-note {
+  display: -webkit-box;
+  margin-top: 12rpx;
+  overflow: hidden;
+  color: #7d8593;
+  font-size: 25rpx;
+  font-weight: 760;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.sch-card-swiper {
+  width: 176rpx;
+  height: 142rpx;
+  overflow: hidden;
+  border-radius: 24rpx;
+  background: #eef2f7;
+  box-shadow: 0 8rpx 22rpx rgba(15, 23, 42, 0.08);
+}
+
+.sch-card-pic {
+  display: block;
+  width: 176rpx;
+  height: 142rpx;
+  margin: 0;
+  border-radius: 24rpx;
+  background: #eef2f7;
+}
+
+@media (max-width: 340px) {
+  .sch-head text {
+    font-size: 34rpx;
+  }
+
+  .sch-row {
+    grid-template-columns: 96rpx 34rpx minmax(0, 1fr);
+    gap: 10rpx;
+    padding-bottom: 26rpx;
+  }
+
+  .sch-hour {
+    font-size: 31rpx;
+  }
+
+  .sch-day,
+  .sch-card-note,
+  .sch-place {
+    font-size: 22rpx;
+  }
+
+  .sch-state,
+  .sch-tag {
+    font-size: 20rpx;
+  }
+
+  .sch-card.is-pic {
+    grid-template-columns: minmax(0, 1fr) 136rpx;
+    gap: 16rpx;
+    min-height: 168rpx;
+    padding: 24rpx;
+  }
+
+  .sch-card-title {
+    font-size: 30rpx;
+  }
+
+  .sch-card-swiper,
+  .sch-card-pic {
+    width: 136rpx;
+    height: 124rpx;
+    border-radius: 22rpx;
+  }
+}
+
+/* Swipe actions and event surface. */
+.sch-wrap {
+  isolation: isolate;
+}
+
+.sch-card {
+  z-index: 2;
+  transition: transform 0.18s ease;
+  background:
+    radial-gradient(circle at 0% 20%, rgba(255, 122, 0, 0.09) 0, rgba(255, 122, 0, 0) 142rpx),
+    linear-gradient(100deg, #ffffff 0%, #ffffff 56%, #fff7f0 100%);
+}
+
+.sch-row:first-of-type .sch-card {
+  background:
+    radial-gradient(circle at 0% 20%, rgba(255, 122, 0, 0.09) 0, rgba(255, 122, 0, 0) 142rpx),
+    linear-gradient(100deg, #ffffff 0%, #ffffff 56%, #fff7f0 100%);
+}
+
+.sch-card.is-slide {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  transform: translateX(-208rpx);
+  background: #ffffff;
+  box-shadow:
+    0 8rpx 30rpx rgba(15, 23, 42, 0.045),
+    0 18rpx 52rpx rgba(255, 122, 0, 0.055);
+}
+
+.sch-card.is-slide::before {
+  display: none;
+}
+
+.sch-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 104rpx);
+  width: 208rpx;
+  overflow: hidden;
+  border-radius: 0 34rpx 34rpx 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+
+.sch-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: #ffffff;
+  font-size: 24rpx;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.sch-action.is-edit {
+  background: #ff9a1f;
+}
+
+.sch-action.is-danger {
+  background: #ef5b48;
+}
+
+.sch-actions.is-show {
+  opacity: 1;
+  pointer-events: auto;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+@media (max-width: 340px) {
+  .sch-card.is-slide {
+    transform: translateX(-184rpx);
+  }
+
+  .sch-actions {
+    grid-template-columns: repeat(2, 92rpx);
+    width: 184rpx;
+  }
+
+  .sch-action {
+    font-size: 22rpx;
+  }
+}
+
+/* Empty trip tip card */
+.sch-tip-empty {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-height: 126rpx;
+  padding: 26rpx 30rpx;
+  background:
+    radial-gradient(circle at 12% 50%, rgba(255, 122, 0, 0.08) 0, rgba(255, 122, 0, 0) 154rpx),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 251, 255, 0.96) 100%);
+}
+
+.is-tip-alt {
+  font-size: 32rpx;
+  font-weight: 850;
+}
+
+.is-sub-alt {
+  color: #8a93a3;
+  font-size: 24rpx;
+  white-space: normal;
+}
+
+.is-meta-hide {
+  display: none;
+}
+
+@media (max-width: 340px) {
+  .sch-tip-empty {
+    min-height: 112rpx;
+    padding: 22rpx 24rpx;
+  }
+}
+
+/* Empty schedule list: no mascot overlay, keep copy readable. */
+.sch-board-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 240rpx;
+  margin: 18rpx 24rpx 10rpx 4rpx;
+  padding: 38rpx 28rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.96);
+  border-radius: 38rpx;
+  color: #8a93a3;
+  text-align: center;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 122, 0, 0.08) 0, rgba(255, 122, 0, 0) 190rpx),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 251, 255, 0.96) 100%);
+  box-shadow:
+    0 8rpx 30rpx rgba(15, 23, 42, 0.035),
+    0 18rpx 54rpx rgba(255, 122, 0, 0.05);
+}
+
+.sch-board-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 78rpx;
+  height: 78rpx;
+  border-radius: 28rpx;
+  color: #ff6500;
+  font-size: 42rpx;
+  font-weight: 700;
+  background: #fff0e5;
+  box-shadow: inset 0 0 0 1rpx rgba(255, 122, 0, 0.12);
+}
+
+.sch-empty-title {
+  margin-top: 22rpx;
+  color: #111827;
+  font-size: 34rpx;
+  font-weight: 850;
+  line-height: 1.2;
+}
+
+.sch-empty-desc {
+  margin-top: 12rpx;
+  color: #8a93a3;
+  font-size: 25rpx;
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: center;
+}
+
+@media (max-width: 340px) {
+  .sch-empty-title {
+    font-size: 30rpx;
+  }
+
+  .sch-empty-desc {
+    font-size: 23rpx;
+  }
+}
+
+/* No trip: onboarding card inside plan-card. */
+.sch-no-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 132rpx;
+  align-items: center;
+  min-height: 180rpx;
+  padding: 28rpx 28rpx 24rpx;
+  overflow: hidden;
+  border-radius: 34rpx;
+  background:
+    radial-gradient(circle at 88% 34%, rgba(255, 122, 0, 0.13) 0, rgba(255, 122, 0, 0) 138rpx),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.86) 0%, rgba(255, 248, 239, 0.94) 100%);
+  box-shadow:
+    inset 0 0 0 2rpx rgba(255, 255, 255, 0.82),
+    0 12rpx 30rpx rgba(255, 122, 0, 0.08);
+}
+
+.sch-no-copy {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+}
+
+.sch-no-kicker {
+  display: inline-flex;
+  align-items: center;
+  height: 42rpx;
+  padding: 0 18rpx;
+  border-radius: 999rpx;
+  background: #fff1df;
+  color: #ff6500;
+  font-size: 22rpx;
+  font-weight: 850;
+  line-height: 42rpx;
+}
+
+.sch-no-title {
+  margin-top: 18rpx;
+  color: #111827;
+  font-size: 34rpx;
+  font-weight: 900;
+  line-height: 1.16;
+}
+
+.sch-no-desc {
+  margin-top: 10rpx;
+  color: #818a99;
+  font-size: 24rpx;
+  line-height: 1.45;
+}
+
+.sch-no-visual {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 132rpx;
+  height: 132rpx;
+  border-radius: 38rpx;
+  background: linear-gradient(135deg, #fff8e8 0%, #ffe3bd 100%);
+  box-shadow: 0 16rpx 36rpx rgba(255, 122, 0, 0.14);
+  transform: rotate(-5deg);
+}
+
+.sch-no-visual::after {
+  content: "";
+  position: absolute;
+  right: -36rpx;
+  bottom: -40rpx;
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 50%;
+  background: rgba(255, 122, 0, 0.12);
+}
+
+.sch-no-foot {
+  position: relative;
+  z-index: 1;
+  width: 74rpx;
+  height: 74rpx;
+}
+
+.sch-quick-add.sch-quick-main {
+  width: 420rpx;
+  max-width: 100%;
+  margin: 24rpx auto 0;
+  background: linear-gradient(135deg, #ff9a1f 0%, #ff6500 100%);
+  box-shadow:
+    0 18rpx 34rpx rgba(255, 101, 0, 0.2),
+    0 8rpx 22rpx rgba(255, 122, 0, 0.12);
+}
+
+.sch-no-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14rpx;
+  margin-top: 20rpx;
+}
+
+.sch-no-step {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 54rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 244, 223, 0.84);
+  color: #b58b6a;
+  font-size: 22rpx;
+  font-weight: 800;
+  white-space: nowrap;
+}

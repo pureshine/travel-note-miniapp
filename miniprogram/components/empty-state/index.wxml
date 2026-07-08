@@ -1,0 +1,6 @@
+<view class="c-empty {{panel ? 'panel' : ''}} {{extraClass}}">
+  <view class="empty-state-icon">{{icon}}</view>
+  <view class="empty-state-title">{{title}}</view>
+  <view class="empty-state-desc">{{desc}}</view>
+  <button wx:if="{{buttonText}}" class="primary-button empty-state-button" bindtap="onTap">{{buttonText}}</button>
+</view>

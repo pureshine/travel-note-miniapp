@@ -1,0 +1,12 @@
+page {
+  --color-brand: #ff6500;
+  --color-brand-light: #ff9a1f;
+  --color-text: #111827;
+  --color-muted: #7d8593;
+  --color-bg: #f7fafe;
+  --radius-card: 36rpx;
+  --radius-field: 28rpx;
+  --radius-button: 30rpx;
+  --shadow-panel: 0 8rpx 32rpx rgba(0, 0, 0, 0.03), 0 16rpx 64rpx rgba(255, 122, 0, 0.05);
+  --shadow-button: 0 16rpx 30rpx rgba(255, 101, 0, 0.22);
+}

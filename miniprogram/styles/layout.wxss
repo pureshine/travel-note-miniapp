@@ -1,0 +1,36 @@
+.page {
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  padding: 32rpx;
+  background:
+    radial-gradient(
+      circle at 76% 8%,
+      rgba(255, 255, 255, 0.95) 0,
+      rgba(255, 255, 255, 0) 210rpx
+    ),
+    radial-gradient(
+      circle at 78% 18%,
+      rgba(255, 122, 0, 0.055) 0,
+      rgba(255, 122, 0, 0) 220rpx
+    ),
+    linear-gradient(180deg, #fbfdff 0%, #f4f8fd 48%, #eef4fb 100%);
+}
+
+.sch-page,
+.notes-page,
+.stats-page,
+.profile-page,
+.home-page {
+  padding-top: calc(132rpx + env(safe-area-inset-top));
+}
+
+.one-line {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.u-hide {
+  display: none;
+}

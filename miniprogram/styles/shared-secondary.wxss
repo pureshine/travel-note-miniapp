@@ -1,0 +1,91 @@
+/* Secondary pages: duck travel visual system backgrounds and typography. */
+.form-page,
+.budget-page,
+.profile-edit-page,
+.settings-page,
+.trip-detail-page,
+.index-page,
+.trips-page,
+.checklist-page,
+.expenses-page {
+  background:
+    radial-gradient(circle at 76% 8%, rgba(255, 122, 0, 0.1) 0, rgba(255, 122, 0, 0) 210rpx),
+    linear-gradient(180deg, #f9fbff 0%, #f1f5fa 100%);
+}
+
+.form-page .form-title,
+.budget-page .page-title,
+.profile-edit-page .page-title,
+.settings-page .page-title,
+.trip-detail-page .page-title,
+.index-page .page-title,
+.trips-page .page-title,
+.checklist-page .page-title,
+.expenses-page .page-title,
+.title {
+  color: var(--color-text);
+  font-weight: 950;
+  letter-spacing: 0;
+}
+
+.form-page .form-subtitle,
+.budget-page .page-subtitle,
+.profile-edit-page .page-subtitle,
+.settings-page .page-subtitle,
+.trip-detail-page .page-subtitle,
+.index-page .page-subtitle,
+.trips-page .page-subtitle,
+.checklist-page .page-subtitle,
+.expenses-page .page-subtitle,
+.subtitle,
+.desc {
+  color: var(--color-muted);
+}
+
+.form-page .form-card,
+.budget-page .budget-card,
+.budget-page .preset-card,
+.profile-edit-page .form-card,
+.settings-page .card,
+.trip-detail-page .card,
+.trips-page .card,
+.checklist-page .card,
+.expenses-page .card {
+  border: 2rpx solid rgba(255, 255, 255, 0.92);
+  border-radius: var(--radius-card);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow-panel);
+}
+
+.budget-page .save-button,
+.form-page .primary-button,
+.form-page .save-button,
+.profile-edit-page .save-button,
+.settings-page .save-button,
+.trip-detail-page .save-button,
+.trips-page .save-button,
+.checklist-page .save-button,
+.expenses-page .save-button,
+.submit-button,
+.confirm-button {
+  border-radius: var(--radius-button);
+  background: linear-gradient(135deg, var(--color-brand-light) 0%, var(--color-brand) 100%);
+  color: #ffffff;
+  box-shadow: var(--shadow-button);
+}
+
+.budget-page .preset-button,
+.form-page .preset-button,
+.ghost-button,
+.secondary-button {
+  border-radius: 26rpx;
+  background: #fff0e5;
+  color: var(--color-brand);
+}
+
+.home-page {
+  background:
+    radial-gradient(circle at 84% 6%, rgba(255, 255, 255, 0.96) 0, rgba(255, 255, 255, 0) 230rpx),
+    radial-gradient(circle at 72% 20%, rgba(255, 122, 0, 0.055) 0, rgba(255, 122, 0, 0) 220rpx),
+    linear-gradient(180deg, #fbfdff 0%, #f5f8fd 48%, #eef4fb 100%);
+}

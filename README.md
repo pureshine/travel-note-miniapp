@@ -2,49 +2,58 @@
 
 冲鸭去旅行是一款微信小程序，用来管理旅行日程、出行清单、备忘记录和消费统计。
 
-## 当前版本
+## 开发流程
 
-- 原生微信小程序
-- TypeScript
-- TypeScript 源码会编译成同目录 `.js` 文件，兼容未启用 TypeScript 插件的微信开发者工具
-- 本地缓存数据存储
-- 首页、旅行列表、旅行详情、清单、消费、备忘、统计、设置
-- 内置一组示例数据，方便第一次打开就能体验
+1. 修改 `miniprogram/**/*.ts` 源码（逻辑唯一来源）。
+2. 运行 `npm run build` 生成同目录 `.js` 文件。
+3. 微信开发者工具编译预览。
+
+```bash
+npm run build
+npm run typecheck
+npm run lint
+npm run style:check
+npm run format:check
+```
+
+## 交接文档
+
+- `docs/vibe-building-handoff.md`：本项目的设计风格、核心数据流、云同步坑位、图片资源要求，以及开启新 Codex 对话或复用到下一个小程序 vibe building 的快速上下文。
+
+## 目录约定
+
+```text
+miniprogram/
+  app.ts / app.wxss          # 入口，app.wxss 通过 @import 聚合 styles/
+  styles/                    # 设计系统（tokens / layout / components / tab partials）
+  components/                # 复用 UI（brand-nav / form-shell / empty-state / plan-switch）
+  behaviors/                 # 页面公共 behavior（page-shell / active-trip）
+  constants/                 # storage key、路由常量
+  pages/
+  services/                  # trip-store、cloud-sync、trip-sync-notify
+  types/
+  utils/
+```
+
+## 样式规范
+
+- 全局原子样式只在 `styles/components.wxss` 定义，页面禁止复制 `Shared design refresh` 块。
+- CSS 类名 kebab-case，最多 3 段（`-` 分割 ≤ 3）。
+- **禁止** `.parent .child` 类名嵌套；页面元素用唯一类名（如 `sch-tip`、`time-duck`），状态用 `.is-*` 挂在同一元素。
+- 共用样式可抽成同一类（如 `panel`、`u-hide`），但不做多层选择器叠加以压优先级。
+- Tab 大页 polish 放在 `styles/tab/*.wxss`，页面 wxss 只保留布局骨架并 `@import`。
+- `npm run style:check` 会检查类名段数、嵌套选择器、`!important` 与超长文件。
+
+## 新增组件 checklist
+
+- [ ] 组件 wxss 使用独立前缀（如 `c-plan-`），类名 ≤ 3 段
+- [ ] 组件内不直接调用 `trip-store`，数据由 Page 传入
+- [ ] 在 2+ 页面复用后再提交
+- [ ] `npm run build` 与开发者工具编译通过
 
 ## 使用方式
 
 1. 安装并打开微信开发者工具。
-2. 选择“导入项目”。
-3. 项目目录选择本仓库根目录。
-4. 没有真实 AppID 时，在导入页选择“无 AppID 模式”，后端服务选择“不使用云服务”。注册好小程序后，再把真实 AppID 填入 `project.private.config.json`。
-5. 进入后编译预览。
-
-如果修改了 `.ts` 文件，可以运行：
-
-```bash
-npm run build
-```
-
-这会重新生成微信开发者工具实际加载的 `.js` 文件。
-
-## 目录结构
-
-```text
-miniprogram/
-  app.json
-  app.ts
-  app.wxss
-  pages/
-  services/
-  types/
-  utils/
-project.config.json
-tsconfig.json
-```
-
-## 后续建议
-
-1. 接入微信云开发，实现多设备同步。
-2. 增加旅行编辑页，支持修改目的地和日期。
-3. 增加同行人、分账、人均统计。
-4. 增加数据导出和行程分享。
+2. 选择“导入项目”，目录选择本仓库根目录。
+3. 无真实 AppID 时选择“无 AppID 模式”；有云开发环境时配置 `config/cloud.ts`。
+4. 编译预览。

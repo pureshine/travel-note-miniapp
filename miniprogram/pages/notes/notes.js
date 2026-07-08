@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const trip_store_1 = require("../../services/trip-store");
-const ui_1 = require("../../utils/ui");
+const page_shell_1 = require("../../behaviors/page-shell");
+const active_trip_1 = require("../../behaviors/active-trip");
 function getNoteProgress(trip) {
     const noteCount = trip ? trip.notes.length : 0;
     const noteDoneCount = trip
@@ -15,9 +16,8 @@ function getNoteProgress(trip) {
     };
 }
 Page({
+    behaviors: [page_shell_1.pageShellBehavior, active_trip_1.activeTripBehavior],
     data: {
-        safeTopStyle: (0, ui_1.getSafeTopStyle)(14),
-        customNavStyle: (0, ui_1.getCustomNavStyle)(),
         tripId: "",
         trip: undefined,
         trips: [],
@@ -68,14 +68,6 @@ Page({
             ...getNoteProgress(trip),
             filteredNotes: this.filterNotes(trip ? trip.notes : [], this.data.selectedFilter),
         });
-    },
-    onTripChange(event) {
-        const index = Number(event.detail.value);
-        const trip = this.data.trips[index];
-        if (!trip)
-            return;
-        (0, trip_store_1.setActiveTripId)(trip.id);
-        this.loadTrip(trip.id);
     },
     selectFilter(event) {
         const selectedFilter = event.currentTarget.dataset.value;

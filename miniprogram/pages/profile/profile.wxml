@@ -1,8 +1,6 @@
 <view class="page profile-page" style="{{safeTopStyle}}">
-  <view class="custom-nav" style="{{customNavStyle}}">
-    <view class="custom-nav-logo"></view>
-  </view>
-  <view class="profile-brand"><text class="profile-brand-hot">冲鸭</text>去旅行</view>
+  <brand-nav customNavStyle="{{customNavStyle}}" />
+  <view class="profile-brand u-hide"><text class="profile-brand-hot">冲鸭</text>去旅行</view>
   <view class="profile-hero">
     <image class="profile-hero-duck" src="/assets/design3d/profile-duck-camera-full.png" mode="aspectFit" />
     <view class="hero-topline" bindtap="openProfileEdit">
@@ -37,17 +35,35 @@
   </view>
 
   <view class="overview-grid">
-    <view class="mini-card">
-      <view class="mini-value">{{tripCount}}</view>
-      <view class="mini-label">旅行</view>
+    <view class="stat-item">
+      <view class="stat-icon-box">
+        <image class="stat-icon" src="/assets/design3d/profile-stat-trip.png" mode="aspectFit" />
+      </view>
+      <view class="stat-copy">
+        <view class="stat-value {{tripCount > 99 ? 'is-compact' : ''}}">{{tripCount}}</view>
+        <view class="stat-title">旅行</view>
+        <view class="stat-desc">已记录</view>
+      </view>
     </view>
-    <view class="mini-card">
-      <view class="mini-value">{{scheduleCount}}</view>
-      <view class="mini-label">日程</view>
+    <view class="stat-item">
+      <view class="stat-icon-box">
+        <image class="stat-icon" src="/assets/design3d/profile-stat-schedule.png" mode="aspectFit" />
+      </view>
+      <view class="stat-copy">
+        <view class="stat-value {{scheduleCount > 99 ? 'is-compact' : ''}}">{{scheduleCount}}</view>
+        <view class="stat-title">日程</view>
+        <view class="stat-desc">项日程</view>
+      </view>
     </view>
-    <view class="mini-card wide">
-      <view class="mini-value sync-time">{{lastSyncText}}</view>
-      <view class="mini-label">最近同步</view>
+    <view class="stat-item stat-sync">
+      <view class="stat-icon-box">
+        <image class="stat-icon" src="/assets/design3d/profile-stat-sync.png" mode="aspectFit" />
+      </view>
+      <view class="stat-copy">
+        <view class="stat-value is-time">{{lastSyncText}}</view>
+        <view class="stat-title">同步</view>
+        <view class="stat-desc">最近同步</view>
+      </view>
     </view>
   </view>
 

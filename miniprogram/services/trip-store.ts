@@ -11,16 +11,17 @@ import {
 } from "../types/trip";
 import { createId } from "../utils/id";
 import { today } from "../utils/date";
+import { STORAGE_KEYS, CURRENT_DATA_RESET_VERSION } from "../constants/storage-keys";
+import { notifyTripDataChanged } from "./trip-sync-notify";
 
-const STORAGE_KEY = "travel-note-trips";
-const ACTIVE_TRIP_KEY = "travel-note-active-trip-id";
-const ACTIVE_TRIP_CLEARED_KEY = "travel-note-active-trip-cleared";
-const PROFILE_KEY = "travel-note-profile";
-const DELETED_ITEMS_KEY = "travel-note-deleted-item-ids";
-const DELETED_TRIPS_KEY = "travel-note-deleted-trip-ids";
-const DATA_UPDATED_AT_KEY = "travel-note-data-updated-at";
-const DATA_RESET_VERSION_KEY = "travel-note-data-reset-version";
-const CURRENT_DATA_RESET_VERSION = 3;
+const STORAGE_KEY = STORAGE_KEYS.trips;
+const ACTIVE_TRIP_KEY = STORAGE_KEYS.activeTripId;
+const ACTIVE_TRIP_CLEARED_KEY = STORAGE_KEYS.activeTripCleared;
+const PROFILE_KEY = STORAGE_KEYS.profile;
+const DELETED_ITEMS_KEY = STORAGE_KEYS.deletedItems;
+const DELETED_TRIPS_KEY = STORAGE_KEYS.deletedTrips;
+const DATA_UPDATED_AT_KEY = STORAGE_KEYS.dataUpdatedAt;
+const DATA_RESET_VERSION_KEY = STORAGE_KEYS.dataResetVersion;
 let autoSyncTimer: number | undefined;
 
 interface StoredProfile {
@@ -171,7 +172,7 @@ export function updateTripBudget(tripId: string, budget: number): Trip | undefin
   }));
 }
 
-export function deleteTrip(tripId: string, options?: { clearActive?: boolean }): Trip | undefined {
+export function deleteTrip(tripId: string, _options?: { clearActive?: boolean }): Trip | undefined {
   markDeletedTrip(tripId);
   const activeTripId = wx.getStorageSync<string>(ACTIVE_TRIP_KEY);
   const trips = readTrips().filter((trip) => trip.id !== tripId);
@@ -539,33 +540,6 @@ function markDeletedTrip(tripId: string): void {
     delete nextDeletedItems[tripId];
     wx.setStorageSync(DELETED_ITEMS_KEY, nextDeletedItems);
   }
-}
-
-function notifyTripDataChanged(): void {
-  wx.setStorageSync(DATA_UPDATED_AT_KEY, Date.now());
-  const pages = typeof getCurrentPages === "function" ? getCurrentPages() : [];
-  pages.forEach((page) => {
-    const route = typeof page.route === "string" ? page.route : "";
-    if (route === "pages/index/index" && typeof page.refreshHomeData === "function") {
-      page.refreshHomeData();
-      return;
-    }
-    if (route === "pages/trips/trips" && typeof page.refreshTripList === "function") {
-      page.refreshTripList();
-      return;
-    }
-    if (route === "pages/schedule/schedule" && typeof page.loadTrip === "function") {
-      page.loadTrip();
-      return;
-    }
-    if ((route === "pages/notes/notes" || route === "pages/stats/stats" || route === "pages/expenses/expenses") && typeof page.loadSelectedTrip === "function") {
-      page.loadSelectedTrip();
-      return;
-    }
-    if (route === "pages/profile/profile" && typeof page.refreshLocalStats === "function") {
-      page.refreshLocalStats();
-    }
-  });
 }
 
 function markDeletedItem(tripId: string, collection: SyncItemCollection, itemId: string): void {

@@ -1,0 +1,39 @@
+.form-page .form-title {
+  display: inline-flex;
+  align-items: center;
+  min-height: 54rpx;
+  padding: 0 22rpx;
+  border-radius: 999rpx;
+  background: #fff1df;
+  color: #ff6500;
+  font-size: 28rpx;
+  font-weight: 850;
+  line-height: 54rpx;
+}
+
+.form-page .form-subtitle {
+  margin-top: 18rpx;
+  color: var(--color-muted);
+  font-size: 25rpx;
+  line-height: 1.5;
+}
+
+.form-page .form-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+  padding: 24rpx;
+  margin-top: 26rpx;
+}
+
+.form-page .picker-field {
+  display: flex;
+  align-items: center;
+  min-height: 84rpx;
+  padding: 0 24rpx;
+  border: 2rpx solid rgba(226, 232, 240, 0.88);
+  border-radius: var(--radius-field);
+  background: #ffffff;
+  color: #e66d35;
+  font-weight: 800;
+}

@@ -1,0 +1,57 @@
+@import "../../styles/components.wxss";
+
+.c-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48rpx 24rpx;
+  text-align: center;
+}
+
+.empty-state-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 92rpx;
+  height: 92rpx;
+  border-radius: 32rpx;
+  color: #ff6500;
+  font-size: 48rpx;
+  font-weight: 700;
+  background: #fff0e5;
+  box-shadow: inset 0 0 0 1rpx rgba(255, 122, 0, 0.12);
+}
+
+.empty-state-title {
+  margin-top: 22rpx;
+  color: #111827;
+  font-size: 34rpx;
+  font-weight: 850;
+  line-height: 1.2;
+}
+
+.empty-state-desc {
+  margin-top: 12rpx;
+  color: #8a93a3;
+  font-size: 25rpx;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.empty-state-button {
+  width: 288rpx;
+  height: 76rpx;
+  min-height: 76rpx;
+  margin-top: 28rpx;
+  border-radius: 30rpx;
+  color: #ffffff;
+  font-size: 28rpx;
+  font-weight: 850;
+  line-height: 76rpx;
+  background: linear-gradient(135deg, #ff9a1f 0%, #ff6500 100%);
+  box-shadow: 0 14rpx 28rpx rgba(255, 101, 0, 0.2);
+}
+
+.empty-state-button::after {
+  border: 0;
+}

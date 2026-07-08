@@ -1,29 +1,24 @@
-<view class="page form-page" wx:if="{{trip}}">
-  <view class="form-title">{{formTitle}}</view>
-  <view class="form-subtitle">{{trip.name}} · {{trip.destination}}</view>
-
-  <view class="form-card panel">
-    <input class="field" placeholder="几点去做什么" value="{{title}}" bindinput="onTitleInput" />
-    <view class="form-grid">
-      <picker mode="date" value="{{day}}" bindchange="onDayChange">
-        <view class="picker-field">{{day}}</view>
-      </picker>
-      <picker mode="time" value="{{time}}" bindchange="onTimeChange">
-        <view class="picker-field">{{time}}</view>
-      </picker>
-    </view>
-    <picker mode="selector" range="{{categories}}" bindchange="onCategoryChange">
-      <view class="picker-field">类型：{{category}}</view>
+<form-shell wx:if="{{trip}}" title="{{formTitle}}" subtitle="{{trip.name}} · {{trip.destination}}">
+  <input class="field" placeholder="几点去做什么" value="{{title}}" bindinput="onTitleInput" />
+  <view class="form-grid">
+    <picker mode="date" value="{{day}}" bindchange="onDayChange">
+      <view class="picker-field">{{day}}</view>
     </picker>
-    <input class="field" placeholder="地点，如 鼓浪屿 / 厦门北站" value="{{place}}" bindinput="onPlaceInput" />
-    <textarea class="field textarea" placeholder="补充交通、住宿、门票或注意事项" value="{{note}}" bindinput="onNoteInput" />
-    <scroll-view class="image-row" scroll-x>
-      <image wx:for="{{images}}" wx:key="*this" class="preview-image" src="{{item}}" mode="aspectFill" />
-      <button wx:if="{{images.length < 3}}" class="upload-card {{images.length === 0 ? 'wide' : ''}}" bindtap="chooseImages">
-        <text class="upload-plus">+</text>
-        <text>{{uploadingImages ? "上传中" : "上传图片"}}</text>
-      </button>
-    </scroll-view>
-    <button class="primary-button" loading="{{saving}}" disabled="{{saving || uploadingImages}}" bindtap="saveSchedule">{{saveLabel}}</button>
+    <picker mode="time" value="{{time}}" bindchange="onTimeChange">
+      <view class="picker-field">{{time}}</view>
+    </picker>
   </view>
-</view>
+  <picker mode="selector" range="{{categories}}" bindchange="onCategoryChange">
+    <view class="picker-field">类型：{{category}}</view>
+  </picker>
+  <input class="field" placeholder="地点，如 鼓浪屿 / 厦门北站" value="{{place}}" bindinput="onPlaceInput" />
+  <textarea class="field textarea" placeholder="补充交通、住宿、门票或注意事项" value="{{note}}" bindinput="onNoteInput" />
+  <scroll-view class="image-row" scroll-x>
+    <image wx:for="{{images}}" wx:key="*this" class="preview-image" src="{{item}}" mode="aspectFill" />
+    <button wx:if="{{images.length < 3}}" class="upload-card {{images.length === 0 ? 'wide' : ''}}" bindtap="chooseImages">
+      <text class="upload-plus">+</text>
+      <text>{{uploadingImages ? "上传中" : "上传图片"}}</text>
+    </button>
+  </scroll-view>
+  <button class="primary-button" loading="{{saving}}" disabled="{{saving || uploadingImages}}" bindtap="saveSchedule">{{saveLabel}}</button>
+</form-shell>

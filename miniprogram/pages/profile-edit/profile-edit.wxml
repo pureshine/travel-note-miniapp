@@ -1,5 +1,5 @@
 <view class="page profile-edit-page">
-  <view class="profile-edit-bg-mountain"></view>
+  <view class="edit-bg-peak"></view>
   <view class="profile-card panel">
     <image class="profile-card-duck" src="/assets/design3d/profile-duck-camera-full.png" mode="aspectFit" />
     <button class="avatar-picker" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
