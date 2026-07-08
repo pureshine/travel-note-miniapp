@@ -5,13 +5,15 @@ const trip_view_1 = require("../../utils/trip-view");
 const schedule_view_1 = require("../../utils/schedule-view");
 const active_trip_1 = require("../../behaviors/active-trip");
 const page_shell_1 = require("../../behaviors/page-shell");
+const tab_cloud_sync_1 = require("../../behaviors/tab-cloud-sync");
 Page({
-    behaviors: [page_shell_1.pageShellBehavior, active_trip_1.activeTripBehavior],
+    behaviors: [page_shell_1.pageShellBehavior, active_trip_1.activeTripBehavior, tab_cloud_sync_1.tabCloudSyncBehavior],
     data: {
         trip: null,
         trips: [],
         tripOptions: [],
         activeTripIndex: 0,
+        showTripOptions: false,
         tripStatus: "待出发",
         tripStatusClass: "upcoming",
         scheduleTouchStartX: 0,
@@ -29,6 +31,7 @@ Page({
         categoryFilterOptions: ["全部类型"],
         categoryFilterIndex: 0,
         activeCategoryFilter: "全部类型",
+        openFilterKey: "",
         filterDocked: false,
         filterDockTop: 0,
         filterDockStyle: "",
@@ -39,9 +42,6 @@ Page({
             metaTop: "0 项",
             metaBottom: "待规划",
         },
-    },
-    onShow() {
-        this.loadTrip();
     },
     onReady() {
         this.measureFilterAnchor();
@@ -80,6 +80,7 @@ Page({
             activeTripIndex: trip
                 ? Math.max(trips.findIndex((item) => item.id === trip.id), 0)
                 : 0,
+            showTripOptions: false,
             tripStatus,
             tripStatusClass: (0, trip_view_1.getTripStatusClass)(tripStatus),
             openScheduleId: "",
@@ -93,6 +94,7 @@ Page({
             categoryFilterOptions,
             categoryFilterIndex: nextCategoryFilterIndex,
             activeCategoryFilter: categoryFilterOptions[nextCategoryFilterIndex] || "全部类型",
+            openFilterKey: "",
             travelTip: trip
                 ? createTravelTip(trip, schedules.length)
                 : createEmptyTravelTip(),
@@ -265,13 +267,44 @@ Page({
             },
         });
     },
+    toggleTripOptions() {
+        this.setData({ showTripOptions: !this.data.showTripOptions });
+    },
+    onTripOptionTap(event) {
+        const index = Number(event.currentTarget.dataset.index);
+        this.onTripChangeByIndex(index);
+        this.setData({ showTripOptions: false });
+    },
+    onTripChange(event) {
+        this.onTripChangeByIndex(Number(event.detail.value));
+    },
+    onTripChangeByIndex(index) {
+        const trip = this.data.trips[index];
+        if (!trip)
+            return;
+        (0, trip_store_1.setActiveTripId)(trip.id);
+        this.loadTrip();
+    },
+    toggleFilterMenu(event) {
+        const key = event.currentTarget.dataset.key || "";
+        this.setData({
+            openFilterKey: this.data.openFilterKey === key ? "" : key,
+        });
+    },
+    onDateFilterSelect(event) {
+        const dateFilterIndex = Number(event.currentTarget.dataset.index);
+        this.applyDateFilter(dateFilterIndex);
+    },
     onDateFilterChange(event) {
-        const dateFilterIndex = Number(event.detail.value);
+        this.applyDateFilter(Number(event.detail.value));
+    },
+    applyDateFilter(dateFilterIndex) {
         const dateValue = this.data.dateFilterOptions[dateFilterIndex]?.value || "all";
         const filteredSchedules = (0, schedule_view_1.filterSchedules)(this.data.schedules, dateValue, this.data.activeStatusFilter, this.data.activeCategoryFilter);
         this.closeScheduleSwipe();
         this.setData({
             dateFilterIndex,
+            openFilterKey: "",
             filteredSchedules,
             scheduleGroups: (0, schedule_view_1.groupSchedulesByYear)(filteredSchedules),
         });
@@ -281,12 +314,19 @@ Page({
         this.closeScheduleSwipe();
         this.setData({
             dateFilterIndex: 0,
+            openFilterKey: "",
             filteredSchedules,
             scheduleGroups: (0, schedule_view_1.groupSchedulesByYear)(filteredSchedules),
         });
     },
+    onCategoryFilterSelect(event) {
+        const categoryFilterIndex = Number(event.currentTarget.dataset.index);
+        this.applyCategoryFilter(categoryFilterIndex);
+    },
     onCategoryFilterChange(event) {
-        const categoryFilterIndex = Number(event.detail.value);
+        this.applyCategoryFilter(Number(event.detail.value));
+    },
+    applyCategoryFilter(categoryFilterIndex) {
         const activeCategoryFilter = this.data.categoryFilterOptions[categoryFilterIndex] || "全部类型";
         const dateValue = this.data.dateFilterOptions[this.data.dateFilterIndex]?.value || "all";
         const filteredSchedules = (0, schedule_view_1.filterSchedules)(this.data.schedules, dateValue, this.data.activeStatusFilter, activeCategoryFilter);
@@ -294,6 +334,7 @@ Page({
         this.setData({
             categoryFilterIndex,
             activeCategoryFilter,
+            openFilterKey: "",
             filteredSchedules,
             scheduleGroups: (0, schedule_view_1.groupSchedulesByYear)(filteredSchedules),
         });
@@ -305,12 +346,19 @@ Page({
         this.setData({
             categoryFilterIndex: 0,
             activeCategoryFilter: "全部类型",
+            openFilterKey: "",
             filteredSchedules,
             scheduleGroups: (0, schedule_view_1.groupSchedulesByYear)(filteredSchedules),
         });
     },
+    onStatusFilterSelect(event) {
+        const statusFilterIndex = Number(event.currentTarget.dataset.index);
+        this.applyStatusFilter(statusFilterIndex);
+    },
     onStatusFilterChange(event) {
-        const statusFilterIndex = Number(event.detail.value);
+        this.applyStatusFilter(Number(event.detail.value));
+    },
+    applyStatusFilter(statusFilterIndex) {
         const activeStatusFilter = this.data.statusFilters[statusFilterIndex] || "全部";
         const dateValue = this.data.dateFilterOptions[this.data.dateFilterIndex]?.value || "all";
         const filteredSchedules = (0, schedule_view_1.filterSchedules)(this.data.schedules, dateValue, activeStatusFilter, this.data.activeCategoryFilter);
@@ -318,6 +366,7 @@ Page({
         this.setData({
             statusFilterIndex,
             activeStatusFilter,
+            openFilterKey: "",
             filteredSchedules,
             scheduleGroups: (0, schedule_view_1.groupSchedulesByYear)(filteredSchedules),
         });
@@ -329,6 +378,7 @@ Page({
         this.setData({
             statusFilterIndex: 0,
             activeStatusFilter: "全部",
+            openFilterKey: "",
             filteredSchedules,
             scheduleGroups: (0, schedule_view_1.groupSchedulesByYear)(filteredSchedules),
         });
@@ -339,6 +389,7 @@ Page({
             trips: [],
             tripOptions: [],
             activeTripIndex: 0,
+            showTripOptions: false,
             tripStatus: "待出发",
             tripStatusClass: "upcoming",
             openScheduleId: "",
@@ -355,6 +406,7 @@ Page({
             categoryFilterOptions: ["全部类型"],
             categoryFilterIndex: 0,
             activeCategoryFilter: "全部类型",
+            openFilterKey: "",
             filterDocked: false,
             travelTip: createEmptyTravelTip(),
         };

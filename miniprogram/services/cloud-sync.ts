@@ -4,13 +4,17 @@ import {
   getDeletedTripIdsForSync,
   importTripsFromSync,
   isLocalTripsCleared,
-  reconcileClearedPlanState
+  reconcileClearedPlanState,
+  setActiveTripId
 } from "./trip-store";
 import { Trip } from "../types/trip";
 
 import { STORAGE_KEYS } from "../constants/storage-keys";
 
 const PROFILE_KEY = STORAGE_KEYS.profile;
+const FOREGROUND_SYNC_INTERVAL = 5 * 1000;
+let foregroundSyncPromise: Promise<SyncResult | undefined> | null = null;
+let lastForegroundSyncAt = 0;
 
 export interface CloudProfile {
   loggedIn: boolean;
@@ -164,6 +168,26 @@ export async function syncTripsWithCloud(): Promise<SyncResult> {
   return result;
 }
 
+export async function syncTripsOnForeground(force = false): Promise<SyncResult | undefined> {
+  const profile = getSavedProfile();
+  if (!profile?.loggedIn || !profile.openid) return undefined;
+  const now = Date.now();
+  if (!force && now - lastForegroundSyncAt < FOREGROUND_SYNC_INTERVAL) {
+    return undefined;
+  }
+  if (foregroundSyncPromise) return foregroundSyncPromise;
+  foregroundSyncPromise = (async () => {
+    const result = await syncTripsWithCloud();
+    lastForegroundSyncAt = Date.now();
+    return result;
+  })();
+  try {
+    return await foregroundSyncPromise;
+  } finally {
+    foregroundSyncPromise = null;
+  }
+}
+
 export async function resetMyCloudData(): Promise<SyncResult> {
   return callCloudFunction<SyncResult>("syncTrips", {
     action: "resetMyData"
@@ -184,7 +208,14 @@ export async function acceptTripInvite(inviteCode: string): Promise<AcceptInvite
     inviteCode,
     memberProfile: getSyncMemberProfile()
   });
-  await downloadTripsFromCloud();
+  const download = await callCloudFunction<SyncResult>("syncTrips", {
+    action: "download"
+  });
+  if (Array.isArray(download.trips)) {
+    importTripsFromSync(download.trips, { adoptTripIds: [result.tripId] });
+  }
+  setActiveTripId(result.tripId);
+  updateLastSyncAt(download.updatedAt || Date.now());
   return result;
 }
 

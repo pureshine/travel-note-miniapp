@@ -200,8 +200,8 @@ Page({
     onNoteInput(event) {
         this.setData({ note: event.detail.value });
     },
-    onCategoryChange(event) {
-        const index = Number(event.detail.value);
+    onCategorySelect(event) {
+        const index = Number(event.currentTarget.dataset.index);
         this.setData({
             categoryIndex: index,
             category: this.data.categories[index],

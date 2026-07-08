@@ -81,13 +81,18 @@
   position: relative;
   min-height: 410rpx;
   margin: 0 -10rpx 0;
-  padding: 28rpx 28rpx 0;
-  overflow: hidden;
+  padding: 28rpx 24rpx 0 28rpx;
+  overflow: visible;
   border-radius: 0;
   background:
     radial-gradient(circle at 78% 66%, rgba(199, 208, 222, 0.34) 0, rgba(199, 208, 222, 0) 250rpx),
     linear-gradient(90deg, rgba(251, 253, 255, 0) 0%, #f8fbff 49%, #f0f4f9 100%);
   box-shadow: none;
+}
+
+.pf-hero.is-guest {
+  min-height: 400rpx;
+  padding-bottom: 28rpx;
 }
 
 .pf-hero-duck {
@@ -102,29 +107,120 @@
 
 /* Profile hero copy redesign: reserve enough room for the full location text. */
 .pf-topline {
-  width: 360rpx;
+  position: relative;
+  z-index: 3;
+  width: calc(100% - 318rpx);
+  max-width: 334rpx;
+  min-width: 0;
   min-height: 286rpx;
-  margin-left: 342rpx;
-  padding-top: 96rpx;
+  margin-left: 318rpx;
+  padding-top: 88rpx;
+  padding-right: 4rpx;
+  box-sizing: border-box;
   align-items: flex-start;
 }
 
 .pf-copy {
-  width: 360rpx;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
+}
+
+.pf-copy.is-guest {
+  gap: 18rpx;
+  padding-bottom: 12rpx;
+}
+
+.pf-copy.is-guest .pf-location {
+  margin-top: 0;
+}
+
+.pf-copy.is-guest .pf-record-pill {
+  margin-top: 0;
+}
+
+.pf-login-box {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+}
+
+.pf-login-wrap {
+  position: relative;
+  display: inline-flex;
+  align-self: flex-start;
+  max-width: 100%;
+}
+
+.pf-login-face {
+  display: inline-flex;
+  align-items: center;
+  gap: 10rpx;
+  max-width: 100%;
+  height: 64rpx;
+  padding: 0 22rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow:
+    0 10rpx 24rpx rgba(255, 122, 0, 0.1),
+    inset 0 0 0 2rpx rgba(255, 154, 31, 0.22);
+  pointer-events: none;
+}
+
+.pf-login-hit {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  margin: 0;
+  padding: 0;
+  opacity: 0;
+  background: transparent;
+  border: 0;
+}
+
+.pf-login-hit::after {
+  border: 0;
+}
+
+.pf-login-ico {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 34rpx;
+  height: 34rpx;
+  border-radius: 50%;
+  color: #07c160;
+  font-size: 21rpx;
+  font-weight: 900;
+  line-height: 1;
+  background: #e9f9ef;
+}
+
+.pf-login-text {
+  overflow: hidden;
+  color: #ff6500;
+  font-size: 27rpx;
+  font-weight: 850;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .pf-name-row {
   display: flex;
   align-items: center;
   min-width: 0;
-  width: 360rpx;
+  width: 100%;
+  max-width: 100%;
   gap: 16rpx;
 }
 
 .pf-name {
   flex: 0 1 auto;
-  max-width: 360rpx;
+  max-width: 100%;
   color: #1a1a1a;
   font-size: 50rpx;
   font-weight: 850;
@@ -134,16 +230,16 @@
 .pf-location {
   display: flex;
   align-items: center;
-  width: 360rpx;
-  max-width: 360rpx;
+  width: 100%;
+  max-width: 100%;
   gap: 10rpx;
   margin-top: 18rpx;
-  overflow: visible;
+  overflow: hidden;
   color: #6b7280;
   font-size: 22rpx;
   font-weight: 400;
   letter-spacing: 0;
-  text-overflow: clip;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -183,10 +279,12 @@
   display: inline-flex;
   flex-wrap: nowrap;
   align-items: center;
-  min-width: 234rpx;
+  align-self: flex-start;
+  max-width: 100%;
+  min-width: 0;
   height: 52rpx;
   margin-top: 24rpx;
-  padding: 0 19rpx;
+  padding: 0 18rpx;
   border: 1rpx solid rgba(107, 114, 128, 0.16);
   border-radius: 999rpx;
   background: rgba(255, 255, 255, 0.78);
@@ -194,6 +292,7 @@
   line-height: 1;
   white-space: nowrap;
   box-shadow: 0 8rpx 22rpx rgba(17, 24, 39, 0.035);
+  box-sizing: border-box;
 }
 
 .pf-record-copy {
@@ -292,6 +391,10 @@
   box-shadow:
     0 8rpx 32rpx rgba(0, 0, 0, 0.035),
     0 18rpx 64rpx rgba(17, 24, 39, 0.045);
+}
+
+.pf-overview.is-guest {
+  margin-top: -24rpx;
 }
 
 .pf-stat {
@@ -565,31 +668,55 @@
 }
 
 @media (max-width: 340px) {
-  .pf-topline,
-  .pf-login-box {
-    width: 292rpx;
-    margin-left: 268rpx;
-    padding-top: 76rpx;
+  .pf-topline {
+    width: calc(100% - 252rpx);
+    max-width: 300rpx;
+    margin-left: 252rpx;
+    padding-top: 72rpx;
+  }
+
+  .pf-copy.is-guest {
+    gap: 14rpx;
+    padding-bottom: 8rpx;
+  }
+
+  .pf-login-face {
+    height: 58rpx;
+    padding: 0 18rpx;
+  }
+
+  .pf-login-text {
+    font-size: 24rpx;
+  }
+
+  .pf-login-ico {
+    width: 30rpx;
+    height: 30rpx;
+    font-size: 19rpx;
+  }
+
+  .pf-overview.is-guest {
+    margin-top: -16rpx;
   }
 
   .pf-copy,
   .pf-name-row {
-    width: 292rpx;
+    width: 100%;
+    max-width: 100%;
   }
 
   .pf-name {
-    max-width: 292rpx;
+    max-width: 100%;
   }
 
   .pf-location {
-    width: 292rpx;
-    max-width: 292rpx;
+    width: 100%;
+    max-width: 100%;
     gap: 7rpx;
     font-size: 19rpx;
   }
 
   .pf-record-pill {
-    min-width: 206rpx;
     height: 46rpx;
     padding: 0 14rpx;
   }

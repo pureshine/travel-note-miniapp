@@ -7,12 +7,16 @@ exports.updateSavedProfile = updateSavedProfile;
 exports.uploadTripsToCloud = uploadTripsToCloud;
 exports.downloadTripsFromCloud = downloadTripsFromCloud;
 exports.syncTripsWithCloud = syncTripsWithCloud;
+exports.syncTripsOnForeground = syncTripsOnForeground;
 exports.resetMyCloudData = resetMyCloudData;
 exports.createTripInvite = createTripInvite;
 exports.acceptTripInvite = acceptTripInvite;
 const trip_store_1 = require("./trip-store");
 const storage_keys_1 = require("../constants/storage-keys");
 const PROFILE_KEY = storage_keys_1.STORAGE_KEYS.profile;
+const FOREGROUND_SYNC_INTERVAL = 5 * 1000;
+let foregroundSyncPromise = null;
+let lastForegroundSyncAt = 0;
 function callCloudFunction(name, data) {
     return new Promise((resolve, reject) => {
         if (!wx.cloud) {
@@ -114,6 +118,28 @@ async function syncTripsWithCloud() {
     updateLastSyncAt(result.updatedAt || Date.now());
     return result;
 }
+async function syncTripsOnForeground(force = false) {
+    const profile = getSavedProfile();
+    if (!profile?.loggedIn || !profile.openid)
+        return undefined;
+    const now = Date.now();
+    if (!force && now - lastForegroundSyncAt < FOREGROUND_SYNC_INTERVAL) {
+        return undefined;
+    }
+    if (foregroundSyncPromise)
+        return foregroundSyncPromise;
+    foregroundSyncPromise = (async () => {
+        const result = await syncTripsWithCloud();
+        lastForegroundSyncAt = Date.now();
+        return result;
+    })();
+    try {
+        return await foregroundSyncPromise;
+    }
+    finally {
+        foregroundSyncPromise = null;
+    }
+}
 async function resetMyCloudData() {
     return callCloudFunction("syncTrips", {
         action: "resetMyData"
@@ -132,7 +158,14 @@ async function acceptTripInvite(inviteCode) {
         inviteCode,
         memberProfile: getSyncMemberProfile()
     });
-    await downloadTripsFromCloud();
+    const download = await callCloudFunction("syncTrips", {
+        action: "download"
+    });
+    if (Array.isArray(download.trips)) {
+        (0, trip_store_1.importTripsFromSync)(download.trips, { adoptTripIds: [result.tripId] });
+    }
+    (0, trip_store_1.setActiveTripId)(result.tripId);
+    updateLastSyncAt(download.updatedAt || Date.now());
     return result;
 }
 function updateLastSyncAt(lastSyncAt) {

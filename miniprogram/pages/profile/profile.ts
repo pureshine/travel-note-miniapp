@@ -7,6 +7,7 @@ import {
   downloadTripsFromCloud,
   getSavedProfile,
   loginByCloud,
+  syncTripsOnForeground,
   syncTripsWithCloud,
   updateSavedProfile
 } from "../../services/cloud-sync";
@@ -54,10 +55,27 @@ Page({
 
   onShow() {
     this.applyProfile(getSavedProfile());
-    this.refreshLocalStats();
-    if (this.data.loggedIn && !this.data.syncing) {
-      void this.reconcileWithCloud();
+    if (!this.data.loggedIn || this.data.syncing) {
+      this.refreshAfterCloudSync();
+      return;
     }
+    if (this.data.pendingInviteCode) {
+      void this.acceptInvite(this.data.pendingInviteCode);
+      return;
+    }
+    this.pullCloudAndRefresh();
+  },
+
+  pullCloudAndRefresh() {
+    this.refreshAfterCloudSync();
+    if (!getSavedProfile()?.loggedIn) return;
+    void syncTripsOnForeground()
+      .finally(() => {
+        this.refreshAfterCloudSync();
+      })
+      .catch((error) => {
+        console.error("我的页云端同步失败", error);
+      });
   },
 
   async reconcileWithCloud() {
@@ -288,13 +306,20 @@ Page({
     try {
       const result = await acceptTripInvite(inviteCode);
       this.applyAcceptedInvite(result);
-      this.refreshLocalStats();
       wx.showToast({ title: "已加入旅行", icon: "success" });
     } catch (error) {
       console.error("加入邀请失败", error);
       wx.showToast({ title: "加入失败", icon: "none" });
     } finally {
       this.setData({ syncing: false, pendingInviteCode: "" });
+    }
+  },
+
+  refreshAfterCloudSync() {
+    this.refreshLocalStats();
+    const profile = getSavedProfile();
+    if (profile?.lastSyncAt) {
+      this.setData({ lastSyncText: formatSyncTime(profile.lastSyncAt) });
     }
   },
 
@@ -371,7 +396,8 @@ Page({
     this.setData({
       tripCount: trips.length,
       scheduleCount: summary.scheduleCount,
-      memberNamesText: memberNames.length > 0 ? memberNames.join("、") : ""
+      memberNamesText: memberNames.length > 0 ? memberNames.join("、") : "",
+      inviteCode: memberNames.length > 0 ? "" : this.data.inviteCode
     });
   },
 
@@ -389,7 +415,11 @@ Page({
     });
   },
 
-  applyAcceptedInvite(_result: AcceptInviteResult) {},
+  applyAcceptedInvite(_result: AcceptInviteResult) {
+    this.setData({ inviteCode: "" });
+    this.applySyncResult(0, Date.now());
+    this.refreshLocalStats();
+  },
 
   onShareAppMessage() {
     return {

@@ -261,11 +261,12 @@ function importTripsFromSync(trips, options) {
     const deletedTripIds = new Set(readDeletedTripIds());
     const normalizedTrips = trips.filter((trip) => !deletedTripIds.has(trip.id)).map(normalizeTrip);
     const localTrips = readTrips().map(normalizeTrip);
+    const adoptTripIds = new Set(options?.adoptTripIds || []);
     const mergedTrips = options?.replace
         ? normalizedTrips
         : localTrips.length === 0 && activeTripWasCleared
             ? []
-            : mergeTrips(localTrips, normalizedTrips);
+            : mergeTrips(localTrips, normalizedTrips, adoptTripIds);
     writeTrips(mergedTrips, { skipAutoSync: true });
     const stillActiveTrip = activeTripId ? mergedTrips.find((trip) => trip.id === activeTripId) : undefined;
     if (stillActiveTrip) {
@@ -327,14 +328,14 @@ function normalizeTrip(trip) {
         sharedMembers: Array.isArray(trip.sharedMembers) ? trip.sharedMembers : []
     };
 }
-function mergeTrips(localTrips, cloudTrips) {
+function mergeTrips(localTrips, cloudTrips, adoptTripIds = new Set()) {
     const allowCloudBootstrap = localTrips.length === 0 && !wx.getStorageSync(ACTIVE_TRIP_CLEARED_KEY);
     const tripMap = new Map();
     localTrips.forEach((trip) => tripMap.set(trip.id, normalizeTrip(trip)));
     cloudTrips.forEach((trip) => {
         const localTrip = tripMap.get(trip.id);
         if (!localTrip) {
-            if (allowCloudBootstrap) {
+            if (allowCloudBootstrap || adoptTripIds.has(trip.id)) {
                 tripMap.set(trip.id, normalizeTrip(trip));
             }
             return;

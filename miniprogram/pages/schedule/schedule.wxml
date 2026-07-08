@@ -21,28 +21,29 @@
 
   <view wx:if="{{trip}}" class="sch-plan panel">
     <view class="sch-plan-main">
-      <picker
-        class="sch-plan-pick"
-        mode="selector"
-        range="{{tripOptions}}"
-        value="{{activeTripIndex}}"
-        bindchange="onTripChange"
-      >
-        <view class="sch-plan-pill">
-          <view class="sch-plan-dot {{tripStatusClass}}"></view>
-          <view class="sch-plan-copy">
-            <view class="sch-plan-label">当前计划</view>
-            <view class="sch-plan-name">{{trip.name}}</view>
-          </view>
-          <view class="sch-plan-ops">
-            <view class="sch-plan-tail {{tripStatusClass}}">
-              <view class="sch-status">{{tripStatus}}</view>
-              <view class="sch-plan-more">▾</view>
-            </view>
-            <view class="sch-plan-menu" catchtap="manageTrip">⋮</view>
-          </view>
+      <view class="sch-plan-pill" bindtap="toggleTripOptions">
+        <view class="sch-plan-dot {{tripStatusClass}}"></view>
+        <view class="sch-plan-copy">
+          <view class="sch-plan-label">当前计划</view>
+          <view class="sch-plan-name">{{trip.name}}</view>
         </view>
-      </picker>
+        <view class="sch-plan-ops">
+          <view class="sch-plan-tail {{tripStatusClass}}">
+            <view class="sch-status">{{tripStatus}}</view>
+            <view class="sch-plan-more">{{showTripOptions ? "▴" : "▾"}}</view>
+          </view>
+          <view class="sch-plan-menu" catchtap="manageTrip">⋮</view>
+        </view>
+      </view>
+      <view wx:if="{{showTripOptions}}" class="sch-plan-list">
+        <view
+          wx:for="{{tripOptions}}"
+          wx:key="*this"
+          class="sch-plan-item {{activeTripIndex === index ? 'is-on' : ''}}"
+          data-index="{{index}}"
+          bindtap="onTripOptionTap"
+        >{{item}}</view>
+      </view>
     </view>
     <button class="sch-quick-add" bindtap="goScheduleForm">+ 添加日程</button>
   </view>
@@ -73,19 +74,20 @@
     <view class="sch-filter {{filterDocked ? 'is-fixed' : ''}}" style="{{filterDocked ? filterDockStyle : ''}}">
       <view class="sch-filter-grid">
         <view class="sch-filter-cell">
-          <picker
-            class="sch-filter-pick"
-            mode="selector"
-            range="{{dateFilterLabels}}"
-            value="{{dateFilterIndex}}"
-            bindchange="onDateFilterChange"
-          >
-            <view class="sch-filter-chip {{dateFilterIndex > 0 ? 'has-clear' : ''}}">
-              <text class="sch-filter-label">日期</text>
-              <text class="sch-filter-value">{{dateFilterLabels[dateFilterIndex]}}</text>
-              <text wx:if="{{dateFilterIndex === 0}}" class="sch-filter-caret">▾</text>
-            </view>
-          </picker>
+          <view class="sch-filter-chip {{dateFilterIndex > 0 ? 'has-clear' : ''}}" data-key="date" bindtap="toggleFilterMenu">
+            <text class="sch-filter-label">日期</text>
+            <text class="sch-filter-value">{{dateFilterLabels[dateFilterIndex]}}</text>
+            <text class="sch-filter-caret">{{openFilterKey === "date" ? "▴" : "▾"}}</text>
+          </view>
+          <view wx:if="{{openFilterKey === 'date'}}" class="sch-filter-list">
+            <view
+              wx:for="{{dateFilterLabels}}"
+              wx:key="*this"
+              class="sch-filter-item {{dateFilterIndex === index ? 'is-on' : ''}}"
+              data-index="{{index}}"
+              bindtap="onDateFilterSelect"
+            >{{item}}</view>
+          </view>
           <text
             wx:if="{{dateFilterIndex > 0}}"
             class="sch-filter-clear"
@@ -93,19 +95,20 @@
           >×</text>
         </view>
         <view class="sch-filter-cell">
-          <picker
-            class="sch-filter-pick"
-            mode="selector"
-            range="{{categoryFilterOptions}}"
-            value="{{categoryFilterIndex}}"
-            bindchange="onCategoryFilterChange"
-          >
-            <view class="sch-filter-chip {{categoryFilterIndex > 0 ? 'has-clear' : ''}}">
-              <text class="sch-filter-label">类型</text>
-              <text class="sch-filter-value">{{categoryFilterOptions[categoryFilterIndex]}}</text>
-              <text wx:if="{{categoryFilterIndex === 0}}" class="sch-filter-caret">▾</text>
-            </view>
-          </picker>
+          <view class="sch-filter-chip {{categoryFilterIndex > 0 ? 'has-clear' : ''}}" data-key="category" bindtap="toggleFilterMenu">
+            <text class="sch-filter-label">类型</text>
+            <text class="sch-filter-value">{{categoryFilterOptions[categoryFilterIndex]}}</text>
+            <text class="sch-filter-caret">{{openFilterKey === "category" ? "▴" : "▾"}}</text>
+          </view>
+          <view wx:if="{{openFilterKey === 'category'}}" class="sch-filter-list">
+            <view
+              wx:for="{{categoryFilterOptions}}"
+              wx:key="*this"
+              class="sch-filter-item {{categoryFilterIndex === index ? 'is-on' : ''}}"
+              data-index="{{index}}"
+              bindtap="onCategoryFilterSelect"
+            >{{item}}</view>
+          </view>
           <text
             wx:if="{{categoryFilterIndex > 0}}"
             class="sch-filter-clear"
@@ -113,19 +116,20 @@
           >×</text>
         </view>
         <view class="sch-filter-cell">
-          <picker
-            class="sch-filter-pick"
-            mode="selector"
-            range="{{statusFilters}}"
-            value="{{statusFilterIndex}}"
-            bindchange="onStatusFilterChange"
-          >
-            <view class="sch-filter-chip {{statusFilterIndex > 0 ? 'has-clear' : ''}}">
-              <text class="sch-filter-label">状态</text>
-              <text class="sch-filter-value">{{activeStatusFilter}}</text>
-              <text wx:if="{{statusFilterIndex === 0}}" class="sch-filter-caret">▾</text>
-            </view>
-          </picker>
+          <view class="sch-filter-chip {{statusFilterIndex > 0 ? 'has-clear' : ''}}" data-key="status" bindtap="toggleFilterMenu">
+            <text class="sch-filter-label">状态</text>
+            <text class="sch-filter-value">{{activeStatusFilter}}</text>
+            <text class="sch-filter-caret">{{openFilterKey === "status" ? "▴" : "▾"}}</text>
+          </view>
+          <view wx:if="{{openFilterKey === 'status'}}" class="sch-filter-list">
+            <view
+              wx:for="{{statusFilters}}"
+              wx:key="*this"
+              class="sch-filter-item {{statusFilterIndex === index ? 'is-on' : ''}}"
+              data-index="{{index}}"
+              bindtap="onStatusFilterSelect"
+            >{{item}}</view>
+          </view>
           <text
             wx:if="{{statusFilterIndex > 0}}"
             class="sch-filter-clear"

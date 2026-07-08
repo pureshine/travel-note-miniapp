@@ -1,5 +1,8 @@
 "use strict";
 Component({
+    data: {
+        showOptions: false
+    },
     properties: {
         tripOptions: { type: Array, value: [] },
         activeIndex: { type: Number, value: 0 },
@@ -9,8 +12,13 @@ Component({
         showMenu: { type: Boolean, value: false }
     },
     methods: {
-        onPickerChange(event) {
-            this.triggerEvent("change", { value: event.detail.value });
+        onToggleOptions() {
+            this.setData({ showOptions: !this.data.showOptions });
+        },
+        onSelectOption(event) {
+            const index = Number(event.currentTarget.dataset.index);
+            this.setData({ showOptions: false });
+            this.triggerEvent("change", { value: String(index) });
         },
         onMenuTap() {
             this.triggerEvent("menu");

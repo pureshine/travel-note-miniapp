@@ -1,5 +1,6 @@
 import { CLOUD_ENV_ID } from "./config/cloud";
 import { STORAGE_KEYS } from "./constants/storage-keys";
+import { syncTripsOnForeground } from "./services/cloud-sync";
 
 App<IAppOption>({
   globalData: {
@@ -15,6 +16,8 @@ App<IAppOption>({
     wx.setStorageSync(STORAGE_KEYS.lastOpened, Date.now());
   },
   onShow() {
-    // 同步仅在「我的」页触发，避免后台拉取把已删除数据 merge 回来
+    syncTripsOnForeground(true).catch((error) => {
+      console.error("前台自动同步失败", error);
+    });
   }
 });

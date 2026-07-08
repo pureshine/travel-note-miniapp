@@ -36,21 +36,6 @@
   height: 1rpx;
 }
 
-.pf-login-box {
-  position: relative;
-  z-index: 4;
-  margin-left: 342rpx;
-}
-
-.pf-login-btn {
-  background: linear-gradient(135deg, #ff9a1f 0%, #ff6500 100%);
-  box-shadow: 0 16rpx 30rpx rgba(255, 101, 0, 0.22);
-}
-
-.pf-login-btn::after {
-  border: 0;
-}
-
 /* Setup sheet — page polish lives in profile-dashboard.wxss */
 
 .pf-mask {

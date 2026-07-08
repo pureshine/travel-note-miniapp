@@ -3,10 +3,6 @@
   margin-top: 24rpx;
 }
 
-.c-plan-picker {
-  width: 100%;
-}
-
 .c-plan-ops {
   display: flex;
   flex-shrink: 0;
@@ -19,6 +15,41 @@
   align-items: center;
   gap: 14rpx;
   min-width: 0;
+}
+
+.c-plan-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  margin-top: 14rpx;
+  padding-top: 8rpx;
+  border-top: 1rpx solid rgba(226, 232, 240, 0.72);
+}
+
+.c-plan-item {
+  display: flex;
+  align-items: center;
+  min-height: 66rpx;
+  padding: 0 18rpx;
+  border-radius: 18rpx;
+  background: #f8fafc;
+}
+
+.c-plan-item.is-on {
+  background: rgba(255, 101, 0, 0.1);
+}
+
+.c-plan-text {
+  overflow: hidden;
+  color: #344256;
+  font-size: 25rpx;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.c-plan-item.is-on .c-plan-text {
+  color: #ff6500;
 }
 
 .c-plan-dot {

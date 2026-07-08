@@ -2,6 +2,7 @@ import { deleteExpense as removeExpense, getActiveTrip, listTrips, setActiveTrip
 import { ExpenseCategory, ExpenseItem, Trip } from "../../types/trip";
 import { pageShellBehavior } from "../../behaviors/page-shell";
 import { activeTripBehavior } from "../../behaviors/active-trip";
+import { tabCloudSyncBehavior } from "../../behaviors/tab-cloud-sync";
 
 type CalendarDay = {
   dateKey: string;
@@ -20,7 +21,7 @@ type DailyBar = {
 };
 
 Page({
-  behaviors: [pageShellBehavior, activeTripBehavior],
+  behaviors: [pageShellBehavior, activeTripBehavior, tabCloudSyncBehavior],
   data: {
     trips: [] as Trip[],
     tripNames: [] as string[],
@@ -50,10 +51,6 @@ Page({
     selectedDateExpenseTotal: 0,
     selectedDateExpenses: [] as ExpenseItem[],
     dailyBars: [] as DailyBar[]
-  },
-
-  onShow() {
-    this.loadSelectedTrip();
   },
 
   loadSelectedTrip() {

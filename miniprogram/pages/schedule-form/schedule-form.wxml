@@ -23,9 +23,18 @@
       </picker>
     </view>
   </view>
-  <picker mode="selector" range="{{categories}}" value="{{categoryIndex}}" bindchange="onCategoryChange">
-    <view class="picker-field">类型：{{category}}</view>
-  </picker>
+  <view class="pick-box">
+    <view class="pick-headline">类型</view>
+    <view class="pick-list">
+      <view
+        wx:for="{{categories}}"
+        wx:key="*this"
+        class="pick-item {{categoryIndex === index ? 'is-on' : ''}}"
+        data-index="{{index}}"
+        bindtap="onCategorySelect"
+      >{{item}}</view>
+    </view>
+  </view>
   <input class="field" placeholder="地点，如 鼓浪屿 / 厦门北站" value="{{place}}" bindinput="onPlaceInput" />
   <textarea class="field textarea" placeholder="补充交通、住宿、门票或注意事项" value="{{note}}" bindinput="onNoteInput" />
   <scroll-view class="image-row" scroll-x>

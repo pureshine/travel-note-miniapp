@@ -54,11 +54,11 @@ Page({
     onContentInput(event) {
         this.setData({ content: event.detail.value });
     },
-    onCategoryChange(event) {
-        const index = Number(event.detail.value);
+    onCategorySelect(event) {
+        const index = Number(event.currentTarget.dataset.index);
         this.setData({
             categoryIndex: index,
-            category: this.data.categories[index]
+            category: this.data.categories[index],
         });
     },
     saveNote() {

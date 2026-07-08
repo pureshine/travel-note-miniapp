@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const cloud_1 = require("./config/cloud");
 const storage_keys_1 = require("./constants/storage-keys");
+const cloud_sync_1 = require("./services/cloud-sync");
 App({
     globalData: {
         appName: "冲鸭去旅行"
@@ -16,6 +17,8 @@ App({
         wx.setStorageSync(storage_keys_1.STORAGE_KEYS.lastOpened, Date.now());
     },
     onShow() {
-        // 同步仅在「我的」页触发，避免后台拉取把已删除数据 merge 回来
+        (0, cloud_sync_1.syncTripsOnForeground)(true).catch((error) => {
+            console.error("前台自动同步失败", error);
+        });
     }
 });

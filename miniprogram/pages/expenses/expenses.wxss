@@ -60,6 +60,7 @@
   display: grid;
   grid-template-columns: 1fr 220rpx;
   gap: 18rpx;
+  align-items: start;
 }
 
 .picker-field {
@@ -72,6 +73,48 @@
   background: #fbfdfc;
   color: #167c70;
   font-weight: 700;
+}
+
+.exp-pick {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.exp-pick-head {
+  display: flex;
+  align-items: center;
+  min-height: 36rpx;
+  padding: 0 4rpx;
+}
+
+.exp-pick-value {
+  color: #98a6ba;
+  font-size: 22rpx;
+  font-weight: 700;
+}
+
+.exp-pick-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+
+.exp-pick-item {
+  min-width: 76rpx;
+  height: 44rpx;
+  padding: 0 14rpx;
+  border-radius: 999rpx;
+  color: #7b8984;
+  font-size: 22rpx;
+  line-height: 44rpx;
+  text-align: center;
+  background: #f3f7f5;
+}
+
+.exp-pick-item.is-on {
+  color: #167c70;
+  background: rgba(22, 124, 112, 0.14);
 }
 
 .list {

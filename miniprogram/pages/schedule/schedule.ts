@@ -28,6 +28,7 @@ import {
 } from "../../utils/schedule-view";
 import { activeTripBehavior } from "../../behaviors/active-trip";
 import { pageShellBehavior } from "../../behaviors/page-shell";
+import { tabCloudSyncBehavior } from "../../behaviors/tab-cloud-sync";
 
 type TripStatusView = TripStatus;
 type TravelTipView = {
@@ -41,12 +42,13 @@ type SelectorRect = {
   top: number;
 };
 Page({
-  behaviors: [pageShellBehavior, activeTripBehavior],
+  behaviors: [pageShellBehavior, activeTripBehavior, tabCloudSyncBehavior],
   data: {
     trip: null,
     trips: [] as Trip[],
     tripOptions: [] as string[],
     activeTripIndex: 0,
+    showTripOptions: false,
     tripStatus: "待出发" as TripStatusView,
     tripStatusClass: "upcoming",
     scheduleTouchStartX: 0,
@@ -64,6 +66,7 @@ Page({
     categoryFilterOptions: ["全部类型"] as ScheduleCategoryFilter[],
     categoryFilterIndex: 0,
     activeCategoryFilter: "全部类型" as ScheduleCategoryFilter,
+    openFilterKey: "",
     filterDocked: false,
     filterDockTop: 0,
     filterDockStyle: "",
@@ -74,10 +77,6 @@ Page({
       metaTop: "0 项",
       metaBottom: "待规划",
     } as TravelTipView,
-  },
-
-  onShow() {
-    this.loadTrip();
   },
 
   onReady() {
@@ -136,6 +135,7 @@ Page({
             0,
           )
         : 0,
+      showTripOptions: false,
       tripStatus,
       tripStatusClass: getTripStatusClass(tripStatus),
       openScheduleId: "",
@@ -149,6 +149,7 @@ Page({
       categoryFilterOptions,
       categoryFilterIndex: nextCategoryFilterIndex,
       activeCategoryFilter: categoryFilterOptions[nextCategoryFilterIndex] || "全部类型",
+      openFilterKey: "",
       travelTip: trip
         ? createTravelTip(trip, schedules.length)
         : createEmptyTravelTip(),
@@ -351,8 +352,44 @@ Page({
     });
   },
 
+  toggleTripOptions() {
+    this.setData({ showTripOptions: !this.data.showTripOptions });
+  },
+
+  onTripOptionTap(event: { currentTarget: { dataset: { index: string } } }) {
+    const index = Number(event.currentTarget.dataset.index);
+    this.onTripChangeByIndex(index);
+    this.setData({ showTripOptions: false });
+  },
+
+  onTripChange(event: { detail: { value: string } }) {
+    this.onTripChangeByIndex(Number(event.detail.value));
+  },
+
+  onTripChangeByIndex(index: number) {
+    const trip = this.data.trips[index];
+    if (!trip) return;
+    setActiveTripId(trip.id);
+    this.loadTrip();
+  },
+
+  toggleFilterMenu(event: { currentTarget: { dataset: { key: string } } }) {
+    const key = event.currentTarget.dataset.key || "";
+    this.setData({
+      openFilterKey: this.data.openFilterKey === key ? "" : key,
+    });
+  },
+
+  onDateFilterSelect(event: { currentTarget: { dataset: { index: string } } }) {
+    const dateFilterIndex = Number(event.currentTarget.dataset.index);
+    this.applyDateFilter(dateFilterIndex);
+  },
+
   onDateFilterChange(event: { detail: { value: string } }) {
-    const dateFilterIndex = Number(event.detail.value);
+    this.applyDateFilter(Number(event.detail.value));
+  },
+
+  applyDateFilter(dateFilterIndex: number) {
     const dateValue = this.data.dateFilterOptions[dateFilterIndex]?.value || "all";
     const filteredSchedules = filterSchedules(
       this.data.schedules,
@@ -363,6 +400,7 @@ Page({
     this.closeScheduleSwipe();
     this.setData({
       dateFilterIndex,
+      openFilterKey: "",
       filteredSchedules,
       scheduleGroups: groupSchedulesByYear(filteredSchedules),
     });
@@ -378,13 +416,22 @@ Page({
     this.closeScheduleSwipe();
     this.setData({
       dateFilterIndex: 0,
+      openFilterKey: "",
       filteredSchedules,
       scheduleGroups: groupSchedulesByYear(filteredSchedules),
     });
   },
 
+  onCategoryFilterSelect(event: { currentTarget: { dataset: { index: string } } }) {
+    const categoryFilterIndex = Number(event.currentTarget.dataset.index);
+    this.applyCategoryFilter(categoryFilterIndex);
+  },
+
   onCategoryFilterChange(event: { detail: { value: string } }) {
-    const categoryFilterIndex = Number(event.detail.value);
+    this.applyCategoryFilter(Number(event.detail.value));
+  },
+
+  applyCategoryFilter(categoryFilterIndex: number) {
     const activeCategoryFilter =
       this.data.categoryFilterOptions[categoryFilterIndex] || "全部类型";
     const dateValue =
@@ -399,6 +446,7 @@ Page({
     this.setData({
       categoryFilterIndex,
       activeCategoryFilter,
+      openFilterKey: "",
       filteredSchedules,
       scheduleGroups: groupSchedulesByYear(filteredSchedules),
     });
@@ -417,13 +465,22 @@ Page({
     this.setData({
       categoryFilterIndex: 0,
       activeCategoryFilter: "全部类型" as ScheduleCategoryFilter,
+      openFilterKey: "",
       filteredSchedules,
       scheduleGroups: groupSchedulesByYear(filteredSchedules),
     });
   },
 
+  onStatusFilterSelect(event: { currentTarget: { dataset: { index: string } } }) {
+    const statusFilterIndex = Number(event.currentTarget.dataset.index);
+    this.applyStatusFilter(statusFilterIndex);
+  },
+
   onStatusFilterChange(event: { detail: { value: string } }) {
-    const statusFilterIndex = Number(event.detail.value);
+    this.applyStatusFilter(Number(event.detail.value));
+  },
+
+  applyStatusFilter(statusFilterIndex: number) {
     const activeStatusFilter = this.data.statusFilters[statusFilterIndex] || "全部";
     const dateValue =
       this.data.dateFilterOptions[this.data.dateFilterIndex]?.value || "all";
@@ -437,6 +494,7 @@ Page({
     this.setData({
       statusFilterIndex,
       activeStatusFilter,
+      openFilterKey: "",
       filteredSchedules,
       scheduleGroups: groupSchedulesByYear(filteredSchedules),
     });
@@ -455,6 +513,7 @@ Page({
     this.setData({
       statusFilterIndex: 0,
       activeStatusFilter: "全部" as ScheduleStatusFilter,
+      openFilterKey: "",
       filteredSchedules,
       scheduleGroups: groupSchedulesByYear(filteredSchedules),
     });
@@ -466,6 +525,7 @@ Page({
       trips: [] as Trip[],
       tripOptions: [] as string[],
       activeTripIndex: 0,
+      showTripOptions: false,
       tripStatus: "待出发" as TripStatusView,
       tripStatusClass: "upcoming",
       openScheduleId: "",
@@ -482,6 +542,7 @@ Page({
       categoryFilterOptions: ["全部类型"] as ScheduleCategoryFilter[],
       categoryFilterIndex: 0,
       activeCategoryFilter: "全部类型" as ScheduleCategoryFilter,
+      openFilterKey: "",
       filterDocked: false,
       travelTip: createEmptyTravelTip(),
     };

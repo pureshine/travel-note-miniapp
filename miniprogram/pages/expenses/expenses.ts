@@ -18,6 +18,7 @@ Page({
     title: "",
     amount: "",
     category: "餐饮" as ExpenseCategory,
+    categoryIndex: 2,
     paidBy: "我",
     categories: ["交通", "住宿", "餐饮", "门票", "购物", "其他"] as ExpenseCategory[],
     total: 0
@@ -82,9 +83,12 @@ Page({
     this.setData({ paidBy: event.detail.value });
   },
 
-  onCategoryChange(event: { detail: { value: string } }) {
-    const index = Number(event.detail.value);
-    this.setData({ category: this.data.categories[index] });
+  onCategorySelect(event: { currentTarget: { dataset: { index: string } } }) {
+    const index = Number(event.currentTarget.dataset.index);
+    this.setData({
+      categoryIndex: index,
+      category: this.data.categories[index],
+    });
   },
 
   addItem() {

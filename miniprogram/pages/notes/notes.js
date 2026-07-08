@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const trip_store_1 = require("../../services/trip-store");
 const page_shell_1 = require("../../behaviors/page-shell");
 const active_trip_1 = require("../../behaviors/active-trip");
+const tab_cloud_sync_1 = require("../../behaviors/tab-cloud-sync");
 function getNoteProgress(trip) {
     const noteCount = trip ? trip.notes.length : 0;
     const noteDoneCount = trip
@@ -16,7 +17,7 @@ function getNoteProgress(trip) {
     };
 }
 Page({
-    behaviors: [page_shell_1.pageShellBehavior, active_trip_1.activeTripBehavior],
+    behaviors: [page_shell_1.pageShellBehavior, active_trip_1.activeTripBehavior, tab_cloud_sync_1.tabCloudSyncBehavior],
     data: {
         tripId: "",
         trip: undefined,
@@ -36,9 +37,6 @@ Page({
     onLoad(options) {
         if (options.id)
             (0, trip_store_1.setActiveTripId)(options.id);
-        this.loadSelectedTrip();
-    },
-    onShow() {
         this.loadSelectedTrip();
     },
     loadSelectedTrip() {

@@ -46,3 +46,74 @@
   color: #e66d35;
   font-weight: 800;
 }
+
+.form-page .pick-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+.form-page .pick-headline {
+  color: #9ca3af;
+  font-size: 23rpx;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.form-page .pick-head {
+  display: flex;
+  align-items: center;
+  min-height: 84rpx;
+  padding: 0 24rpx;
+  border: 2rpx solid rgba(226, 232, 240, 0.88);
+  border-radius: var(--radius-field);
+  background: #ffffff;
+}
+
+.form-page .pick-label {
+  flex-shrink: 0;
+  color: #e66d35;
+  font-weight: 800;
+}
+
+.form-page .pick-value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: #111827;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.form-page .pick-arrow {
+  flex-shrink: 0;
+  color: #b8c1cc;
+  font-size: 24rpx;
+  font-weight: 800;
+}
+
+.form-page .pick-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  padding: 2rpx 0;
+}
+
+.form-page .pick-item {
+  min-width: 116rpx;
+  height: 58rpx;
+  padding: 0 22rpx;
+  border-radius: 999rpx;
+  color: #7a8493;
+  font-size: 24rpx;
+  font-weight: 700;
+  line-height: 58rpx;
+  text-align: center;
+  background: #f4f7fb;
+}
+
+.form-page .pick-item.is-on {
+  color: #ff6500;
+  background: rgba(255, 101, 0, 0.1);
+}

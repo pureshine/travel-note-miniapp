@@ -131,6 +131,31 @@
   width: 100%;
 }
 
+.sch-plan-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  margin-top: 12rpx;
+  padding-top: 8rpx;
+  border-top: 1rpx solid rgba(226, 232, 240, 0.78);
+}
+
+.sch-plan-item {
+  min-height: 62rpx;
+  padding: 0 18rpx;
+  border-radius: 16rpx;
+  color: #475569;
+  font-size: 24rpx;
+  font-weight: 700;
+  line-height: 62rpx;
+  background: #f8fafc;
+}
+
+.sch-plan-item.is-on {
+  color: #ff6500;
+  background: rgba(255, 101, 0, 0.12);
+}
+
 .sch-plan-ops {
   display: flex;
   flex: 0 0 auto;
@@ -436,11 +461,43 @@
   line-height: 1;
 }
 
+.sch-filter-list {
+  position: absolute;
+  top: calc(100% + 6rpx);
+  left: 10rpx;
+  right: 10rpx;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+  max-height: 300rpx;
+  padding: 8rpx;
+  overflow: auto;
+  border-radius: 16rpx;
+  background: #ffffff;
+  box-shadow: 0 8rpx 26rpx rgba(15, 23, 42, 0.12);
+}
+
+.sch-filter-item {
+  min-height: 54rpx;
+  padding: 0 12rpx;
+  border-radius: 10rpx;
+  color: #64748b;
+  font-size: 23rpx;
+  font-weight: 700;
+  line-height: 54rpx;
+}
+
+.sch-filter-item.is-on {
+  color: #ff6500;
+  background: rgba(255, 101, 0, 0.1);
+}
+
 .sch-filter-clear {
   position: absolute;
   top: 50%;
   right: 10rpx;
-  z-index: 2;
+  z-index: 22;
   color: #ff6500;
   font-size: 30rpx;
   font-weight: 700;

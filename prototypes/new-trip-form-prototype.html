@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>新建计划交互原型</title>
+  <style>
+    :root {
+      --brand: #ff6500;
+      --brand-soft: #fff1df;
+      --brand-light: #ff9a1f;
+      --ink: #111827;
+      --muted: #7d8593;
+      --line: rgba(226, 232, 240, 0.9);
+      --bg: #f7fafe;
+      --panel: rgba(255, 255, 255, 0.86);
+      --green: #20b486;
+      --blue: #3b82f6;
+      --radius-card: 18px;
+      --radius-field: 14px;
+      --shadow-panel: 0 8px 28px rgba(0, 0, 0, 0.035), 0 18px 54px rgba(255, 122, 0, 0.07);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 12% 4%, rgba(255, 154, 31, 0.18), transparent 26%),
+        linear-gradient(180deg, #fff8ef 0%, var(--bg) 36%, #eef7ff 100%);
+      color: var(--ink);
+    }
+
+    button, input, textarea {
+      font: inherit;
+    }
+
+    .stage {
+      width: min(100%, 430px);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 18px 16px 96px;
+      position: relative;
+    }
+
+    .nav {
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #334155;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .nav-btn {
+      width: 34px;
+      height: 34px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.7);
+      color: var(--brand);
+      font-size: 22px;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+    }
+
+    .hero {
+      position: relative;
+      padding: 18px 18px 20px;
+      border: 1px solid rgba(255, 255, 255, 0.88);
+      border-radius: 26px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(255, 243, 225, 0.92));
+      box-shadow: var(--shadow-panel);
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -28px;
+      top: -24px;
+      width: 128px;
+      height: 128px;
+      background: url("../miniprogram/assets/design3d/schedule-plan-duck.png") center/contain no-repeat;
+      opacity: 0.95;
+    }
+
+    .pill-title {
+      display: inline-flex;
+      align-items: center;
+      height: 28px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: var(--brand-soft);
+      color: var(--brand);
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .hero h1 {
+      width: 70%;
+      margin: 14px 0 8px;
+      font-size: 30px;
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      width: 68%;
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+      font-weight: 650;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .summary-item {
+      min-height: 64px;
+      padding: 10px 8px;
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.72);
+      text-align: center;
+    }
+
+    .summary-value {
+      display: block;
+      color: var(--brand);
+      font-size: 18px;
+      font-weight: 950;
+      line-height: 1.2;
+    }
+
+    .summary-label {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 750;
+    }
+
+    .panel {
+      margin-top: 14px;
+      padding: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.88);
+      border-radius: var(--radius-card);
+      background: var(--panel);
+      box-shadow: var(--shadow-panel);
+      backdrop-filter: blur(18px);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 950;
+    }
+
+    .section-sub {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .mini-pill {
+      border: 0;
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: rgba(255, 101, 0, 0.1);
+      color: var(--brand);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .fields {
+      display: grid;
+      gap: 10px;
+    }
+
+    .field {
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-field);
+      background: #fff;
+      color: var(--ink);
+      padding: 0 14px;
+      outline: 0;
+      font-weight: 780;
+    }
+
+    .field:focus {
+      border-color: rgba(255, 101, 0, 0.5);
+      box-shadow: 0 0 0 4px rgba(255, 101, 0, 0.08);
+    }
+
+    textarea.field {
+      min-height: 88px;
+      resize: none;
+      padding-top: 13px;
+      line-height: 1.5;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      padding: 4px;
+      border-radius: 18px;
+      background: rgba(241, 245, 249, 0.8);
+      margin-top: 14px;
+    }
+
+    .tab {
+      min-height: 40px;
+      border: 0;
+      border-radius: 14px;
+      background: transparent;
+      color: #64748b;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .tab.active {
+      color: var(--brand);
+      background: #fff;
+      box-shadow: 0 8px 16px rgba(15, 23, 42, 0.05);
+    }
+
+    .module { display: none; }
+    .module.active { display: block; }
+
+    .item-card {
+      position: relative;
+      padding: 13px;
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      border-radius: 16px;
+      background: #fff;
+      margin-top: 10px;
+    }
+
+    .item-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .item-title {
+      font-size: 15px;
+      font-weight: 950;
+      line-height: 1.35;
+    }
+
+    .item-meta {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .tag {
+      flex-shrink: 0;
+      border-radius: 999px;
+      padding: 5px 9px;
+      background: #eff6ff;
+      color: var(--blue);
+      font-size: 11px;
+      font-weight: 950;
+    }
+
+    .tag.green {
+      background: #e8fff6;
+      color: var(--green);
+    }
+
+    .tag.orange {
+      background: var(--brand-soft);
+      color: var(--brand);
+    }
+
+    .add-line {
+      width: 100%;
+      min-height: 48px;
+      border: 1px dashed rgba(255, 101, 0, 0.5);
+      border-radius: 16px;
+      background: rgba(255, 101, 0, 0.055);
+      color: var(--brand);
+      font-weight: 950;
+      margin-top: 10px;
+    }
+
+    .budget-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #111827, #334155);
+      color: #fff;
+      margin-top: 10px;
+    }
+
+    .budget-box span {
+      display: block;
+      color: rgba(255, 255, 255, 0.68);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .budget-box strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 24px;
+      line-height: 1.1;
+    }
+
+    .bottom-bar {
+      position: fixed;
+      left: 50%;
+      bottom: 0;
+      width: min(100%, 430px);
+      transform: translateX(-50%);
+      padding: 12px 16px 18px;
+      background: linear-gradient(180deg, rgba(247, 250, 254, 0), rgba(247, 250, 254, 0.96) 24%, #f7fafe);
+    }
+
+    .save {
+      width: 100%;
+      height: 52px;
+      border: 0;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-light));
+      color: #fff;
+      font-size: 16px;
+      font-weight: 950;
+      box-shadow: 0 14px 26px rgba(255, 101, 0, 0.24);
+    }
+
+    .sheet-mask {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.34);
+      z-index: 10;
+    }
+
+    .sheet-mask.open { display: flex; }
+
+    .sheet {
+      width: min(100%, 430px);
+      max-height: 86vh;
+      overflow: auto;
+      padding: 16px 16px 20px;
+      border-radius: 28px 28px 0 0;
+      background: #f8fbff;
+      box-shadow: 0 -20px 48px rgba(15, 23, 42, 0.16);
+    }
+
+    .sheet-bar {
+      width: 46px;
+      height: 5px;
+      margin: 0 auto 14px;
+      border-radius: 999px;
+      background: #cbd5e1;
+    }
+
+    .sheet-title {
+      margin: 0 0 12px;
+      font-size: 20px;
+      font-weight: 950;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .chip {
+      min-height: 34px;
+      border: 0;
+      border-radius: 999px;
+      padding: 0 13px;
+      background: #eef2f7;
+      color: #64748b;
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    .chip.active {
+      background: rgba(255, 101, 0, 0.12);
+      color: var(--brand);
+    }
+
+    .sheet-actions {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .ghost {
+      height: 48px;
+      border: 0;
+      border-radius: 15px;
+      background: #eef2f7;
+      color: #64748b;
+      font-weight: 950;
+    }
+
+    .primary {
+      height: 48px;
+      border: 0;
+      border-radius: 15px;
+      background: var(--brand);
+      color: #fff;
+      font-weight: 950;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      top: 26px;
+      transform: translateX(-50%) translateY(-80px);
+      min-width: 220px;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(17, 24, 39, 0.92);
+      color: #fff;
+      text-align: center;
+      font-weight: 850;
+      opacity: 0;
+      transition: 0.25s ease;
+      z-index: 20;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <main class="stage">
+    <div class="nav">
+      <button class="nav-btn" type="button">‹</button>
+      <span>新建旅行计划</span>
+      <span style="width:34px"></span>
+    </div>
+
+    <section class="hero">
+      <span class="pill-title">填写出行信息</span>
+      <h1>一次把计划搭起来</h1>
+      <p>日程、备忘和预算会随旅行一起创建，后面再去各模块继续补。</p>
+    </section>
+
+    <section class="summary">
+      <div class="summary-item"><span class="summary-value" id="sumSchedule">1</span><span class="summary-label">日程</span></div>
+      <div class="summary-item"><span class="summary-value" id="sumNote">1</span><span class="summary-label">备忘</span></div>
+      <div class="summary-item"><span class="summary-value" id="sumExpense">1</span><span class="summary-label">花费</span></div>
+      <div class="summary-item"><span class="summary-value" id="sumBudget">8600</span><span class="summary-label">预算</span></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">基础信息</h2>
+          <div class="section-sub">先确定旅行名称、目的地和日期</div>
+        </div>
+      </div>
+      <div class="fields">
+        <input class="field" value="厦门周末小旅行" aria-label="旅行名称" />
+        <input class="field" value="厦门" aria-label="目的地" />
+        <div class="field-row">
+          <input class="field" value="2026-07-18" aria-label="开始日期" />
+          <input class="field" value="2026-07-21" aria-label="结束日期" />
+        </div>
+      </div>
+    </section>
+
+    <nav class="segmented" aria-label="初始化模块">
+      <button class="tab active" type="button" data-tab="schedule">日程 <span id="tabSchedule">1</span></button>
+      <button class="tab" type="button" data-tab="notes">备忘 <span id="tabNote">1</span></button>
+      <button class="tab" type="button" data-tab="budget">预算 <span id="tabExpense">1</span></button>
+    </nav>
+
+    <section class="panel module active" id="module-schedule">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">同步到日程</h2>
+          <div class="section-sub">适合先录入抵达、酒店、景点这些确定安排</div>
+        </div>
+        <button class="mini-pill" type="button" data-open="schedule">添加</button>
+      </div>
+      <div id="scheduleList"></div>
+      <button class="add-line" type="button" data-open="schedule">+ 添加一个日程</button>
+    </section>
+
+    <section class="panel module" id="module-notes">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">同步到备忘</h2>
+          <div class="section-sub">把出发前要带、要订、要查的东西先放进去</div>
+        </div>
+        <button class="mini-pill" type="button" data-open="note">添加</button>
+      </div>
+      <div id="noteList"></div>
+      <button class="add-line" type="button" data-open="note">+ 添加一个备忘</button>
+    </section>
+
+    <section class="panel module" id="module-budget">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">同步到消费</h2>
+          <div class="section-sub">总预算进统计，已知花费进消费流水</div>
+        </div>
+        <button class="mini-pill" type="button" data-open="expense">添加</button>
+      </div>
+      <div class="budget-box">
+        <div><span>本次总预算</span><strong>¥ <input id="budgetInput" value="8600" style="width:90px;border:0;background:transparent;color:#fff;font:inherit;font-size:24px;font-weight:950;outline:0" /></strong></div>
+        <span>保存后同步到预算圆环</span>
+      </div>
+      <div id="expenseList"></div>
+      <button class="add-line" type="button" data-open="expense">+ 添加预计花费</button>
+    </section>
+  </main>
+
+  <div class="bottom-bar">
+    <button class="save" type="button" id="saveBtn">保存旅行并同步内容</button>
+  </div>
+
+  <div class="sheet-mask" id="sheetMask">
+    <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+      <div class="sheet-bar"></div>
+      <h2 class="sheet-title" id="sheetTitle">添加日程</h2>
+      <div id="sheetBody"></div>
+      <div class="sheet-actions">
+        <button class="ghost" type="button" id="cancelSheet">取消</button>
+        <button class="primary" type="button" id="confirmSheet">保存并同步</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast">已保存，内容会同步到对应模块</div>
+
+  <script>
+    const state = {
+      activeTab: "schedule",
+      sheetType: "schedule",
+      schedules: [
+        { title: "抵达厦门北站", date: "2026-07-18", start: "09:30", end: "11:00", category: "交通", place: "厦门北站", note: "打车去酒店" }
+      ],
+      notes: [
+        { title: "身份证、充电器、相机电池", category: "物品", content: "出门前统一检查一遍" }
+      ],
+      expenses: [
+        { title: "酒店三晚", amount: "1800", date: "2026-07-18", category: "住宿", paidBy: "我" }
+      ]
+    };
+
+    const $ = (selector) => document.querySelector(selector);
+    const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+
+    function render() {
+      $("#scheduleList").innerHTML = state.schedules.map(item => `
+        <article class="item-card">
+          <div class="item-top">
+            <div>
+              <div class="item-title">${item.title}</div>
+              <div class="item-meta">${item.date} ${item.start}-${item.end} · ${item.place}</div>
+              <div class="item-meta">${item.note}</div>
+            </div>
+            <span class="tag orange">${item.category}</span>
+          </div>
+        </article>
+      `).join("");
+
+      $("#noteList").innerHTML = state.notes.map(item => `
+        <article class="item-card">
+          <div class="item-top">
+            <div>
+              <div class="item-title">□ ${item.title}</div>
+              <div class="item-meta">${item.content}</div>
+            </div>
+            <span class="tag green">${item.category}</span>
+          </div>
+        </article>
+      `).join("");
+
+      $("#expenseList").innerHTML = state.expenses.map(item => `
+        <article class="item-card">
+          <div class="item-top">
+            <div>
+              <div class="item-title">${item.title}</div>
+              <div class="item-meta">${item.date} · ${item.category} · ${item.paidBy}</div>
+            </div>
+            <span class="tag">¥${item.amount}</span>
+          </div>
+        </article>
+      `).join("");
+
+      $("#sumSchedule").textContent = state.schedules.length;
+      $("#sumNote").textContent = state.notes.length;
+      $("#sumExpense").textContent = state.expenses.length;
+      $("#sumBudget").textContent = $("#budgetInput").value || "0";
+      $("#tabSchedule").textContent = state.schedules.length;
+      $("#tabNote").textContent = state.notes.length;
+      $("#tabExpense").textContent = state.expenses.length;
+    }
+
+    function setTab(tab) {
+      state.activeTab = tab;
+      $$(".tab").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === tab));
+      $$(".module").forEach(module => module.classList.remove("active"));
+      $(`#module-${tab}`).classList.add("active");
+    }
+
+    function chipRow(values) {
+      return `<div class="chips">${values.map((value, index) => `<button class="chip ${index === 0 ? "active" : ""}" type="button">${value}</button>`).join("")}</div>`;
+    }
+
+    function openSheet(type) {
+      state.sheetType = type;
+      const titles = { schedule: "添加一个日程", note: "添加一个备忘", expense: "添加预计花费" };
+      $("#sheetTitle").textContent = titles[type];
+      if (type === "schedule") {
+        $("#sheetBody").innerHTML = `
+          <div class="fields">
+            <input class="field" id="fTitle" value="入住海边民宿" aria-label="日程标题" />
+            <div class="field-row">
+              <input class="field" id="fDate" value="2026-07-18" aria-label="日期" />
+              <input class="field" id="fPlace" value="曾厝垵" aria-label="地点" />
+            </div>
+            <div class="field-row">
+              <input class="field" id="fStart" value="14:00" aria-label="开始时间" />
+              <input class="field" id="fEnd" value="15:00" aria-label="结束时间" />
+            </div>
+            ${chipRow(["住宿", "交通", "餐饮", "游玩"])}
+            <textarea class="field" id="fNote" aria-label="备注">放下行李，顺路买水和早餐券。</textarea>
+          </div>
+        `;
+      }
+      if (type === "note") {
+        $("#sheetBody").innerHTML = `
+          <div class="fields">
+            <input class="field" id="fTitle" value="提前确认民宿入住码" aria-label="备忘标题" />
+            ${chipRow(["预订", "物品", "事项", "攻略"])}
+            <textarea class="field" id="fContent" aria-label="备忘内容">出发前一天联系房东，确认门禁和寄存行李。</textarea>
+          </div>
+        `;
+      }
+      if (type === "expense") {
+        $("#sheetBody").innerHTML = `
+          <div class="fields">
+            <input class="field" id="fTitle" value="鼓浪屿船票" aria-label="消费名称" />
+            <div class="field-row">
+              <input class="field" id="fAmount" value="70" aria-label="金额" />
+              <input class="field" id="fDate" value="2026-07-19" aria-label="日期" />
+            </div>
+            ${chipRow(["门票", "交通", "住宿", "餐饮"])}
+            <input class="field" id="fPaidBy" value="我" aria-label="付款人" />
+          </div>
+        `;
+      }
+      $("#sheetMask").classList.add("open");
+    }
+
+    function closeSheet() {
+      $("#sheetMask").classList.remove("open");
+    }
+
+    function activeChipText() {
+      const active = $(".sheet .chip.active");
+      return active ? active.textContent : "";
+    }
+
+    function confirmSheet() {
+      const type = state.sheetType;
+      if (type === "schedule") {
+        state.schedules.push({
+          title: $("#fTitle").value,
+          date: $("#fDate").value,
+          start: $("#fStart").value,
+          end: $("#fEnd").value,
+          category: activeChipText(),
+          place: $("#fPlace").value,
+          note: $("#fNote").value
+        });
+        setTab("schedule");
+      }
+      if (type === "note") {
+        state.notes.push({
+          title: $("#fTitle").value,
+          category: activeChipText(),
+          content: $("#fContent").value
+        });
+        setTab("notes");
+      }
+      if (type === "expense") {
+        state.expenses.push({
+          title: $("#fTitle").value,
+          amount: $("#fAmount").value,
+          date: $("#fDate").value,
+          category: activeChipText(),
+          paidBy: $("#fPaidBy").value
+        });
+        setTab("budget");
+      }
+      closeSheet();
+      render();
+    }
+
+    $$(".tab").forEach(btn => btn.addEventListener("click", () => setTab(btn.dataset.tab)));
+    $$("[data-open]").forEach(btn => btn.addEventListener("click", () => openSheet(btn.dataset.open)));
+    $("#cancelSheet").addEventListener("click", closeSheet);
+    $("#confirmSheet").addEventListener("click", confirmSheet);
+    $("#budgetInput").addEventListener("input", render);
+    $("#sheetBody").addEventListener("click", (event) => {
+      if (!event.target.classList.contains("chip")) return;
+      $$(".sheet .chip").forEach(chip => chip.classList.remove("active"));
+      event.target.classList.add("active");
+    });
+    $("#saveBtn").addEventListener("click", () => {
+      $("#toast").classList.add("show");
+      setTimeout(() => $("#toast").classList.remove("show"), 1800);
+    });
+
+    render();
+  </script>
+</body>
+</html>

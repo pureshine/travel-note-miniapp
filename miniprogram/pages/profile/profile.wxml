@@ -1,6 +1,6 @@
 <view class="page pf-page" style="{{safeTopStyle}}">
   <brand-nav customNavStyle="{{customNavStyle}}" nav-class="pf-nav" logo-class="pf-nav-logo" />
-  <view class="pf-hero">
+  <view class="pf-hero {{loggedIn ? '' : 'is-guest'}}">
     <image class="pf-hero-duck" src="/assets/design3d/profile-duck-camera-full.png" mode="aspectFit" />
     <view class="pf-topline" bindtap="openProfileEdit">
       <view wx:if="{{loggedIn}}" class="pf-avatar">
@@ -10,10 +10,24 @@
       <view wx:else class="pf-mark">
         <image class="pf-mark-img" src="/assets/illustrations/duck-avatar.png" mode="aspectFit" />
       </view>
-      <view class="pf-copy">
-        <view class="pf-name-row">
-          <view wx:if="{{loggedIn}}" class="pf-name">{{nickname}}</view>
-          <view wx:else class="pf-name">未登录旅行者</view>
+      <view class="pf-copy {{loggedIn ? '' : 'is-guest'}}">
+        <view wx:if="{{loggedIn}}" class="pf-name-row">
+          <view class="pf-name">{{nickname}}</view>
+        </view>
+        <view wx:else class="pf-login-box">
+          <view class="pf-login-wrap">
+            <view class="pf-login-face">
+              <view class="pf-login-ico">微</view>
+              <text class="pf-login-text">微信一键登录</text>
+            </view>
+            <button
+              class="pf-login-hit"
+              loading="{{syncing}}"
+              catchtap="loginWithWechat"
+              hover-class="none"
+              aria-label="微信一键登录"
+            />
+          </view>
         </view>
         <view class="pf-location">
           <text class="pf-loc-icon">●</text>
@@ -29,12 +43,9 @@
         </view>
       </view>
     </view>
-    <view wx:if="{{!loggedIn}}" class="pf-login-box">
-      <button class="pf-login-btn" loading="{{syncing}}" bindtap="loginWithWechat">微信一键登录</button>
-    </view>
   </view>
 
-  <view class="pf-overview">
+  <view class="pf-overview {{loggedIn ? '' : 'is-guest'}}">
     <view class="pf-stat">
       <view class="pf-stat-icon">
         <image class="pf-stat-pic" src="/assets/design3d/profile-stat-trip.png" mode="aspectFit" />

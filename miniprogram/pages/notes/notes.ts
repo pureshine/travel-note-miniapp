@@ -10,6 +10,7 @@ import {
 import { NoteItem, Trip } from "../../types/trip";
 import { pageShellBehavior } from "../../behaviors/page-shell";
 import { activeTripBehavior } from "../../behaviors/active-trip";
+import { tabCloudSyncBehavior } from "../../behaviors/tab-cloud-sync";
 
 function getNoteProgress(trip?: Trip) {
   const noteCount = trip ? trip.notes.length : 0;
@@ -27,7 +28,7 @@ function getNoteProgress(trip?: Trip) {
 }
 
 Page({
-  behaviors: [pageShellBehavior, activeTripBehavior],
+  behaviors: [pageShellBehavior, activeTripBehavior, tabCloudSyncBehavior],
   data: {
     tripId: "",
     trip: undefined as Trip | undefined,
@@ -47,10 +48,6 @@ Page({
 
   onLoad(options: { id?: string }) {
     if (options.id) setActiveTripId(options.id);
-    this.loadSelectedTrip();
-  },
-
-  onShow() {
     this.loadSelectedTrip();
   },
 

@@ -326,17 +326,21 @@ export function reconcileClearedPlanState(): void {
   writeTrips([], { skipAutoSync: true });
 }
 
-export function importTripsFromSync(trips: Trip[], options?: { replace?: boolean }): Trip[] {
+export function importTripsFromSync(
+  trips: Trip[],
+  options?: { replace?: boolean; adoptTripIds?: string[] }
+): Trip[] {
   const activeTripId = wx.getStorageSync<string>(ACTIVE_TRIP_KEY);
   const activeTripWasCleared = Boolean(wx.getStorageSync(ACTIVE_TRIP_CLEARED_KEY));
   const deletedTripIds = new Set(readDeletedTripIds());
   const normalizedTrips = trips.filter((trip) => !deletedTripIds.has(trip.id)).map(normalizeTrip);
   const localTrips = readTrips().map(normalizeTrip);
+  const adoptTripIds = new Set(options?.adoptTripIds || []);
   const mergedTrips = options?.replace
     ? normalizedTrips
     : localTrips.length === 0 && activeTripWasCleared
       ? []
-      : mergeTrips(localTrips, normalizedTrips);
+      : mergeTrips(localTrips, normalizedTrips, adoptTripIds);
   writeTrips(mergedTrips, { skipAutoSync: true });
   const stillActiveTrip = activeTripId ? mergedTrips.find((trip) => trip.id === activeTripId) : undefined;
   if (stillActiveTrip) {
@@ -399,14 +403,14 @@ function normalizeTrip(trip: Trip): Trip {
   };
 }
 
-function mergeTrips(localTrips: Trip[], cloudTrips: Trip[]): Trip[] {
+function mergeTrips(localTrips: Trip[], cloudTrips: Trip[], adoptTripIds = new Set<string>()): Trip[] {
   const allowCloudBootstrap = localTrips.length === 0 && !wx.getStorageSync(ACTIVE_TRIP_CLEARED_KEY);
   const tripMap = new Map<string, Trip>();
   localTrips.forEach((trip) => tripMap.set(trip.id, normalizeTrip(trip)));
   cloudTrips.forEach((trip) => {
     const localTrip = tripMap.get(trip.id);
     if (!localTrip) {
-      if (allowCloudBootstrap) {
+      if (allowCloudBootstrap || adoptTripIds.has(trip.id)) {
         tripMap.set(trip.id, normalizeTrip(trip));
       }
       return;

@@ -4,9 +4,18 @@
   <picker mode="date" value="{{date}}" bindchange="onDateChange">
     <view class="picker-field">日期：{{date}}</view>
   </picker>
-  <picker mode="selector" range="{{categories}}" value="{{categoryIndex}}" bindchange="onCategoryChange">
-    <view class="picker-field">分类：{{category}}</view>
-  </picker>
+  <view class="pick-box">
+    <view class="pick-headline">分类</view>
+    <view class="pick-list">
+      <view
+        wx:for="{{categories}}"
+        wx:key="*this"
+        class="pick-item {{categoryIndex === index ? 'is-on' : ''}}"
+        data-index="{{index}}"
+        bindtap="onCategorySelect"
+      >{{item}}</view>
+    </view>
+  </view>
   <input class="field" placeholder="付款人" value="{{paidBy}}" bindinput="onPaidByInput" />
   <button class="primary-button" loading="{{saving}}" disabled="{{saving}}" bindtap="saveExpense">{{saveLabel}}</button>
 </form-shell>

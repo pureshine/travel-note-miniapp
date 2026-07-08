@@ -42,10 +42,27 @@ Page({
     },
     onShow() {
         this.applyProfile((0, cloud_sync_1.getSavedProfile)());
-        this.refreshLocalStats();
-        if (this.data.loggedIn && !this.data.syncing) {
-            void this.reconcileWithCloud();
+        if (!this.data.loggedIn || this.data.syncing) {
+            this.refreshAfterCloudSync();
+            return;
         }
+        if (this.data.pendingInviteCode) {
+            void this.acceptInvite(this.data.pendingInviteCode);
+            return;
+        }
+        this.pullCloudAndRefresh();
+    },
+    pullCloudAndRefresh() {
+        this.refreshAfterCloudSync();
+        if (!(0, cloud_sync_1.getSavedProfile)()?.loggedIn)
+            return;
+        void (0, cloud_sync_1.syncTripsOnForeground)()
+            .finally(() => {
+            this.refreshAfterCloudSync();
+        })
+            .catch((error) => {
+            console.error("我的页云端同步失败", error);
+        });
     },
     async reconcileWithCloud() {
         if (this.data.syncing)
@@ -288,7 +305,6 @@ Page({
         try {
             const result = await (0, cloud_sync_1.acceptTripInvite)(inviteCode);
             this.applyAcceptedInvite(result);
-            this.refreshLocalStats();
             wx.showToast({ title: "已加入旅行", icon: "success" });
         }
         catch (error) {
@@ -297,6 +313,13 @@ Page({
         }
         finally {
             this.setData({ syncing: false, pendingInviteCode: "" });
+        }
+    },
+    refreshAfterCloudSync() {
+        this.refreshLocalStats();
+        const profile = (0, cloud_sync_1.getSavedProfile)();
+        if (profile?.lastSyncAt) {
+            this.setData({ lastSyncText: formatSyncTime(profile.lastSyncAt) });
         }
     },
     applyProfile(profile) {
@@ -367,7 +390,8 @@ Page({
         this.setData({
             tripCount: trips.length,
             scheduleCount: summary.scheduleCount,
-            memberNamesText: memberNames.length > 0 ? memberNames.join("、") : ""
+            memberNamesText: memberNames.length > 0 ? memberNames.join("、") : "",
+            inviteCode: memberNames.length > 0 ? "" : this.data.inviteCode
         });
     },
     applySyncResult(_tripCount, updatedAt) {
@@ -382,7 +406,11 @@ Page({
             sharePath: `/pages/profile/profile?inviteCode=${invite.inviteCode}`
         });
     },
-    applyAcceptedInvite(_result) { },
+    applyAcceptedInvite(_result) {
+        this.setData({ inviteCode: "" });
+        this.applySyncResult(0, Date.now());
+        this.refreshLocalStats();
+    },
     onShareAppMessage() {
         return {
             title: this.data.shareTitle,

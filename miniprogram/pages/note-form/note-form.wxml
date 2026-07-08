@@ -1,8 +1,17 @@
 <form-shell wx:if="{{trip}}" title="{{formTitle}}" subtitle="{{trip.name}} · {{trip.destination}}">
   <input class="field" placeholder="标题，如 购买旅行保险" value="{{title}}" bindinput="onTitleInput" />
-  <picker mode="selector" range="{{categories}}" value="{{categoryIndex}}" bindchange="onCategoryChange">
-    <view class="picker-field">分类：{{category}}</view>
-  </picker>
+  <view class="pick-box">
+    <view class="pick-headline">分类</view>
+    <view class="pick-list">
+      <view
+        wx:for="{{categories}}"
+        wx:key="*this"
+        class="pick-item {{categoryIndex === index ? 'is-on' : ''}}"
+        data-index="{{index}}"
+        bindtap="onCategorySelect"
+      >{{item}}</view>
+    </view>
+  </view>
   <textarea class="field textarea" placeholder="写下具体事项、截止时间或提醒（选填）" value="{{content}}" bindinput="onContentInput" />
   <button class="primary-button" loading="{{saving}}" disabled="{{saving}}" bindtap="saveNote">{{saveLabel}}</button>
 </form-shell>

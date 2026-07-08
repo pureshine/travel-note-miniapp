@@ -9,9 +9,20 @@
     <input class="field" placeholder="消费名称，比如晚餐、打车" value="{{title}}" bindinput="onTitleInput" />
     <view class="form-row">
       <input class="field" type="digit" placeholder="金额" value="{{amount}}" bindinput="onAmountInput" />
-      <picker mode="selector" range="{{categories}}" bindchange="onCategoryChange">
-        <view class="picker-field">{{category}}</view>
-      </picker>
+      <view class="exp-pick">
+        <view class="exp-pick-head">
+          <text class="exp-pick-value">分类</text>
+        </view>
+        <view class="exp-pick-list">
+          <view
+            wx:for="{{categories}}"
+            wx:key="*this"
+            class="exp-pick-item {{categoryIndex === index ? 'is-on' : ''}}"
+            data-index="{{index}}"
+            bindtap="onCategorySelect"
+          >{{item}}</view>
+        </view>
+      </view>
     </view>
     <input class="field" placeholder="付款人" value="{{paidBy}}" bindinput="onPaidByInput" />
     <button class="primary-button" bindtap="addItem">记录消费</button>
