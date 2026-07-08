@@ -6,9 +6,10 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
+    "test:logic": "npm run build && node scripts/check-schedule-view.js && node scripts/check-trip-store-domains.js",
     "format:check": "node scripts/check-format.js",
     "style:check": "node scripts/check-styles.js",
-    "lint": "eslint miniprogram --ext .ts"
+    "lint": "node --require ./scripts/eslint-node16-polyfill.js ./node_modules/eslint/bin/eslint.js miniprogram --ext .ts"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.0.0",

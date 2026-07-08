@@ -104,6 +104,8 @@
 | notes legacy-title-row 僵尸 DOM + display:none 清理 | ✅ |
 | schedule 计划控件 sch-plan-ops 统一设计 | ✅ |
 | shared-secondary 删除与 index.wxss 重复的 .home-page | ✅ |
+| profile 分享按钮双层结构（见 wechat-ui-patterns.md） | ✅ |
+| schedule 筛选项视觉升级（分段磨砂胶囊） | ✅ |
 | 核心路径人工验收清单 | 待本地确认 |
 | 超长 tab polish 文件瘦身（>800 行） | ✅ |
 
@@ -119,3 +121,7 @@
 | schedule.wxss | 1,630 | **3**（纯 @import 骨架） |
 
 `schedule-timeline.wxss` 日程区 **0 类嵌套**；`schedule.wxss` 使用 `time-duck` / `sch-*` 唯一类名。
+
+## 相关文档
+
+- [微信小程序 UI 踩坑与标准解法](./wechat-ui-patterns.md) — button 宽度、分享按钮双层结构、syncing 互斥等

@@ -252,10 +252,6 @@ Page({
       wx.showToast({ title: "请先微信登录", icon: "none" });
       return;
     }
-    if (this.data.syncing) {
-      wx.showToast({ title: "正在同步，请稍后", icon: "none" });
-      return;
-    }
     const trip = getActiveTrip();
     if (!trip) {
       wx.showToast({ title: "请先新建旅行", icon: "none" });
@@ -264,7 +260,15 @@ Page({
     this.setData({ inviteLoading: true });
     try {
       await syncTripsWithCloud();
+      this.refreshLocalStats();
+      if (this.data.memberNamesText) {
+        wx.showToast({ title: "已有同行人", icon: "none" });
+        return;
+      }
       const invite = await createTripInvite(trip.id);
+      if (!invite?.inviteCode) {
+        throw new Error("未返回邀请码");
+      }
       this.applyInvite(invite);
       wx.showToast({ title: "邀请已生成", icon: "success" });
     } catch (error) {
@@ -372,7 +376,6 @@ Page({
   },
 
   applySyncResult(_tripCount: number, updatedAt?: number) {
-    const tripCount = listTrips().length;
     this.setData({
       lastSyncText: formatSyncTime(updatedAt || Date.now())
     });

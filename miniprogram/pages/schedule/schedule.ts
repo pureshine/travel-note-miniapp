@@ -6,39 +6,30 @@ import {
   reconcileClearedPlanState,
   setActiveTripId,
 } from "../../services/trip-store";
-import { ScheduleItem, Trip } from "../../types/trip";
+import { Trip } from "../../types/trip";
 import {
-  formatScheduleDate,
   formatTripOption,
   getTripStatus,
   getTripStatusClass,
   TripStatus,
 } from "../../utils/trip-view";
+import {
+  createCategoryFilterOptions,
+  createDateFilterOptions,
+  createScheduleViews,
+  DateFilterOption,
+  filterSchedules,
+  groupSchedulesByYear,
+  ScheduleCategoryFilter,
+  ScheduleStatusFilter,
+  ScheduleView,
+  ScheduleYearGroup,
+  sortScheduleViews,
+} from "../../utils/schedule-view";
 import { activeTripBehavior } from "../../behaviors/active-trip";
 import { pageShellBehavior } from "../../behaviors/page-shell";
 
-type ScheduleStatus = "已完成" | "进行中" | "待出发";
-type ScheduleStatusFilter = "全部" | ScheduleStatus;
-type ScheduleCategoryFilter = "全部类型" | ScheduleItem["category"];
 type TripStatusView = TripStatus;
-type ScheduleView = ScheduleItem & {
-  year: string;
-  monthDay: string;
-  status: ScheduleStatus;
-  statusClass: string;
-  active: boolean;
-  startTime: string;
-  endTimeText: string;
-  timeRange: string;
-};
-type DateFilterOption = {
-  label: string;
-  value: string;
-};
-type ScheduleYearGroup = {
-  year: string;
-  items: ScheduleView[];
-};
 type TravelTipView = {
   icon: string;
   title: string;
@@ -113,9 +104,7 @@ Page({
       });
       return;
     }
-    const schedules = this.sortScheduleViews(
-      this.toScheduleViews(trip ? trip.schedules : []),
-    );
+    const schedules = sortScheduleViews(createScheduleViews(trip ? trip.schedules : []));
     const dateFilterOptions = createDateFilterOptions(schedules);
     const categoryFilterOptions = createCategoryFilterOptions(schedules);
     const nextDateFilterIndex = Math.max(
@@ -130,7 +119,7 @@ Page({
       ),
       0,
     );
-    const filteredSchedules = this.filterSchedules(
+    const filteredSchedules = filterSchedules(
       schedules,
       dateFilterOptions[nextDateFilterIndex]?.value || "all",
       this.data.activeStatusFilter,
@@ -153,7 +142,7 @@ Page({
       clipScheduleId: "",
       schedules,
       filteredSchedules,
-      scheduleGroups: this.groupSchedulesByYear(filteredSchedules),
+      scheduleGroups: groupSchedulesByYear(filteredSchedules),
       dateFilterOptions,
       dateFilterLabels: dateFilterOptions.map((item) => item.label),
       dateFilterIndex: nextDateFilterIndex,
@@ -365,7 +354,7 @@ Page({
   onDateFilterChange(event: { detail: { value: string } }) {
     const dateFilterIndex = Number(event.detail.value);
     const dateValue = this.data.dateFilterOptions[dateFilterIndex]?.value || "all";
-    const filteredSchedules = this.filterSchedules(
+    const filteredSchedules = filterSchedules(
       this.data.schedules,
       dateValue,
       this.data.activeStatusFilter,
@@ -375,12 +364,12 @@ Page({
     this.setData({
       dateFilterIndex,
       filteredSchedules,
-      scheduleGroups: this.groupSchedulesByYear(filteredSchedules),
+      scheduleGroups: groupSchedulesByYear(filteredSchedules),
     });
   },
 
   clearDateFilter() {
-    const filteredSchedules = this.filterSchedules(
+    const filteredSchedules = filterSchedules(
       this.data.schedules,
       "all",
       this.data.activeStatusFilter,
@@ -390,7 +379,7 @@ Page({
     this.setData({
       dateFilterIndex: 0,
       filteredSchedules,
-      scheduleGroups: this.groupSchedulesByYear(filteredSchedules),
+      scheduleGroups: groupSchedulesByYear(filteredSchedules),
     });
   },
 
@@ -400,7 +389,7 @@ Page({
       this.data.categoryFilterOptions[categoryFilterIndex] || "全部类型";
     const dateValue =
       this.data.dateFilterOptions[this.data.dateFilterIndex]?.value || "all";
-    const filteredSchedules = this.filterSchedules(
+    const filteredSchedules = filterSchedules(
       this.data.schedules,
       dateValue,
       this.data.activeStatusFilter,
@@ -411,14 +400,14 @@ Page({
       categoryFilterIndex,
       activeCategoryFilter,
       filteredSchedules,
-      scheduleGroups: this.groupSchedulesByYear(filteredSchedules),
+      scheduleGroups: groupSchedulesByYear(filteredSchedules),
     });
   },
 
   clearCategoryFilter() {
     const dateValue =
       this.data.dateFilterOptions[this.data.dateFilterIndex]?.value || "all";
-    const filteredSchedules = this.filterSchedules(
+    const filteredSchedules = filterSchedules(
       this.data.schedules,
       dateValue,
       this.data.activeStatusFilter,
@@ -429,7 +418,7 @@ Page({
       categoryFilterIndex: 0,
       activeCategoryFilter: "全部类型" as ScheduleCategoryFilter,
       filteredSchedules,
-      scheduleGroups: this.groupSchedulesByYear(filteredSchedules),
+      scheduleGroups: groupSchedulesByYear(filteredSchedules),
     });
   },
 
@@ -438,7 +427,7 @@ Page({
     const activeStatusFilter = this.data.statusFilters[statusFilterIndex] || "全部";
     const dateValue =
       this.data.dateFilterOptions[this.data.dateFilterIndex]?.value || "all";
-    const filteredSchedules = this.filterSchedules(
+    const filteredSchedules = filterSchedules(
       this.data.schedules,
       dateValue,
       activeStatusFilter,
@@ -449,14 +438,14 @@ Page({
       statusFilterIndex,
       activeStatusFilter,
       filteredSchedules,
-      scheduleGroups: this.groupSchedulesByYear(filteredSchedules),
+      scheduleGroups: groupSchedulesByYear(filteredSchedules),
     });
   },
 
   clearStatusFilter() {
     const dateValue =
       this.data.dateFilterOptions[this.data.dateFilterIndex]?.value || "all";
-    const filteredSchedules = this.filterSchedules(
+    const filteredSchedules = filterSchedules(
       this.data.schedules,
       dateValue,
       "全部",
@@ -467,63 +456,8 @@ Page({
       statusFilterIndex: 0,
       activeStatusFilter: "全部" as ScheduleStatusFilter,
       filteredSchedules,
-      scheduleGroups: this.groupSchedulesByYear(filteredSchedules),
+      scheduleGroups: groupSchedulesByYear(filteredSchedules),
     });
-  },
-
-  toScheduleViews(items: ScheduleItem[]): ScheduleView[] {
-    return items.map((item) => {
-      const status = getScheduleStatus(item);
-      const startTime = item.time || "00:00";
-      const endTimeText = item.endTime && item.endTime !== startTime ? item.endTime : "";
-      return {
-        ...item,
-        ...formatScheduleDate(item.day),
-        status,
-        statusClass: getStatusClass(status),
-        active: status === "进行中",
-        startTime,
-        endTimeText,
-        timeRange: endTimeText ? `${startTime} - ${endTimeText}` : startTime,
-      };
-    });
-  },
-
-  sortScheduleViews(items: ScheduleView[]): ScheduleView[] {
-    return [...items].sort((a, b) => {
-      const aDone = a.status === "已完成";
-      const bDone = b.status === "已完成";
-      if (aDone !== bDone) return aDone ? 1 : -1;
-      return `${a.day} ${a.time}`.localeCompare(`${b.day} ${b.time}`);
-    });
-  },
-
-  filterSchedules(
-    items: ScheduleView[],
-    dateValue: string,
-    statusValue: ScheduleStatusFilter,
-    categoryValue: ScheduleCategoryFilter,
-  ): ScheduleView[] {
-    return items.filter((item) => {
-      const dateMatched = dateValue === "all" || item.day === dateValue;
-      const statusMatched = statusValue === "全部" || item.status === statusValue;
-      const categoryMatched =
-        categoryValue === "全部类型" || item.category === categoryValue;
-      return dateMatched && statusMatched && categoryMatched;
-    });
-  },
-
-  groupSchedulesByYear(items: ScheduleView[]): ScheduleYearGroup[] {
-    const groups: ScheduleYearGroup[] = [];
-    items.forEach((item) => {
-      let group = groups.find((entry) => entry.year === item.year);
-      if (!group) {
-        group = { year: item.year, items: [] };
-        groups.push(group);
-      }
-      group.items.push(item);
-    });
-    return groups;
   },
 
   getEmptyScheduleState() {
@@ -554,22 +488,6 @@ Page({
   },
 });
 
-function getScheduleStatus(item: ScheduleItem): ScheduleStatus {
-  const startTime = new Date(
-    `${item.day}T${item.time || "00:00"}:00`,
-  ).getTime();
-  const endTime = new Date(
-    `${item.day}T${item.endTime || item.time || "00:00"}:00`,
-  ).getTime();
-  const now = Date.now();
-  if (Number.isNaN(startTime)) return "待出发";
-  if (now < startTime) return "待出发";
-  if (!Number.isNaN(endTime) && endTime > startTime && now <= endTime) {
-    return "进行中";
-  }
-  return "已完成";
-}
-
 function getFilterDockTop(): number {
   const wxApi = wx as WechatMiniprogram.Wx & {
     getSystemInfoSync?: () => { statusBarHeight?: number };
@@ -579,31 +497,6 @@ function getFilterDockTop(): number {
   const menuBottom =
     wxApi.getMenuButtonBoundingClientRect?.().bottom || statusBarHeight + 44;
   return Math.ceil(menuBottom + 8);
-}
-
-function getStatusClass(status: ScheduleStatus): string {
-  if (status === "已完成") return "done";
-  if (status === "进行中") return "active";
-  return "pending";
-}
-
-function createDateFilterOptions(items: ScheduleView[]): DateFilterOption[] {
-  const dates = Array.from(new Set(items.map((item) => item.day))).sort();
-  return [
-    { label: "全部日期", value: "all" },
-    ...dates.map((date) => {
-      const formatted = formatScheduleDate(date);
-      return {
-        label: `${formatted.monthDay} ${formatted.year}`,
-        value: date,
-      };
-    }),
-  ];
-}
-
-function createCategoryFilterOptions(items: ScheduleView[]): ScheduleCategoryFilter[] {
-  const categories = Array.from(new Set(items.map((item) => item.category))).sort();
-  return ["全部类型", ...categories];
 }
 
 function createTravelTip(trip: Trip, scheduleCount: number): TravelTipView {

@@ -73,17 +73,22 @@
       <view class="pf-card-copy">
         <view class="pf-sync-title">邀请好友一起记录</view>
         <view class="pf-sync-desc">一起探索世界，留下美好回忆</view>
-        <view
-          wx:if="{{!memberNamesText}}"
-          class="pf-invite-btn {{inviteLoading ? 'is-busy' : ''}}"
-          bindtap="createInvite"
-        >{{inviteLoading ? '生成中...' : '生成邀请'}}</view>
-        <button wx:if="{{inviteCode}}" class="pf-share-btn" open-type="share">分享给好友</button>
+        <view wx:if="{{memberNamesText}}" class="pf-member-row">
+          <text class="pf-member-tag">同行</text>
+          <text class="pf-member-names">{{memberNamesText}}</text>
+        </view>
+        <view class="pf-card-actions">
+          <view
+            wx:if="{{!memberNamesText && !inviteCode}}"
+            class="pf-invite-btn {{inviteLoading ? 'is-busy' : ''}}"
+            bindtap="createInvite"
+          >{{inviteLoading ? '生成中...' : '生成邀请'}}</view>
+          <view wx:if="{{inviteCode}}" class="pf-share-wrap">
+            <view class="pf-share-face">分享给好友</view>
+            <button class="pf-share-hit" open-type="share" hover-class="none">分享给好友</button>
+          </view>
+        </view>
       </view>
-    </view>
-    <view wx:if="{{memberNamesText}}" class="pf-member-row">
-      <text class="pf-member-tag">同行</text>
-      <text class="pf-member-names">{{memberNamesText}}</text>
     </view>
   </view>
 

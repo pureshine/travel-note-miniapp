@@ -1,18 +1,45 @@
 import {
-  ChecklistItem,
   ExpenseCategory,
-  ExpenseItem,
   NoteCategory,
-  NoteItem,
-  ScheduleCategory,
   ScheduleItem,
-  Trip,
-  TripSummary
+  Trip
 } from "../types/trip";
 import { createId } from "../utils/id";
 import { today } from "../utils/date";
 import { STORAGE_KEYS, CURRENT_DATA_RESET_VERSION } from "../constants/storage-keys";
 import { notifyTripDataChanged } from "./trip-sync-notify";
+import {
+  addChecklistItemToTrip,
+  toggleChecklistItemInTrip
+} from "./trip-store/checklist";
+import {
+  addExpenseToTrip,
+  deleteExpenseFromTrip,
+  getExpenseByCategoryFromTrips,
+  updateExpenseInTrip
+} from "./trip-store/expenses";
+import {
+  addNoteToTrip,
+  deleteNoteFromTrip,
+  normalizeNoteCategory,
+  toggleNoteInTrip,
+  updateNoteInTrip
+} from "./trip-store/notes";
+import {
+  addScheduleToTrip,
+  compareSchedule,
+  deleteScheduleFromTrip,
+  updateScheduleInTrip
+} from "./trip-store/schedules";
+import { getSummaryFromTrips } from "./trip-store/summary";
+import {
+  createTripData,
+  updateTripBudgetInTrip,
+  updateTripInfoInTrip
+} from "./trip-store/trips";
+
+export { getNoteCategories } from "./trip-store/notes";
+export { getScheduleCategories } from "./trip-store/schedules";
 
 const STORAGE_KEY = STORAGE_KEYS.trips;
 const ACTIVE_TRIP_KEY = STORAGE_KEYS.activeTripId;
@@ -134,19 +161,7 @@ export function getTrip(tripId: string): Trip | undefined {
 
 export function createTrip(input?: { name?: string; destination?: string; startDate?: string; endDate?: string }): Trip {
   const current = today();
-  const trip: Trip = {
-    id: createId("trip"),
-    name: input?.name || "新的旅行",
-    destination: input?.destination || "待定目的地",
-    startDate: input?.startDate || current,
-    endDate: input?.endDate || input?.startDate || current,
-    budget: 10000,
-    coverTone: "sky",
-    schedules: [],
-    checklist: [],
-    notes: [],
-    expenses: []
-  };
+  const trip = createTripData(input, createId("trip"), current);
   setActiveTripId(trip.id);
   writeTrips([trip, ...readTrips()]);
   return trip;
@@ -156,20 +171,11 @@ export function updateTripInfo(
   tripId: string,
   input: { name: string; destination: string; startDate: string; endDate: string }
 ): Trip | undefined {
-  return updateTrip(tripId, (trip) => ({
-    ...trip,
-    name: input.name,
-    destination: input.destination,
-    startDate: input.startDate,
-    endDate: input.endDate
-  }));
+  return updateTrip(tripId, (trip) => updateTripInfoInTrip(trip, input));
 }
 
 export function updateTripBudget(tripId: string, budget: number): Trip | undefined {
-  return updateTrip(tripId, (trip) => ({
-    ...trip,
-    budget
-  }));
+  return updateTrip(tripId, (trip) => updateTripBudgetInTrip(trip, budget));
 }
 
 export function deleteTrip(tripId: string, _options?: { clearActive?: boolean }): Trip | undefined {
@@ -186,46 +192,34 @@ export function deleteTrip(tripId: string, _options?: { clearActive?: boolean })
 }
 
 export function addSchedule(tripId: string, item: Omit<ScheduleItem, "id">): Trip | undefined {
-  return updateTrip(tripId, (trip) => ({
-    ...trip,
-    schedules: [{ ...item, id: createId("schedule") }, ...trip.schedules].sort(compareSchedule)
-  }));
+  return updateTrip(tripId, (trip) =>
+    addScheduleToTrip(trip, item, createId("schedule"))
+  );
 }
 
 export function updateSchedule(tripId: string, scheduleId: string, input: Omit<ScheduleItem, "id">): Trip | undefined {
-  return updateTrip(tripId, (trip) => ({
-    ...trip,
-    schedules: trip.schedules.map((item: ScheduleItem) => (item.id === scheduleId ? { ...input, id: item.id } : item)).sort(compareSchedule)
-  }));
+  return updateTrip(tripId, (trip) => updateScheduleInTrip(trip, scheduleId, input));
 }
 
 export function deleteSchedule(tripId: string, scheduleId: string): Trip | undefined {
   markDeletedItem(tripId, "schedules", scheduleId);
-  return updateTrip(tripId, (trip) => ({
-    ...trip,
-    schedules: trip.schedules.filter((item: ScheduleItem) => item.id !== scheduleId)
-  }));
+  return updateTrip(tripId, (trip) => deleteScheduleFromTrip(trip, scheduleId));
 }
 
 export function addChecklistItem(tripId: string, title: string): Trip | undefined {
-  return updateTrip(tripId, (trip) => ({
-    ...trip,
-    checklist: [...trip.checklist, { id: createId("check"), title, done: false }]
-  }));
+  return updateTrip(tripId, (trip) =>
+    addChecklistItemToTrip(trip, title, createId("check"))
+  );
 }
 
 export function toggleChecklistItem(tripId: string, itemId: string): Trip | undefined {
-  return updateTrip(tripId, (trip) => ({
-    ...trip,
-    checklist: trip.checklist.map((item: ChecklistItem) => (item.id === itemId ? { ...item, done: !item.done } : item))
-  }));
+  return updateTrip(tripId, (trip) => toggleChecklistItemInTrip(trip, itemId));
 }
 
 export function addNote(tripId: string, title: string, content: string, category: NoteCategory = "物品"): Trip | undefined {
-  return updateTrip(tripId, (trip) => ({
-    ...trip,
-    notes: [{ id: createId("note"), title, content, category, done: false, createdAt: Date.now() }, ...trip.notes]
-  }));
+  return updateTrip(tripId, (trip) =>
+    addNoteToTrip(trip, title, content, category, createId("note"), Date.now())
+  );
 }
 
 export function updateNote(
@@ -233,34 +227,16 @@ export function updateNote(
   noteId: string,
   input: { title: string; content: string; category: NoteCategory }
 ): Trip | undefined {
-  return updateTrip(tripId, (trip) => ({
-    ...trip,
-    notes: trip.notes.map((item: NoteItem) =>
-      item.id === noteId
-        ? {
-            ...item,
-            title: input.title,
-            content: input.content,
-            category: input.category
-          }
-        : item
-    )
-  }));
+  return updateTrip(tripId, (trip) => updateNoteInTrip(trip, noteId, input));
 }
 
 export function toggleNoteItem(tripId: string, itemId: string): Trip | undefined {
-  return updateTrip(tripId, (trip) => ({
-    ...trip,
-    notes: trip.notes.map((item: NoteItem) => (item.id === itemId ? { ...item, done: !item.done } : item))
-  }));
+  return updateTrip(tripId, (trip) => toggleNoteInTrip(trip, itemId));
 }
 
 export function deleteNote(tripId: string, itemId: string): Trip | undefined {
   markDeletedItem(tripId, "notes", itemId);
-  return updateTrip(tripId, (trip) => ({
-    ...trip,
-    notes: trip.notes.filter((item: NoteItem) => item.id !== itemId)
-  }));
+  return updateTrip(tripId, (trip) => deleteNoteFromTrip(trip, itemId));
 }
 
 export function addExpense(
@@ -271,10 +247,17 @@ export function addExpense(
   paidBy: string,
   createdAt: number = Date.now()
 ): Trip | undefined {
-  return updateTrip(tripId, (trip) => ({
-    ...trip,
-    expenses: [{ id: createId("expense"), title, amount, category, paidBy, createdAt }, ...trip.expenses]
-  }));
+  return updateTrip(tripId, (trip) =>
+    addExpenseToTrip(
+      trip,
+      title,
+      amount,
+      category,
+      paidBy,
+      createId("expense"),
+      createdAt
+    )
+  );
 }
 
 export function updateExpense(
@@ -282,58 +265,24 @@ export function updateExpense(
   expenseId: string,
   input: { title: string; amount: number; category: ExpenseCategory; paidBy: string; createdAt?: number }
 ): Trip | undefined {
-  return updateTrip(tripId, (trip) => ({
-    ...trip,
-    expenses: trip.expenses.map((item: ExpenseItem) =>
-      item.id === expenseId
-        ? {
-            ...item,
-            title: input.title,
-            amount: input.amount,
-            category: input.category,
-            paidBy: input.paidBy,
-            createdAt: input.createdAt || item.createdAt
-          }
-        : item
-    )
-  }));
+  return updateTrip(tripId, (trip) => updateExpenseInTrip(trip, expenseId, input));
 }
 
 export function deleteExpense(tripId: string, expenseId: string): Trip | undefined {
   markDeletedItem(tripId, "expenses", expenseId);
-  return updateTrip(tripId, (trip) => ({
-    ...trip,
-    expenses: trip.expenses.filter((item: ExpenseItem) => item.id !== expenseId)
-  }));
+  return updateTrip(tripId, (trip) => deleteExpenseFromTrip(trip, expenseId));
 }
 
 export function getDataUpdatedAt(): number {
   return wx.getStorageSync<number>(DATA_UPDATED_AT_KEY) || 0;
 }
 
-export function getSummary(): TripSummary {
-  const trips = listTrips();
-  const expenses = trips.flatMap((trip) => trip.expenses);
-  const checklist = trips.flatMap((trip) => trip.checklist);
-  const notes = trips.flatMap((trip) => trip.notes);
-
-  return {
-    tripCount: trips.length,
-    expenseTotal: expenses.reduce((total: number, item: ExpenseItem) => total + item.amount, 0),
-    noteCount: notes.length,
-    scheduleCount: trips.reduce((total, trip) => total + trip.schedules.length, 0),
-    checklistDone: checklist.filter((item) => item.done).length,
-    checklistTotal: checklist.length
-  };
+export function getSummary() {
+  return getSummaryFromTrips(listTrips());
 }
 
 export function getExpenseByCategory(): Array<{ category: ExpenseCategory; amount: number }> {
-  const categories: ExpenseCategory[] = ["交通", "住宿", "餐饮", "门票", "购物", "其他"];
-  const expenses = listTrips().flatMap((trip) => trip.expenses);
-  return categories.map((category) => ({
-    category,
-    amount: expenses.filter((item) => item.category === category).reduce((total, item) => total + item.amount, 0)
-  }));
+  return getExpenseByCategoryFromTrips(listTrips());
 }
 
 export function resetDemoData(): void {
@@ -428,24 +377,6 @@ export function setActiveTripId(tripId: string): void {
 export function clearActiveTripId(): void {
   wx.removeStorageSync(ACTIVE_TRIP_KEY);
   wx.setStorageSync(ACTIVE_TRIP_CLEARED_KEY, true);
-}
-
-export function getScheduleCategories(): ScheduleCategory[] {
-  return ["景点", "交通", "住宿", "餐饮", "其他"];
-}
-
-export function getNoteCategories(): NoteCategory[] {
-  return ["物品", "事项", "预订", "攻略"];
-}
-
-function normalizeNoteCategory(category: string): NoteCategory {
-  if (category === "财务") return "事项";
-  if (category === "证件") return "物品";
-  const categories = getNoteCategories();
-  if (categories.includes(category as NoteCategory)) {
-    return category as NoteCategory;
-  }
-  return "物品";
 }
 
 function normalizeTrip(trip: Trip): Trip {
@@ -565,8 +496,4 @@ function markDeletedItem(tripId: string, collection: SyncItemCollection, itemId:
       [collection]: Array.from(new Set([...collectionIds, itemId]))
     }
   });
-}
-
-function compareSchedule(a: ScheduleItem, b: ScheduleItem): number {
-  return `${a.day} ${a.time}`.localeCompare(`${b.day} ${b.time}`);
 }
