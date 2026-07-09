@@ -101,3 +101,52 @@
 3. 视觉宽度问题：改 `view` 是否生效？若生效则是 button 绘制问题 → 用双层结构
 4. 逻辑拦截：是否有多处共用一个 `syncing` 布尔值？
 5. 改 TS 后是否执行 `npm run build` 同步 `profile.js`？
+
+---
+
+## 4. 按钮内图标和文字垂直居中
+
+### 现象
+
+- 按钮里的 `+`、图标、文字上下不齐
+- 文案看起来贴底或贴顶，尤其是原生 `<button>`、虚线添加按钮、小胶囊按钮
+- 用 `line-height: 按钮高度` 后，在真机和开发者工具里仍有偏差
+
+### 标准规则
+
+所有按钮、胶囊操作、虚线添加按钮，只要内部有图标/符号/文字，一律使用 flex 居中：
+
+```css
+.action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  line-height: 1.2;
+}
+```
+
+图标和文字拆成独立 `text`：
+
+```xml
+<button class="action-button">
+  <text class="action-icon">+</text>
+  <text>添加相关备忘</text>
+</button>
+```
+
+### 禁止做法
+
+- ❌ 只靠 `line-height` 做垂直居中
+- ❌ 直接把 `+ 添加文案` 写成一整段文字后再调 padding 硬凑
+- ❌ 图标单独设置 margin，文字单独设置 line-height，导致不同机型漂移
+
+### 还原规则
+
+页面已有 HTML 原型时，WXML/WXSS 必须按原型一比一还原布局、交互层级、间距、按钮形态和卡片结构。当前新增日程同步备忘/预算功能以：
+
+```text
+prototypes/schedule-form-sync-prototype.html
+```
+
+作为样式和交互基准。

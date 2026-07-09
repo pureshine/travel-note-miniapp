@@ -1,6 +1,6 @@
 # 冲鸭去旅行交接与 Vibe Building 指南
 
-> 更新时间：2026-07-07
+> 更新时间：2026-07-09
 > 用途：开启新 Codex 对话、交给其他 AI/开发者接手，或复用到下一个微信小程序快速搭建。
 
 ## 1. 项目一句话
@@ -180,6 +180,8 @@ Tab 页面：
 - `!important` 只在层叠冲突无法快速拆除时使用，并尽量集中在 tab partial 末尾。
 - 不要使用页面内可见文字解释功能如何使用，界面应自解释。
 - 卡片不要套卡片；页面区块尽量是自然布局或全宽带。
+- 所有按钮内的图标/符号和文字必须垂直居中：统一用 `display: flex; align-items: center; justify-content: center; gap: ...`，不要靠 `line-height` 或 padding 硬凑。
+- 已有 HTML 原型时，后续 WXML/WXSS 调整必须以原型为基准一比一还原布局、交互层级、卡片结构、按钮形态和间距；新增日程同步备忘/预算功能当前以 `prototypes/schedule-form-sync-prototype.html` 为准。
 
 ## 9. 状态与数据流红线
 

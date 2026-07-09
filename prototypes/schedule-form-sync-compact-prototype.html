@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>紧凑版新增日程同步原型</title>
+  <style>
+    :root {
+      --brand: #ff6500;
+      --brand-2: #ff9417;
+      --soft: #fff1df;
+      --ink: #101827;
+      --muted: #778294;
+      --line: #e4ebf4;
+      --bg: #f5f8fd;
+      --green: #17a673;
+      --blue: #3478f6;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 18% 0%, rgba(255, 148, 23, 0.14), transparent 26%),
+        linear-gradient(180deg, #fff8ef 0%, var(--bg) 34%, #edf4fb 100%);
+      color: var(--ink);
+    }
+
+    button, input, textarea { font: inherit; }
+
+    .phone {
+      width: min(100%, 430px);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 14px 14px 86px;
+    }
+
+    .nav {
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+      font-weight: 850;
+      color: #334155;
+    }
+
+    .back {
+      width: 32px;
+      height: 32px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(255,255,255,.82);
+      color: var(--brand);
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 14px rgba(15,23,42,.06);
+    }
+
+    .hero {
+      position: relative;
+      min-height: 114px;
+      padding: 14px 16px;
+      border-radius: 24px;
+      overflow: hidden;
+      background: linear-gradient(135deg, rgba(255,255,255,.96), rgba(255,242,224,.88));
+      border: 1px solid rgba(255,255,255,.94);
+      box-shadow: 0 8px 28px rgba(15,23,42,.035), 0 18px 44px rgba(255,122,0,.06);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -24px;
+      bottom: -10px;
+      width: 126px;
+      height: 116px;
+      background: url("../miniprogram/assets/design3d/timeline-duck-right.png") center/contain no-repeat;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      height: 26px;
+      padding: 0 11px;
+      border-radius: 999px;
+      background: var(--soft);
+      color: var(--brand);
+      font-size: 13px;
+      font-weight: 950;
+    }
+
+    .hero h1 {
+      width: 68%;
+      margin: 10px 0 5px;
+      font-size: 25px;
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      width: 65%;
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+      font-weight: 720;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .summary div {
+      min-height: 54px;
+      padding: 8px;
+      border-radius: 16px;
+      text-align: center;
+      background: rgba(255,255,255,.78);
+      border: 1px solid rgba(255,255,255,.9);
+      box-shadow: 0 6px 14px rgba(15,23,42,.035);
+    }
+
+    .summary strong {
+      display: block;
+      color: var(--brand);
+      font-size: 18px;
+      line-height: 1.1;
+      font-weight: 950;
+    }
+
+    .summary span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 780;
+    }
+
+    .panel {
+      margin-top: 10px;
+      padding: 13px;
+      border-radius: 20px;
+      background: rgba(255,255,255,.9);
+      border: 1px solid rgba(255,255,255,.95);
+      box-shadow: 0 8px 26px rgba(15,23,42,.035), 0 16px 44px rgba(255,122,0,.055);
+    }
+
+    .head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .title {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.2;
+      font-weight: 950;
+    }
+
+    .sub {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .tag {
+      min-width: 54px;
+      height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: var(--soft);
+      color: var(--brand);
+      font-size: 12px;
+      font-weight: 950;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .fields {
+      display: grid;
+      gap: 8px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .field {
+      width: 100%;
+      min-height: 44px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      color: var(--ink);
+      outline: 0;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    textarea.field {
+      min-height: 70px;
+      padding-top: 10px;
+      resize: none;
+      line-height: 1.45;
+    }
+
+    .time-box {
+      padding: 10px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #fffdf9, #fff7ef);
+      border: 1px solid rgba(255,122,0,.12);
+    }
+
+    .time-label {
+      margin-bottom: 8px;
+      color: #8a6a52;
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .time-row {
+      display: grid;
+      grid-template-columns: 1fr 28px 1fr;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .time-chip {
+      min-height: 54px;
+      padding: 8px 11px;
+      border-radius: 14px;
+      background: #fff;
+      border: 1px solid rgba(255,122,0,.1);
+    }
+
+    .time-chip span {
+      display: block;
+      color: #9a7255;
+      font-size: 11px;
+      font-weight: 760;
+    }
+
+    .time-chip strong {
+      display: block;
+      margin-top: 5px;
+      color: var(--brand);
+      font-size: 18px;
+      line-height: 1;
+      font-weight: 950;
+    }
+
+    .arrow {
+      color: var(--brand-2);
+      font-weight: 950;
+      text-align: center;
+    }
+
+    .chips {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .chip {
+      height: 32px;
+      min-width: 58px;
+      padding: 0 12px;
+      border: 0;
+      border-radius: 999px;
+      background: #f2f5fa;
+      color: #687487;
+      font-size: 13px;
+      font-weight: 850;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .chip.on {
+      background: rgba(255,101,0,.12);
+      color: var(--brand);
+    }
+
+    .upload {
+      height: 54px;
+      border: 1px dashed rgba(255,101,0,.45);
+      border-radius: 16px;
+      background: rgba(255,101,0,.045);
+      color: var(--brand);
+      font-size: 14px;
+      font-weight: 920;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+    }
+
+    .switch {
+      width: 48px;
+      height: 28px;
+      padding: 3px;
+      border-radius: 999px;
+      background: #ffe7d8;
+      display: flex;
+      justify-content: flex-end;
+      flex-shrink: 0;
+    }
+
+    .switch::before {
+      content: "";
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--brand);
+      box-shadow: 0 4px 10px rgba(255,101,0,.22);
+    }
+
+    .item {
+      margin-top: 8px;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .item-main {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .item-title {
+      font-size: 15px;
+      line-height: 1.3;
+      font-weight: 950;
+    }
+
+    .item-meta {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+      font-weight: 730;
+    }
+
+    .item-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .mini-btn {
+      height: 36px;
+      border: 0;
+      border-radius: 999px;
+      background: #f3f6fb;
+      color: #64748b;
+      font-size: 13px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mini-btn.danger {
+      background: #fff1f2;
+      color: #e5484d;
+    }
+
+    .add {
+      width: 100%;
+      height: 48px;
+      margin-top: 10px;
+      border: 1px dashed rgba(255,101,0,.55);
+      border-radius: 16px;
+      background: rgba(255,101,0,.045);
+      color: var(--brand);
+      font-size: 15px;
+      font-weight: 950;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+    }
+
+    .bottom {
+      position: fixed;
+      left: 50%;
+      bottom: 0;
+      width: min(100%, 430px);
+      transform: translateX(-50%);
+      padding: 10px 14px 16px;
+      background: linear-gradient(180deg, rgba(245,248,253,0), rgba(245,248,253,.96) 28%, #f5f8fd);
+    }
+
+    .save {
+      width: 100%;
+      height: 50px;
+      border: 0;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--brand-2), var(--brand));
+      color: #fff;
+      font-size: 16px;
+      font-weight: 950;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 13px 24px rgba(255,101,0,.22);
+    }
+  </style>
+</head>
+<body>
+  <main class="phone">
+    <div class="nav">
+      <button class="back">‹</button>
+      <span>新增日程</span>
+      <span style="width:32px"></span>
+    </div>
+
+    <section class="hero">
+      <span class="pill">厦门周末小旅行</span>
+      <h1>安排一段行程</h1>
+      <p>日期默认取计划开始日，可顺手同步备忘和预算。</p>
+    </section>
+
+    <section class="summary">
+      <div><strong>1</strong><span>当前日程</span></div>
+      <div><strong>2</strong><span>关联备忘</span></div>
+      <div><strong>2</strong><span>关联预算</span></div>
+    </section>
+
+    <section class="panel">
+      <div class="head">
+        <div>
+          <h2 class="title">日程内容</h2>
+          <div class="sub">同步到日程时间轴</div>
+        </div>
+        <span class="tag">景点</span>
+      </div>
+
+      <div class="fields">
+        <input class="field" value="鼓浪屿半日游" />
+        <div class="row">
+          <input class="field" value="2026-07-18" />
+          <input class="field" value="鼓浪屿" />
+        </div>
+
+        <div class="time-box">
+          <div class="time-label">日程时间段</div>
+          <div class="time-row">
+            <div class="time-chip"><span>开始</span><strong>09:30</strong></div>
+            <div class="arrow">→</div>
+            <div class="time-chip"><span>结束</span><strong>13:30</strong></div>
+          </div>
+        </div>
+
+        <div class="chips">
+          <button class="chip on">景点</button>
+          <button class="chip">交通</button>
+          <button class="chip">住宿</button>
+          <button class="chip">餐饮</button>
+          <button class="chip">其他</button>
+        </div>
+
+        <textarea class="field">提前 20 分钟到码头，岛上主要步行。</textarea>
+        <button class="upload"><span>+</span><span>上传图片</span></button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="head">
+        <div>
+          <h2 class="title">关联备忘</h2>
+          <div class="sub">保存后自动出现在备忘模块</div>
+        </div>
+        <div class="switch"></div>
+      </div>
+
+      <article class="item">
+        <div class="item-main">
+          <div>
+            <div class="item-title">提前购买鼓浪屿船票</div>
+            <div class="item-meta">建议买 09:10 或 09:30 班次，截图保存二维码。</div>
+          </div>
+          <span class="tag" style="background:#e8fff6;color:var(--green)">物品</span>
+        </div>
+        <div class="item-actions">
+          <button class="mini-btn">编辑</button>
+          <button class="mini-btn danger">删除</button>
+        </div>
+      </article>
+
+      <article class="item">
+        <div class="item-main">
+          <div>
+            <div class="item-title">带身份证和少量现金</div>
+            <div class="item-meta">登船可能需要核验身份。</div>
+          </div>
+          <span class="tag" style="background:#e8fff6;color:var(--green)">物品</span>
+        </div>
+        <div class="item-actions">
+          <button class="mini-btn">编辑</button>
+          <button class="mini-btn danger">删除</button>
+        </div>
+      </article>
+
+      <button class="add"><span>+</span><span>添加相关备忘</span></button>
+    </section>
+
+    <section class="panel">
+      <div class="head">
+        <div>
+          <h2 class="title">关联预算 / 花费</h2>
+          <div class="sub">门票、车票、订金等跟随日程日期</div>
+        </div>
+        <div class="switch"></div>
+      </div>
+
+      <article class="item">
+        <div class="item-main">
+          <div>
+            <div class="item-title">鼓浪屿往返船票</div>
+            <div class="item-meta">交通 · 我 · 跟随日程日期</div>
+          </div>
+          <span class="tag" style="background:#eff6ff;color:var(--blue)">¥70</span>
+        </div>
+        <div class="item-actions">
+          <button class="mini-btn">编辑</button>
+          <button class="mini-btn danger">删除</button>
+        </div>
+      </article>
+
+      <article class="item">
+        <div class="item-main">
+          <div>
+            <div class="item-title">岛上午餐预算</div>
+            <div class="item-meta">餐饮 · 我 · 跟随日程日期</div>
+          </div>
+          <span class="tag" style="background:#eff6ff;color:var(--blue)">¥160</span>
+        </div>
+        <div class="item-actions">
+          <button class="mini-btn">编辑</button>
+          <button class="mini-btn danger">删除</button>
+        </div>
+      </article>
+
+      <button class="add"><span>+</span><span>添加相关预算</span></button>
+    </section>
+  </main>
+
+  <div class="bottom">
+    <button class="save">保存日程</button>
+  </div>
+</body>
+</html>

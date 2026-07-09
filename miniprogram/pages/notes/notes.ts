@@ -33,8 +33,6 @@ Page({
     tripId: "",
     trip: undefined as Trip | undefined,
     trips: [] as Trip[],
-    tripNames: [] as string[],
-    activeTripIndex: 0,
     categories: getNoteCategories(),
     filters: ["全部", ...getNoteCategories()],
     selectedFilter: "全部",
@@ -58,13 +56,6 @@ Page({
       tripId: trip ? trip.id : "",
       trip,
       trips,
-      tripNames: trips.map((item) => item.name),
-      activeTripIndex: trip
-        ? Math.max(
-            trips.findIndex((item) => item.id === trip.id),
-            0,
-          )
-        : 0,
       ...getNoteProgress(trip),
       filteredNotes: this.filterNotes(
         trip ? trip.notes : [],
@@ -73,21 +64,16 @@ Page({
     });
   },
 
-  loadTrip(tripId: string) {
-    const trip = getTrip(tripId);
+  loadTrip(tripId?: string) {
+    const activeTrip = tripId ? getTrip(tripId) : getActiveTrip();
     const trips = listTrips();
     this.setData({
-      tripId,
-      trip,
+      tripId: activeTrip ? activeTrip.id : "",
+      trip: activeTrip,
       trips,
-      tripNames: trips.map((item) => item.name),
-      activeTripIndex: Math.max(
-        trips.findIndex((item) => item.id === tripId),
-        0,
-      ),
-      ...getNoteProgress(trip),
+      ...getNoteProgress(activeTrip),
       filteredNotes: this.filterNotes(
-        trip ? trip.notes : [],
+        activeTrip ? activeTrip.notes : [],
         this.data.selectedFilter,
       ),
     });

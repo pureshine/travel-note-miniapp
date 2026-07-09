@@ -1,48 +1,174 @@
-<form-shell wx:if="{{trip}}" title="{{formTitle}}" subtitle="{{trip.name}} · {{trip.destination}}">
-  <input class="field" placeholder="几点去做什么" value="{{title}}" bindinput="onTitleInput" />
-  <view class="form-grid">
-    <picker mode="date" value="{{day}}" bindchange="onDayChange">
-      <view class="picker-field">{{day}}</view>
-    </picker>
-  </view>
-  <view class="time-range-panel">
-    <view class="time-range-label">日程时间段</view>
-    <view class="time-range-grid">
-      <picker mode="time" value="{{time}}" bindchange="onTimeChange">
-        <view class="time-chip">
-          <text class="time-chip-kicker">开始</text>
-          <text class="time-chip-value">{{time}}</text>
-        </view>
-      </picker>
-      <view class="time-range-arrow">→</view>
-      <picker mode="time" value="{{endTime}}" bindchange="onEndTimeChange">
-        <view class="time-chip">
-          <text class="time-chip-kicker">结束</text>
-          <text class="time-chip-value">{{endTime}}</text>
-        </view>
-      </picker>
+<form-shell wx:if="{{trip}}" title="{{formTitle}}" subtitle="{{trip.name}} · {{trip.destination}}" plain="{{true}}">
+  <view wx:if="{{!isEditing}}" class="sync-summary">
+    <view class="sync-summary-item">
+      <text class="sync-summary-value">1</text>
+      <text class="sync-summary-label">当前日程</text>
+    </view>
+    <view class="sync-summary-item">
+      <text class="sync-summary-value">{{linkedNotes.length}}</text>
+      <text class="sync-summary-label">关联备忘</text>
+    </view>
+    <view class="sync-summary-item">
+      <text class="sync-summary-value">{{linkedExpenses.length}}</text>
+      <text class="sync-summary-label">关联预算</text>
     </view>
   </view>
-  <view class="pick-box">
-    <view class="pick-headline">类型</view>
-    <view class="pick-list">
-      <view
-        wx:for="{{categories}}"
-        wx:key="*this"
-        class="pick-item {{categoryIndex === index ? 'is-on' : ''}}"
-        data-index="{{index}}"
-        bindtap="onCategorySelect"
-      >{{item}}</view>
+
+  <view class="schedule-main-panel">
+    <view class="sync-section-title">日程内容</view>
+    <view class="sync-section-sub">这部分会同步到日程时间轴</view>
+    <input class="field" placeholder="几点去做什么" value="{{title}}" bindinput="onTitleInput" />
+    <view class="form-grid">
+      <picker mode="date" value="{{day}}" bindchange="onDayChange">
+        <view class="picker-field">{{day}}</view>
+      </picker>
+      <input class="field" placeholder="地点，如 鼓浪屿" value="{{place}}" bindinput="onPlaceInput" />
     </view>
+    <view class="time-range-panel">
+      <view class="time-range-label">日程时间段</view>
+      <view class="time-range-grid">
+        <picker mode="time" value="{{time}}" bindchange="onTimeChange">
+          <view class="time-chip">
+            <text class="time-chip-kicker">开始</text>
+            <text class="time-chip-value">{{time}}</text>
+          </view>
+        </picker>
+        <view class="time-range-arrow">→</view>
+        <picker mode="time" value="{{endTime}}" bindchange="onEndTimeChange">
+          <view class="time-chip">
+            <text class="time-chip-kicker">结束</text>
+            <text class="time-chip-value">{{endTime}}</text>
+          </view>
+        </picker>
+      </view>
+    </view>
+    <view class="pick-box">
+      <view class="pick-headline">类型</view>
+      <view class="pick-list">
+        <view
+          wx:for="{{categories}}"
+          wx:key="*this"
+          class="pick-item {{categoryIndex === index ? 'is-on' : ''}}"
+          data-index="{{index}}"
+          bindtap="onCategorySelect"
+        >{{item}}</view>
+      </view>
+    </view>
+    <textarea class="field textarea" placeholder="补充交通、住宿、门票或注意事项" value="{{note}}" bindinput="onNoteInput" />
+    <scroll-view class="image-row" scroll-x>
+      <image wx:for="{{images}}" wx:key="*this" class="preview-image" src="{{item}}" mode="aspectFill" />
+      <button wx:if="{{images.length < 3}}" class="upload-card {{images.length === 0 ? 'wide' : ''}}" bindtap="chooseImages">
+        <text class="upload-plus">+</text>
+        <text>{{uploadingImages ? "上传中" : "上传图片"}}</text>
+      </button>
+    </scroll-view>
   </view>
-  <input class="field" placeholder="地点，如 鼓浪屿 / 厦门北站" value="{{place}}" bindinput="onPlaceInput" />
-  <textarea class="field textarea" placeholder="补充交通、住宿、门票或注意事项" value="{{note}}" bindinput="onNoteInput" />
-  <scroll-view class="image-row" scroll-x>
-    <image wx:for="{{images}}" wx:key="*this" class="preview-image" src="{{item}}" mode="aspectFill" />
-    <button wx:if="{{images.length < 3}}" class="upload-card {{images.length === 0 ? 'wide' : ''}}" bindtap="chooseImages">
-      <text class="upload-plus">+</text>
-      <text>{{uploadingImages ? "上传中" : "上传图片"}}</text>
+
+  <view wx:if="{{!isEditing}}" class="sync-panel">
+    <view class="sync-panel-head">
+      <view>
+        <view class="sync-panel-title">关联备忘</view>
+        <view class="sync-panel-sub">保存后自动出现在备忘模块，不用再切过去补</view>
+      </view>
+      <view class="sync-switch {{syncNotesEnabled ? 'is-on' : ''}}" bindtap="toggleSyncNotes" aria-label="切换同步备忘">
+        <view class="sync-switch-knob"></view>
+      </view>
+    </view>
+    <view wx:if="{{syncNotesEnabled}}" wx:for="{{linkedNotes}}" wx:key="index" class="sync-card">
+      <view class="sync-card-main" data-index="{{index}}" bindtap="openLinkedNoteEditor">
+        <view class="sync-card-title">{{item.title}}</view>
+        <view class="sync-card-meta">{{item.content || "无补充说明"}}</view>
+      </view>
+      <view class="sync-card-side">
+        <view class="sync-tag green">{{item.category}}</view>
+      </view>
+      <view class="sync-card-actions">
+        <button class="sync-action" data-index="{{index}}" catchtap="openLinkedNoteEditor">编辑</button>
+        <button class="sync-action danger" data-index="{{index}}" catchtap="deleteLinkedNote">删除</button>
+      </view>
+    </view>
+    <button wx:if="{{syncNotesEnabled}}" class="sync-add" bindtap="openLinkedNoteEditor">
+      <text class="sync-add-icon">+</text>
+      <text>添加相关备忘</text>
     </button>
-  </scroll-view>
-  <button class="primary-button" loading="{{saving}}" disabled="{{saving || uploadingImages}}" bindtap="saveSchedule">{{saveLabel}}</button>
+  </view>
+
+  <view wx:if="{{!isEditing}}" class="sync-panel">
+    <view class="sync-panel-head">
+      <view>
+        <view class="sync-panel-title">关联预算 / 花费</view>
+        <view class="sync-panel-sub">适合记录门票、车票、订金等和这段日程绑定的费用</view>
+      </view>
+      <view class="sync-switch {{syncExpensesEnabled ? 'is-on' : ''}}" bindtap="toggleSyncExpenses" aria-label="切换同步预算">
+        <view class="sync-switch-knob"></view>
+      </view>
+    </view>
+    <view wx:if="{{syncExpensesEnabled}}" wx:for="{{linkedExpenses}}" wx:key="index" class="sync-card">
+      <view class="sync-card-main" data-index="{{index}}" bindtap="openLinkedExpenseEditor">
+        <view class="sync-card-title">{{item.title}}</view>
+        <view class="sync-card-meta">{{item.category}} · {{item.paidBy || "我"}} · 跟随日程日期</view>
+      </view>
+      <view class="sync-card-side">
+        <view class="sync-tag">¥{{item.amount}}</view>
+      </view>
+      <view class="sync-card-actions">
+        <button class="sync-action" data-index="{{index}}" catchtap="openLinkedExpenseEditor">编辑</button>
+        <button class="sync-action danger" data-index="{{index}}" catchtap="deleteLinkedExpense">删除</button>
+      </view>
+    </view>
+    <button wx:if="{{syncExpensesEnabled}}" class="sync-add" bindtap="openLinkedExpenseEditor">
+      <text class="sync-add-icon">+</text>
+      <text>添加相关预算</text>
+    </button>
+  </view>
+
+  <view class="schedule-save-bar">
+    <button class="primary-button" loading="{{saving}}" disabled="{{saving || uploadingImages}}" bindtap="saveSchedule">{{saveLabel}}</button>
+  </view>
+
+  <view wx:if="{{syncEditorVisible}}" class="sync-editor-mask" bindtap="closeSyncEditor" catchtouchmove="noop">
+    <view class="sync-editor" catchtap="noop">
+      <view class="sync-editor-bar"></view>
+      <view class="sync-editor-title">{{syncEditorType === "note" ? "添加相关备忘" : "添加相关预算"}}</view>
+      <input class="field" placeholder="{{syncEditorType === 'note' ? '备忘标题' : '预算名称'}}" value="{{syncTitle}}" bindinput="onSyncTitleInput" />
+
+      <view wx:if="{{syncEditorType === 'note'}}" class="sync-editor-fields">
+        <view class="pick-box">
+          <view class="pick-headline">分类</view>
+          <view class="pick-list">
+            <view
+              wx:for="{{noteCategories}}"
+              wx:key="*this"
+              class="pick-item {{syncNoteCategoryIndex === index ? 'is-on' : ''}}"
+              data-index="{{index}}"
+              bindtap="onSyncNoteCategorySelect"
+            >{{item}}</view>
+          </view>
+        </view>
+        <textarea class="field textarea" placeholder="补充提醒、预订信息或携带事项" value="{{syncContent}}" bindinput="onSyncContentInput" />
+      </view>
+
+      <view wx:else class="sync-editor-fields">
+        <input class="field" type="digit" placeholder="金额" value="{{syncAmount}}" bindinput="onSyncAmountInput" />
+        <view class="pick-box">
+          <view class="pick-headline">分类</view>
+          <view class="pick-list">
+            <view
+              wx:for="{{expenseCategories}}"
+              wx:key="*this"
+              class="pick-item {{syncExpenseCategoryIndex === index ? 'is-on' : ''}}"
+              data-index="{{index}}"
+              bindtap="onSyncExpenseCategorySelect"
+            >{{item}}</view>
+          </view>
+        </view>
+        <input class="field" placeholder="付款人" value="{{syncPaidBy}}" bindinput="onSyncPaidByInput" />
+      </view>
+
+      <view class="sync-editor-actions">
+        <button class="sync-editor-cancel" bindtap="closeSyncEditor">取消</button>
+        <button class="sync-editor-save" bindtap="saveLinkedItem">{{syncEditingIndex >= 0 ? "保存修改" : "添加到日程"}}</button>
+      </view>
+    </view>
+  </view>
 </form-shell>

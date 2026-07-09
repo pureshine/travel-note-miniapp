@@ -8,6 +8,7 @@ exports.updateTripInfo = updateTripInfo;
 exports.updateTripBudget = updateTripBudget;
 exports.deleteTrip = deleteTrip;
 exports.addSchedule = addSchedule;
+exports.addScheduleWithLinkedItems = addScheduleWithLinkedItems;
 exports.updateSchedule = updateSchedule;
 exports.deleteSchedule = deleteSchedule;
 exports.addChecklistItem = addChecklistItem;
@@ -171,6 +172,13 @@ function deleteTrip(tripId, _options) {
 }
 function addSchedule(tripId, item) {
     return updateTrip(tripId, (trip) => (0, schedules_1.addScheduleToTrip)(trip, item, (0, id_1.createId)("schedule")));
+}
+function addScheduleWithLinkedItems(tripId, input) {
+    return updateTrip(tripId, (trip) => {
+        const withSchedule = (0, schedules_1.addScheduleToTrip)(trip, input.schedule, (0, id_1.createId)("schedule"));
+        const withNotes = (input.notes || []).reduce((nextTrip, item) => (0, notes_1.addNoteToTrip)(nextTrip, item.title, item.content, item.category, (0, id_1.createId)("note"), Date.now()), withSchedule);
+        return (input.expenses || []).reduce((nextTrip, item) => (0, expenses_1.addExpenseToTrip)(nextTrip, item.title, item.amount, item.category, item.paidBy, (0, id_1.createId)("expense"), item.createdAt), withNotes);
+    });
 }
 function updateSchedule(tripId, scheduleId, input) {
     return updateTrip(tripId, (trip) => (0, schedules_1.updateScheduleInTrip)(trip, scheduleId, input));

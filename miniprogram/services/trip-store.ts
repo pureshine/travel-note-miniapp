@@ -197,6 +197,50 @@ export function addSchedule(tripId: string, item: Omit<ScheduleItem, "id">): Tri
   );
 }
 
+export function addScheduleWithLinkedItems(
+  tripId: string,
+  input: {
+    schedule: Omit<ScheduleItem, "id">;
+    notes?: Array<{ title: string; content: string; category: NoteCategory }>;
+    expenses?: Array<{
+      title: string;
+      amount: number;
+      category: ExpenseCategory;
+      paidBy: string;
+      createdAt: number;
+    }>;
+  }
+): Trip | undefined {
+  return updateTrip(tripId, (trip) => {
+    const withSchedule = addScheduleToTrip(trip, input.schedule, createId("schedule"));
+    const withNotes = (input.notes || []).reduce(
+      (nextTrip, item) =>
+        addNoteToTrip(
+          nextTrip,
+          item.title,
+          item.content,
+          item.category,
+          createId("note"),
+          Date.now()
+        ),
+      withSchedule
+    );
+    return (input.expenses || []).reduce(
+      (nextTrip, item) =>
+        addExpenseToTrip(
+          nextTrip,
+          item.title,
+          item.amount,
+          item.category,
+          item.paidBy,
+          createId("expense"),
+          item.createdAt
+        ),
+      withNotes
+    );
+  });
+}
+
 export function updateSchedule(tripId: string, scheduleId: string, input: Omit<ScheduleItem, "id">): Trip | undefined {
   return updateTrip(tripId, (trip) => updateScheduleInTrip(trip, scheduleId, input));
 }

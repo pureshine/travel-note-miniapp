@@ -22,13 +22,13 @@
     />
   </view>
 
-  <plan-switch
-    wx:if="{{trip && tripNames.length > 1}}"
-    tripOptions="{{tripNames}}"
-    activeIndex="{{activeTripIndex}}"
-    tripName="{{trip.name}}"
-    bind:change="onTripChange"
-  />
+  <view wx:if="{{trip}}" class="memo-current-plan">
+    <view class="memo-current-dot"></view>
+    <view class="memo-current-copy">
+      <view class="memo-current-label">当前计划</view>
+      <view class="memo-current-name">{{trip.name}}</view>
+    </view>
+  </view>
 
   <view class="memo-title-row">
     <view class="memo-actions">

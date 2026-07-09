@@ -2,11 +2,26 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const trip_store_1 = require("../../services/trip-store");
 const cloud_1 = require("../../config/cloud");
+const cloud_sync_1 = require("../../services/cloud-sync");
 const date_1 = require("../../utils/date");
 const id_1 = require("../../utils/id");
 function getCategoryIndex(category, categories) {
     const index = categories.indexOf(category);
     return index >= 0 ? index : 0;
+}
+function getNoteCategoryIndex(category, categories) {
+    const index = categories.indexOf(category);
+    return index >= 0 ? index : 0;
+}
+function getExpenseCategoryIndex(category, categories) {
+    const index = categories.indexOf(category);
+    return index >= 0 ? index : 0;
+}
+function getDefaultPaidBy() {
+    return (0, cloud_sync_1.getSavedProfile)()?.nickname?.trim() || "我";
+}
+function dateToCreatedAt(date) {
+    return new Date(`${date}T12:00:00`).getTime();
 }
 let cloudReady = false;
 function getFileExt(filePath) {
@@ -146,6 +161,23 @@ Page({
         categoryIndex: 0,
         categories: (0, trip_store_1.getScheduleCategories)(),
         images: [],
+        noteCategories: (0, trip_store_1.getNoteCategories)(),
+        expenseCategories: ["餐饮", "交通", "住宿", "购物", "门票", "其他"],
+        syncNotesEnabled: true,
+        syncExpensesEnabled: true,
+        linkedNotes: [],
+        linkedExpenses: [],
+        syncEditorVisible: false,
+        syncEditorType: "note",
+        syncEditingIndex: -1,
+        syncTitle: "",
+        syncContent: "",
+        syncAmount: "",
+        syncPaidBy: getDefaultPaidBy(),
+        syncNoteCategory: "物品",
+        syncNoteCategoryIndex: 0,
+        syncExpenseCategory: "餐饮",
+        syncExpenseCategoryIndex: 0,
         uploadingImages: false,
         saving: false,
     },
@@ -205,6 +237,129 @@ Page({
         this.setData({
             categoryIndex: index,
             category: this.data.categories[index],
+        });
+    },
+    noop() { },
+    toggleSyncNotes() {
+        this.setData({ syncNotesEnabled: !this.data.syncNotesEnabled });
+    },
+    toggleSyncExpenses() {
+        this.setData({ syncExpensesEnabled: !this.data.syncExpensesEnabled });
+    },
+    openLinkedNoteEditor(event) {
+        if (!this.data.syncNotesEnabled)
+            return;
+        const index = Number(event?.currentTarget.dataset.index ?? -1);
+        const note = index >= 0 ? this.data.linkedNotes[index] : undefined;
+        const category = note ? note.category : "物品";
+        this.setData({
+            syncEditorVisible: true,
+            syncEditorType: "note",
+            syncEditingIndex: index,
+            syncTitle: note ? note.title : "",
+            syncContent: note ? note.content : "",
+            syncNoteCategory: category,
+            syncNoteCategoryIndex: getNoteCategoryIndex(category, this.data.noteCategories),
+        });
+    },
+    openLinkedExpenseEditor(event) {
+        if (!this.data.syncExpensesEnabled)
+            return;
+        const index = Number(event?.currentTarget.dataset.index ?? -1);
+        const expense = index >= 0 ? this.data.linkedExpenses[index] : undefined;
+        const category = expense ? expense.category : "餐饮";
+        this.setData({
+            syncEditorVisible: true,
+            syncEditorType: "expense",
+            syncEditingIndex: index,
+            syncTitle: expense ? expense.title : "",
+            syncAmount: expense ? expense.amount : "",
+            syncPaidBy: expense ? expense.paidBy : getDefaultPaidBy(),
+            syncExpenseCategory: category,
+            syncExpenseCategoryIndex: getExpenseCategoryIndex(category, this.data.expenseCategories),
+        });
+    },
+    closeSyncEditor() {
+        this.setData({ syncEditorVisible: false });
+    },
+    onSyncTitleInput(event) {
+        this.setData({ syncTitle: event.detail.value });
+    },
+    onSyncContentInput(event) {
+        this.setData({ syncContent: event.detail.value });
+    },
+    onSyncAmountInput(event) {
+        this.setData({ syncAmount: event.detail.value });
+    },
+    onSyncPaidByInput(event) {
+        this.setData({ syncPaidBy: event.detail.value });
+    },
+    onSyncNoteCategorySelect(event) {
+        const index = Number(event.currentTarget.dataset.index);
+        this.setData({
+            syncNoteCategoryIndex: index,
+            syncNoteCategory: this.data.noteCategories[index],
+        });
+    },
+    onSyncExpenseCategorySelect(event) {
+        const index = Number(event.currentTarget.dataset.index);
+        this.setData({
+            syncExpenseCategoryIndex: index,
+            syncExpenseCategory: this.data.expenseCategories[index],
+        });
+    },
+    saveLinkedItem() {
+        const title = this.data.syncTitle.trim();
+        if (!title) {
+            wx.showToast({ title: "先写标题", icon: "none" });
+            return;
+        }
+        if (this.data.syncEditorType === "note") {
+            const nextNote = {
+                title,
+                content: this.data.syncContent.trim(),
+                category: this.data.syncNoteCategory,
+            };
+            const linkedNotes = [...this.data.linkedNotes];
+            if (this.data.syncEditingIndex >= 0) {
+                linkedNotes[this.data.syncEditingIndex] = nextNote;
+            }
+            else {
+                linkedNotes.push(nextNote);
+            }
+            this.setData({ linkedNotes, syncEditorVisible: false });
+            return;
+        }
+        const amount = Number(this.data.syncAmount);
+        if (!Number.isFinite(amount) || amount <= 0) {
+            wx.showToast({ title: "填写金额", icon: "none" });
+            return;
+        }
+        const nextExpense = {
+            title,
+            amount: this.data.syncAmount,
+            category: this.data.syncExpenseCategory,
+            paidBy: this.data.syncPaidBy.trim() || getDefaultPaidBy(),
+        };
+        const linkedExpenses = [...this.data.linkedExpenses];
+        if (this.data.syncEditingIndex >= 0) {
+            linkedExpenses[this.data.syncEditingIndex] = nextExpense;
+        }
+        else {
+            linkedExpenses.push(nextExpense);
+        }
+        this.setData({ linkedExpenses, syncEditorVisible: false });
+    },
+    deleteLinkedNote(event) {
+        const index = Number(event.currentTarget.dataset.index);
+        this.setData({
+            linkedNotes: this.data.linkedNotes.filter((_, itemIndex) => itemIndex !== index),
+        });
+    },
+    deleteLinkedExpense(event) {
+        const index = Number(event.currentTarget.dataset.index);
+        this.setData({
+            linkedExpenses: this.data.linkedExpenses.filter((_, itemIndex) => itemIndex !== index),
         });
     },
     chooseImages() {
@@ -307,7 +462,25 @@ Page({
             (0, trip_store_1.updateSchedule)(this.data.tripId, this.data.scheduleId, input);
         }
         else {
-            (0, trip_store_1.addSchedule)(this.data.tripId, input);
+            (0, trip_store_1.addScheduleWithLinkedItems)(this.data.tripId, {
+                schedule: input,
+                notes: this.data.syncNotesEnabled
+                    ? this.data.linkedNotes.map((item) => ({
+                        title: item.title.trim(),
+                        content: item.content.trim(),
+                        category: item.category,
+                    }))
+                    : [],
+                expenses: this.data.syncExpensesEnabled
+                    ? this.data.linkedExpenses.map((item) => ({
+                        title: item.title.trim(),
+                        amount: Number(item.amount),
+                        category: item.category,
+                        paidBy: item.paidBy.trim() || getDefaultPaidBy(),
+                        createdAt: dateToCreatedAt(this.data.day),
+                    }))
+                    : [],
+            });
         }
         wx.navigateBack();
     },

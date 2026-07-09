@@ -2,7 +2,6 @@
   "navigationBarTitleText": "",
   "navigationStyle": "custom",
   "usingComponents": {
-    "brand-nav": "/components/brand-nav/index",
-    "plan-switch": "/components/plan-switch/index"
+    "brand-nav": "/components/brand-nav/index"
   }
 }

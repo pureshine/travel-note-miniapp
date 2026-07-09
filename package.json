@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "test:logic": "npm run build && node scripts/check-schedule-view.js && node scripts/check-trip-store-domains.js",
+    "test:logic": "npm run build && node scripts/check-schedule-view.js && node scripts/check-trip-store-domains.js && node scripts/check-schedule-form-sync.js",
     "format:check": "node scripts/check-format.js",
     "style:check": "node scripts/check-styles.js",
     "lint": "node --require ./scripts/eslint-node16-polyfill.js ./node_modules/eslint/bin/eslint.js miniprogram --ext .ts"
