@@ -44,6 +44,20 @@ const baseTrip = createTripData(
 
 assert.strictEqual(baseTrip.id, "trip_1");
 assert.strictEqual(baseTrip.budget, 10000);
+assert.strictEqual(
+  createTripData(
+    {
+      name: "预算旅行",
+      destination: "杭州",
+      startDate: "2026-09-01",
+      endDate: "2026-09-03",
+      budget: 8800
+    },
+    "trip_budget",
+    "2026-09-01"
+  ).budget,
+  8800
+);
 assert.deepStrictEqual(getScheduleCategories(), ["景点", "交通", "住宿", "餐饮", "其他"]);
 assert.deepStrictEqual(getNoteCategories(), ["物品", "事项", "预订", "攻略"]);
 assert.strictEqual(normalizeNoteCategory("财务"), "事项");

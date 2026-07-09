@@ -14,6 +14,9 @@ Page({
         destination: "",
         startDate: (0, date_1.today)(),
         endDate: (0, date_1.today)(),
+        budgetSyncEnabled: true,
+        budget: "10000",
+        budgetPresets: [3000, 5000, 8000, 10000, 20000, 30000],
         saving: false
     },
     onLoad(options) {
@@ -47,6 +50,20 @@ Page({
     onEndDateChange(event) {
         this.setData({ endDate: event.detail.value });
     },
+    toggleBudgetSync() {
+        if (this.data.isEditing)
+            return;
+        this.setData({ budgetSyncEnabled: !this.data.budgetSyncEnabled });
+    },
+    onBudgetInput(event) {
+        this.setData({ budget: event.detail.value });
+    },
+    chooseBudgetPreset(event) {
+        this.setData({
+            budgetSyncEnabled: true,
+            budget: String(event.currentTarget.dataset.value)
+        });
+    },
     saveTrip() {
         if (this.data.saving)
             return;
@@ -60,12 +77,20 @@ Page({
             wx.showToast({ title: "开始日期不能晚于结束日期", icon: "none" });
             return;
         }
+        const budget = Number(this.data.budget);
+        if (!this.data.isEditing && this.data.budgetSyncEnabled && (!Number.isFinite(budget) || budget <= 0)) {
+            wx.showToast({ title: "请输入预算金额", icon: "none" });
+            return;
+        }
         this.setData({ saving: true });
         const input = {
             name,
             destination,
             startDate: this.data.startDate,
-            endDate: this.data.endDate
+            endDate: this.data.endDate,
+            ...(!this.data.isEditing && this.data.budgetSyncEnabled
+                ? { budget: Math.round(budget) }
+                : {})
         };
         let saved = false;
         if (this.data.isEditing) {

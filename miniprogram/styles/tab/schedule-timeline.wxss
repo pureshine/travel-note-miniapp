@@ -131,31 +131,6 @@
   width: 100%;
 }
 
-.sch-plan-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8rpx;
-  margin-top: 12rpx;
-  padding-top: 8rpx;
-  border-top: 1rpx solid rgba(226, 232, 240, 0.78);
-}
-
-.sch-plan-item {
-  min-height: 62rpx;
-  padding: 0 18rpx;
-  border-radius: 16rpx;
-  color: #475569;
-  font-size: 24rpx;
-  font-weight: 700;
-  line-height: 62rpx;
-  background: #f8fafc;
-}
-
-.sch-plan-item.is-on {
-  color: #ff6500;
-  background: rgba(255, 101, 0, 0.12);
-}
-
 .sch-plan-ops {
   display: flex;
   flex: 0 0 auto;

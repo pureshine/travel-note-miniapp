@@ -13,7 +13,6 @@ Page({
         trips: [],
         tripOptions: [],
         activeTripIndex: 0,
-        showTripOptions: false,
         tripStatus: "待出发",
         tripStatusClass: "upcoming",
         scheduleTouchStartX: 0,
@@ -80,7 +79,6 @@ Page({
             activeTripIndex: trip
                 ? Math.max(trips.findIndex((item) => item.id === trip.id), 0)
                 : 0,
-            showTripOptions: false,
             tripStatus,
             tripStatusClass: (0, trip_view_1.getTripStatusClass)(tripStatus),
             openScheduleId: "",
@@ -267,14 +265,6 @@ Page({
             },
         });
     },
-    toggleTripOptions() {
-        this.setData({ showTripOptions: !this.data.showTripOptions });
-    },
-    onTripOptionTap(event) {
-        const index = Number(event.currentTarget.dataset.index);
-        this.onTripChangeByIndex(index);
-        this.setData({ showTripOptions: false });
-    },
     onTripChange(event) {
         this.onTripChangeByIndex(Number(event.detail.value));
     },
@@ -389,7 +379,6 @@ Page({
             trips: [],
             tripOptions: [],
             activeTripIndex: 0,
-            showTripOptions: false,
             tripStatus: "待出发",
             tripStatusClass: "upcoming",
             openScheduleId: "",

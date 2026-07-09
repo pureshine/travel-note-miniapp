@@ -22,14 +22,6 @@
     />
   </view>
 
-  <view wx:if="{{trip}}" class="memo-current-plan">
-    <view class="memo-current-dot"></view>
-    <view class="memo-current-copy">
-      <view class="memo-current-label">当前计划</view>
-      <view class="memo-current-name">{{trip.name}}</view>
-    </view>
-  </view>
-
   <view class="memo-title-row">
     <view class="memo-actions">
       <button class="memo-add" bindtap="goNoteForm">

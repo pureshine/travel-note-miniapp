@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>新建计划预算同步区块原型</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: #eef3f8;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+          "Microsoft YaHei", sans-serif;
+        color: #111827;
+      }
+
+      .phone {
+        width: 390px;
+        min-height: 780px;
+        padding: 26px 18px 28px;
+        border-radius: 30px;
+        background: linear-gradient(180deg, #fbfdff 0%, #f7f9fc 100%);
+        box-shadow:
+          0 28px 70px rgba(15, 23, 42, 0.16),
+          inset 0 0 0 1px rgba(255, 255, 255, 0.78);
+      }
+
+      .field {
+        height: 58px;
+        display: flex;
+        align-items: center;
+        padding: 0 18px;
+        margin-bottom: 12px;
+        border: 1px solid #e0e7f0;
+        border-radius: 18px;
+        background: #fff;
+        color: #e46d38;
+        font-size: 17px;
+        font-weight: 800;
+      }
+
+      .budget-card {
+        margin-top: 14px;
+        padding: 16px;
+        border: 1px solid rgba(255, 211, 178, 0.95);
+        border-radius: 22px;
+        background:
+          radial-gradient(circle at 96% 4%, rgba(255, 122, 0, 0.12), transparent 120px),
+          linear-gradient(180deg, #fff8f2 0%, #fff 62%);
+      }
+
+      .budget-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .title-wrap {
+        min-width: 0;
+      }
+
+      .budget-title {
+        margin: 0;
+        font-size: 18px;
+        line-height: 1.2;
+        font-weight: 900;
+        letter-spacing: 0;
+      }
+
+      .budget-note {
+        margin: 7px 0 0;
+        color: #7b8494;
+        font-size: 13px;
+        line-height: 1.35;
+        font-weight: 650;
+      }
+
+      .switch {
+        width: 48px;
+        height: 28px;
+        flex: 0 0 auto;
+        border: 0;
+        border-radius: 999px;
+        padding: 3px;
+        background: rgba(255, 101, 0, 0.16);
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        cursor: pointer;
+      }
+
+      .switch-dot {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: #ff6500;
+        box-shadow: 0 5px 12px rgba(255, 101, 0, 0.25);
+      }
+
+      .switch.off {
+        justify-content: flex-start;
+        background: #e8edf5;
+      }
+
+      .switch.off .switch-dot {
+        background: #9aa3b2;
+        box-shadow: 0 5px 12px rgba(15, 23, 42, 0.14);
+      }
+
+      .budget-body {
+        margin-top: 14px;
+      }
+
+      .amount-box {
+        min-height: 78px;
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        border-radius: 20px;
+        background: #fff;
+        box-shadow:
+          0 10px 26px rgba(255, 122, 0, 0.08),
+          inset 0 0 0 1px rgba(255, 221, 198, 0.92);
+      }
+
+      .yuan {
+        width: 42px;
+        height: 42px;
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        border-radius: 15px;
+        background: #fff0e7;
+        color: #ff6500;
+        font-size: 22px;
+        font-weight: 950;
+      }
+
+      .amount-main {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .amount-label {
+        color: #9aa3b2;
+        font-size: 11px;
+        line-height: 1;
+        font-weight: 800;
+      }
+
+      .amount-input {
+        width: 100%;
+        margin-top: 6px;
+        border: 0;
+        outline: 0;
+        padding: 0;
+        background: transparent;
+        color: #101828;
+        font-size: 30px;
+        line-height: 1.05;
+        font-weight: 950;
+      }
+
+      .presets {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 9px;
+        margin-top: 12px;
+      }
+
+      .chip {
+        height: 46px;
+        border: 0;
+        border-radius: 16px;
+        background: #f2f5f9;
+        color: #707a8b;
+        font-size: 15px;
+        font-weight: 850;
+        cursor: pointer;
+      }
+
+      .chip.active {
+        background: linear-gradient(135deg, #ff9a1f 0%, #ff6500 100%);
+        color: #fff;
+        box-shadow: 0 10px 20px rgba(255, 101, 0, 0.2);
+      }
+
+      .save {
+        width: 210px;
+        height: 56px;
+        display: block;
+        margin: 22px auto 0;
+        border: 0;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #ff9a1f 0%, #ff6500 100%);
+        color: #fff;
+        font-size: 18px;
+        font-weight: 900;
+        box-shadow: 0 16px 30px rgba(255, 101, 0, 0.25);
+      }
+
+      .is-hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="phone">
+      <div class="field">开始日期：2026-07-09</div>
+      <div class="field">结束日期：2026-07-09</div>
+
+      <section class="budget-card">
+        <div class="budget-top">
+          <div class="title-wrap">
+            <h2 class="budget-title">同步设置预算</h2>
+            <p class="budget-note">保存后同步到消费模块，后续可在预算页调整</p>
+          </div>
+          <button class="switch" type="button" aria-label="切换预算同步">
+            <span class="switch-dot"></span>
+          </button>
+        </div>
+
+        <div class="budget-body">
+          <label class="amount-box">
+            <span class="yuan">¥</span>
+            <span class="amount-main">
+              <span class="amount-label">本次旅行总预算</span>
+              <input class="amount-input" value="10000" inputmode="decimal" />
+            </span>
+          </label>
+
+          <div class="presets">
+            <button class="chip" type="button">¥3000</button>
+            <button class="chip" type="button">¥5000</button>
+            <button class="chip" type="button">¥8000</button>
+            <button class="chip active" type="button">¥10000</button>
+            <button class="chip" type="button">¥20000</button>
+            <button class="chip" type="button">¥30000</button>
+          </div>
+        </div>
+      </section>
+
+      <button class="save" type="button">保存旅行</button>
+    </main>
+
+    <script>
+      const switchButton = document.querySelector(".switch");
+      const budgetBody = document.querySelector(".budget-body");
+      const amountInput = document.querySelector(".amount-input");
+      const chips = Array.from(document.querySelectorAll(".chip"));
+
+      switchButton.addEventListener("click", () => {
+        switchButton.classList.toggle("off");
+        budgetBody.classList.toggle("is-hidden", switchButton.classList.contains("off"));
+      });
+
+      chips.forEach((chip) => {
+        chip.addEventListener("click", () => {
+          chips.forEach((item) => item.classList.remove("active"));
+          chip.classList.add("active");
+          amountInput.value = chip.textContent.replace("¥", "");
+        });
+      });
+    </script>
+  </body>
+</html>

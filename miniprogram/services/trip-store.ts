@@ -159,7 +159,13 @@ export function getTrip(tripId: string): Trip | undefined {
   return listTrips().find((trip) => trip.id === tripId);
 }
 
-export function createTrip(input?: { name?: string; destination?: string; startDate?: string; endDate?: string }): Trip {
+export function createTrip(input?: {
+  name?: string;
+  destination?: string;
+  startDate?: string;
+  endDate?: string;
+  budget?: number;
+}): Trip {
   const current = today();
   const trip = createTripData(input, createId("trip"), current);
   setActiveTripId(trip.id);

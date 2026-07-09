@@ -145,49 +145,9 @@
   height: 304rpx;
 }
 
-/* Current plan */
-.notes-page .memo-current-plan {
-  display: flex;
-  align-items: center;
-  gap: 18rpx;
-  margin: 18rpx 22rpx 22rpx;
-}
-
-.notes-page .memo-current-dot {
-  flex-shrink: 0;
-  width: 14rpx;
-  height: 14rpx;
-  margin-top: 42rpx;
-  border-radius: 50%;
-  background: #ff6500;
-}
-
-.notes-page .memo-current-copy {
-  min-width: 0;
-}
-
-.notes-page .memo-current-label {
-  color: #8a93a3;
-  font-size: 24rpx;
-  font-weight: 720;
-  line-height: 1.2;
-}
-
-.notes-page .memo-current-name {
-  max-width: 560rpx;
-  margin-top: 8rpx;
-  overflow: hidden;
-  color: #111827;
-  font-size: 31rpx;
-  font-weight: 950;
-  line-height: 1.18;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 /* CTA row */
 .notes-page .memo-title-row {
-  margin: 0 0 18rpx;
+  margin: 18rpx 0 18rpx;
 }
 
 .notes-page .memo-title-row .memo-actions {

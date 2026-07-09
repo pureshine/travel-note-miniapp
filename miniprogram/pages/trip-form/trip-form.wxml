@@ -7,5 +7,49 @@
   <picker mode="date" value="{{endDate}}" start="{{startDate}}" bindchange="onEndDateChange">
     <view class="picker-field">结束日期：{{endDate}}</view>
   </picker>
+
+  <view wx:if="{{!isEditing}}" class="trip-budget-panel">
+    <view class="trip-budget-head">
+      <view class="trip-budget-wrap">
+        <view class="trip-budget-title">同步设置预算</view>
+        <view class="trip-budget-subtitle">保存后同步到消费模块</view>
+      </view>
+      <view
+        class="trip-budget-switch {{budgetSyncEnabled ? 'is-on' : ''}}"
+        bindtap="toggleBudgetSync"
+        role="switch"
+        aria-role="switch"
+        aria-checked="{{budgetSyncEnabled}}"
+      >
+        <view class="trip-budget-knob"></view>
+      </view>
+    </view>
+
+    <view wx:if="{{budgetSyncEnabled}}" class="trip-budget-body">
+      <view class="trip-budget-input">
+        <text class="trip-budget-yuan">¥</text>
+        <view class="trip-budget-main">
+          <text class="trip-budget-label">本次旅行总预算</text>
+          <input
+            class="trip-budget-amount"
+            type="digit"
+            value="{{budget}}"
+            placeholder="输入本次旅行总预算"
+            bindinput="onBudgetInput"
+          />
+        </view>
+      </view>
+      <view class="trip-budget-presets">
+        <button
+          wx:for="{{budgetPresets}}"
+          wx:key="*this"
+          class="trip-budget-chip {{budget == item ? 'is-on' : ''}}"
+          data-value="{{item}}"
+          bindtap="chooseBudgetPreset"
+        >¥{{item}}</button>
+      </view>
+    </view>
+  </view>
+
   <button class="primary-button" loading="{{saving}}" disabled="{{saving}}" bindtap="saveTrip">{{saveLabel}}</button>
 </form-shell>
