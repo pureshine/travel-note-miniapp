@@ -517,7 +517,7 @@
   grid-template-columns: 142rpx 42rpx minmax(0, 1fr);
   gap: 12rpx;
   align-items: start;
-  padding: 20rpx 0 30rpx;
+  padding: 16rpx 0 20rpx;
 }
 
 .sch-time {
@@ -600,12 +600,12 @@
 }
 
 .sch-line {
-  min-height: 204rpx;
+  min-height: 188rpx;
 }
 
 .sch-line::after {
   top: 28rpx;
-  bottom: -50rpx;
+  bottom: -36rpx;
   width: 4rpx;
   background: linear-gradient(180deg, #ff6500 0%, rgba(255, 101, 0, 0.12) 100%);
 }
@@ -1023,7 +1023,7 @@
   .sch-row {
     grid-template-columns: 122rpx 34rpx minmax(0, 1fr);
     gap: 8rpx;
-    padding-bottom: 26rpx;
+    padding-bottom: 18rpx;
   }
 
   .sch-hour {

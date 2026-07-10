@@ -106,7 +106,7 @@
     <view wx:if="{{syncExpensesEnabled}}" wx:for="{{linkedExpenses}}" wx:key="index" class="sync-card">
       <view class="sync-card-main" data-index="{{index}}" bindtap="openLinkedExpenseEditor">
         <view class="sync-card-title">{{item.title}}</view>
-        <view class="sync-card-meta">{{item.category}} · {{item.paidBy || "我"}} · 跟随日程日期</view>
+        <view class="sync-card-meta">{{item.category}} · {{item.paidBy || "我"}} · {{item.date}}</view>
       </view>
       <view class="sync-card-side">
         <view class="sync-tag">¥{{item.amount}}</view>
@@ -150,6 +150,9 @@
 
       <view wx:else class="sync-editor-fields">
         <input class="field" type="digit" placeholder="金额" value="{{syncAmount}}" bindinput="onSyncAmountInput" />
+        <picker mode="date" value="{{syncExpenseDate}}" bindchange="onSyncExpenseDateChange">
+          <view class="picker-field">消费日期：{{syncExpenseDate}}</view>
+        </picker>
         <view class="pick-box">
           <view class="pick-headline">分类</view>
           <view class="pick-list">

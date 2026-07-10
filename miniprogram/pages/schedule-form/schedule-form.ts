@@ -22,6 +22,7 @@ interface LinkedExpenseDraft {
   amount: string;
   category: ExpenseCategory;
   paidBy: string;
+  date: string;
 }
 
 function getCategoryIndex(category: ScheduleCategory, categories: ScheduleCategory[]) {
@@ -216,6 +217,7 @@ Page({
     syncContent: "",
     syncAmount: "",
     syncPaidBy: getDefaultPaidBy(),
+    syncExpenseDate: today(),
     syncNoteCategory: "物品" as NoteCategory,
     syncNoteCategoryIndex: 0,
     syncExpenseCategory: "餐饮" as ExpenseCategory,
@@ -321,6 +323,7 @@ Page({
     const index = Number(event?.currentTarget.dataset.index ?? -1);
     const expense = index >= 0 ? this.data.linkedExpenses[index] : undefined;
     const category = expense ? expense.category : ("餐饮" as ExpenseCategory);
+    const date = expense ? expense.date : this.data.day;
     this.setData({
       syncEditorVisible: true,
       syncEditorType: "expense",
@@ -328,6 +331,7 @@ Page({
       syncTitle: expense ? expense.title : "",
       syncAmount: expense ? expense.amount : "",
       syncPaidBy: expense ? expense.paidBy : getDefaultPaidBy(),
+      syncExpenseDate: date,
       syncExpenseCategory: category,
       syncExpenseCategoryIndex: getExpenseCategoryIndex(category, this.data.expenseCategories),
     });
@@ -351,6 +355,10 @@ Page({
 
   onSyncPaidByInput(event: { detail: { value: string } }) {
     this.setData({ syncPaidBy: event.detail.value });
+  },
+
+  onSyncExpenseDateChange(event: { detail: { value: string } }) {
+    this.setData({ syncExpenseDate: event.detail.value });
   },
 
   onSyncNoteCategorySelect(event: { currentTarget: { dataset: { index: string } } }) {
@@ -400,6 +408,7 @@ Page({
       amount: this.data.syncAmount,
       category: this.data.syncExpenseCategory,
       paidBy: this.data.syncPaidBy.trim() || getDefaultPaidBy(),
+      date: this.data.syncExpenseDate || this.data.day,
     };
     const linkedExpenses = [...this.data.linkedExpenses];
     if (this.data.syncEditingIndex >= 0) {
@@ -483,10 +492,6 @@ Page({
       wx.showToast({ title: "图片还在上传", icon: "none" });
       return;
     }
-    if (this.data.endTime && this.data.endTime < this.data.time) {
-      wx.showToast({ title: "结束时间需晚于开始", icon: "none" });
-      return;
-    }
     this.setData({ saving: true });
     let images = this.data.images;
     if (hasLocalImage(images)) {
@@ -539,7 +544,7 @@ Page({
               amount: Number(item.amount),
               category: item.category,
               paidBy: item.paidBy.trim() || getDefaultPaidBy(),
-              createdAt: dateToCreatedAt(this.data.day),
+              createdAt: dateToCreatedAt(item.date || this.data.day),
             }))
           : [],
       });

@@ -270,6 +270,16 @@
     rgba(255, 255, 255, 0.88);
 }
 
+.stats-page .budget-panel.over-budget {
+  background:
+    radial-gradient(circle at 94% 88%, rgba(255, 102, 72, 0.22) 0, rgba(255, 102, 72, 0) 220rpx),
+    radial-gradient(circle at 74% 30%, rgba(240, 68, 56, 0.12) 0, rgba(240, 68, 56, 0) 210rpx),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 247, 246, 0.9) 100%);
+  box-shadow:
+    0 8rpx 32rpx rgba(0, 0, 0, 0.03),
+    0 18rpx 52rpx rgba(240, 68, 56, 0.08);
+}
+
 .stats-page .budget-left {
   position: relative;
   z-index: 5;
@@ -315,11 +325,47 @@
 }
 
 .stats-page .remain-pill {
+  flex-shrink: 0;
   min-width: 58rpx;
   height: 34rpx;
   padding: 0 12rpx;
   font-size: 22rpx;
   line-height: 34rpx;
+  white-space: nowrap;
+}
+
+.stats-page .budget-panel.over-budget .tag-dot {
+  background: #f04438;
+}
+
+.stats-page .budget-panel.over-budget .remain-total,
+.stats-page .budget-panel.over-budget .ring-value {
+  color: #f04438;
+}
+
+.stats-page .budget-panel.over-budget .remain-row {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10rpx;
+}
+
+.stats-page .budget-panel.over-budget .remain-pill {
+  height: 38rpx;
+  padding: 0 14rpx;
+  color: #b42318;
+  font-size: 21rpx;
+  line-height: 38rpx;
+  background: #fee4e2;
+}
+
+.stats-page .budget-panel.over-budget .ring-inner {
+  box-shadow:
+    0 0 0 2rpx #ffffff,
+    0 12rpx 28rpx rgba(240, 68, 56, 0.09);
+}
+
+.stats-page .budget-panel.over-budget .ring-label {
+  color: #8a493f;
 }
 
 .stats-page .hero-actions {

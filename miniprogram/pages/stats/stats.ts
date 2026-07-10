@@ -1,4 +1,4 @@
-import { deleteExpense as removeExpense, getActiveTrip, listTrips, setActiveTripId } from "../../services/trip-store";
+import { deleteExpense as removeExpense, getActiveTrip, setActiveTripId } from "../../services/trip-store";
 import { ExpenseCategory, ExpenseItem, Trip } from "../../types/trip";
 import { pageShellBehavior } from "../../behaviors/page-shell";
 import { activeTripBehavior } from "../../behaviors/active-trip";
@@ -23,9 +23,6 @@ type DailyBar = {
 Page({
   behaviors: [pageShellBehavior, activeTripBehavior, tabCloudSyncBehavior],
   data: {
-    trips: [] as Trip[],
-    tripNames: [] as string[],
-    activeTripIndex: 0,
     trip: undefined as Trip | undefined,
     expenseTotal: 0,
     categories: [] as Array<{ category: string; amount: number; percent: number }>,
@@ -35,6 +32,10 @@ Page({
     remaining: 0,
     budgetPercent: 0,
     remainingPercent: 0,
+    budgetStatusClass: "",
+    budgetStatusTitle: "预算剩余",
+    budgetBalanceText: "0",
+    budgetStatusPill: "0%",
     expenseTotalText: "0",
     budgetText: "0",
     remainingText: "0",
@@ -54,22 +55,21 @@ Page({
   },
 
   loadSelectedTrip() {
-    const trips = listTrips();
     const trip = getActiveTrip();
     const expenses = trip ? trip.expenses : [];
     const expenseTotal = expenses.reduce((sum, item) => sum + item.amount, 0);
     const categories = getCategories(expenses, expenseTotal);
     const budget = trip?.budget || 10000;
-    const remaining = Math.max(budget - expenseTotal, 0);
-    const budgetPercent = budget > 0 ? Math.min(Math.round((expenseTotal / budget) * 100), 100) : 0;
+    const remaining = budget - expenseTotal;
+    const isOverBudget = remaining < 0;
+    const budgetPercent = budget > 0 ? Math.round((expenseTotal / budget) * 100) : 0;
     const remainingPercent = budget > 0 ? Math.max(100 - budgetPercent, 0) : 0;
+    const budgetBalance = Math.abs(remaining);
+    const overBudgetPercent = budget > 0 ? Math.max(budgetPercent - 100, 0) : 0;
     const selectedDateKey = this.data.selectedDateKey || formatDateKey(new Date());
     const calendarMonth = this.data.calendarMonth || selectedDateKey.slice(0, 7);
     const selectedDateExpenses = getExpensesByDate(expenses, selectedDateKey);
     this.setData({
-      trips,
-      tripNames: trips.map((item) => item.name),
-      activeTripIndex: trip ? Math.max(trips.findIndex((item) => item.id === trip.id), 0) : 0,
       trip,
       expenseTotal,
       categories,
@@ -79,10 +79,14 @@ Page({
       remaining,
       budgetPercent,
       remainingPercent,
+      budgetStatusClass: isOverBudget ? "over-budget" : "",
+      budgetStatusTitle: isOverBudget ? "已超预算" : "预算剩余",
+      budgetBalanceText: formatMoney(budgetBalance),
+      budgetStatusPill: isOverBudget ? `超${overBudgetPercent}%` : `${remainingPercent}%`,
       expenseTotalText: formatMoney(expenseTotal),
       budgetText: formatMoney(budget),
-      remainingText: formatMoney(remaining),
-      budgetRingStyle: getRingStyle(budgetPercent),
+      remainingText: formatMoney(Math.max(remaining, 0)),
+      budgetRingStyle: getRingStyle(budgetPercent, isOverBudget),
       recentExpenses: expenses.slice(0, 4),
       selectedDateKey,
       selectedDateTitle: formatDateTitle(selectedDateKey),
@@ -204,8 +208,11 @@ function getCategories(expenses: ExpenseItem[], total: number): Array<{ category
   });
 }
 
-function getRingStyle(percent: number): string {
-  return `background: conic-gradient(#ff6500 0% ${percent}%, #ffe4d0 ${percent}% 100%);`;
+function getRingStyle(percent: number, isOverBudget = false): string {
+  const ringPercent = Math.min(Math.max(percent, 0), 100);
+  const activeColor = isOverBudget ? "#f04438" : "#ff6500";
+  const trackColor = isOverBudget ? "#ffe0dd" : "#ffe4d0";
+  return `background: conic-gradient(${activeColor} 0% ${ringPercent}%, ${trackColor} ${ringPercent}% 100%);`;
 }
 
 function formatMoney(amount: number): string {

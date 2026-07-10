@@ -1,0 +1,798 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>消费页渐进改版原型</title>
+    <style>
+      :root {
+        --brand: #ff6500;
+        --brand-2: #ff9a1f;
+        --ink: #101827;
+        --muted: #7d8593;
+        --line: rgba(226, 232, 240, 0.9);
+        --card: rgba(255, 255, 255, 0.96);
+        --warm: #fff3e8;
+        --surface: #f5f8fd;
+        --shadow: 0 10px 30px rgba(15, 23, 42, 0.045), 0 18px 48px rgba(255, 122, 0, 0.065);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: start center;
+        padding: 24px 12px;
+        background:
+          radial-gradient(circle at 82% 4%, rgba(255, 122, 0, 0.1), transparent 250px),
+          linear-gradient(180deg, #fbfdff 0%, #edf4fb 100%);
+        color: var(--ink);
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Microsoft YaHei", sans-serif;
+      }
+
+      .phone {
+        width: min(390px, 100%);
+        min-height: 844px;
+        overflow: hidden;
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        border-radius: 34px;
+        background: linear-gradient(180deg, #fbfdff 0%, #f4f8fd 52%, #eef4fb 100%);
+        box-shadow: 0 24px 70px rgba(15, 23, 42, 0.16);
+      }
+
+      .screen {
+        height: 844px;
+        overflow: auto;
+        padding: 18px 16px 96px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 2px 0 14px;
+      }
+
+      .title {
+        font-size: 26px;
+        font-weight: 950;
+      }
+
+      .plan {
+        max-width: 150px;
+        padding: 7px 11px;
+        overflow: hidden;
+        border-radius: 999px;
+        color: #8a4b1f;
+        font-size: 12px;
+        font-weight: 850;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        background: rgba(255, 242, 232, 0.86);
+        box-shadow: inset 0 0 0 1px rgba(255, 122, 0, 0.13);
+      }
+
+      .card {
+        border-radius: 24px;
+        background: var(--card);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(18px);
+      }
+
+      .hero {
+        position: relative;
+        padding: 21px 20px;
+        overflow: hidden;
+      }
+
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(circle at 88% 8%, rgba(255, 154, 31, 0.16), transparent 118px),
+          linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 250, 246, 0.92));
+      }
+
+      .hero > * { position: relative; z-index: 1; }
+
+      .hero-main {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 76px;
+        gap: 14px;
+        align-items: start;
+      }
+
+      .eyebrow {
+        color: #8a93a3;
+        font-size: 13px;
+        font-weight: 850;
+      }
+
+      .amount {
+        margin-top: 6px;
+        font-size: 42px;
+        font-weight: 950;
+        line-height: 1;
+      }
+
+      .sub {
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 720;
+      }
+
+      .ring {
+        width: 76px;
+        height: 76px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background: conic-gradient(var(--brand) 0 37%, #ffe6d2 37% 100%);
+      }
+
+      .ring-inner {
+        width: 55px;
+        height: 55px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background: #fff;
+        color: var(--brand);
+        font-size: 16px;
+        font-weight: 950;
+      }
+
+      .hint-strip {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+        margin-top: 18px;
+      }
+
+      .hint {
+        padding: 11px 12px;
+        border-radius: 17px;
+        background: rgba(248, 250, 252, 0.88);
+        box-shadow: inset 0 0 0 1px rgba(226, 232, 240, 0.84);
+      }
+
+      .hint.is-warm {
+        background: rgba(255, 243, 232, 0.94);
+        box-shadow: inset 0 0 0 1px rgba(255, 122, 0, 0.16);
+      }
+
+      .hint span {
+        display: block;
+        color: #8a93a3;
+        font-size: 11px;
+        font-weight: 850;
+      }
+
+      .hint strong {
+        display: block;
+        margin-top: 5px;
+        font-size: 17px;
+        font-weight: 950;
+      }
+
+      .hint em {
+        display: block;
+        margin-top: 4px;
+        color: var(--brand);
+        font-size: 11px;
+        font-style: normal;
+        font-weight: 900;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: 1fr 116px;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .primary,
+      .secondary {
+        height: 46px;
+        border: 0;
+        border-radius: 18px;
+        font-size: 15px;
+        font-weight: 950;
+      }
+
+      .primary {
+        color: #fff;
+        background: linear-gradient(135deg, var(--brand-2), var(--brand));
+        box-shadow: 0 12px 24px rgba(255, 101, 0, 0.19);
+      }
+
+      .secondary {
+        color: var(--brand);
+        background: #fff0e5;
+        box-shadow: inset 0 0 0 1px rgba(255, 101, 0, 0.12);
+      }
+
+      .section { margin-top: 17px; }
+
+      .section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 0 4px 10px;
+      }
+
+      .section-title {
+        font-size: 17px;
+        font-weight: 950;
+      }
+
+      .section-meta {
+        color: #9aa3af;
+        font-size: 12px;
+        font-weight: 850;
+      }
+
+      .month-scroll {
+        display: flex;
+        gap: 9px;
+        overflow-x: auto;
+        padding: 2px 2px 4px;
+        scrollbar-width: none;
+      }
+
+      .month-scroll::-webkit-scrollbar { display: none; }
+
+      .month-pill {
+        min-width: 91px;
+        padding: 10px 11px;
+        border: 0;
+        border-radius: 18px;
+        text-align: left;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: inset 0 0 0 1px var(--line), 0 8px 18px rgba(15, 23, 42, 0.025);
+      }
+
+      .month-pill.is-active {
+        color: #fff;
+        background: linear-gradient(180deg, #ff9527 0%, #ff6500 100%);
+        box-shadow: 0 12px 24px rgba(255, 101, 0, 0.18);
+      }
+
+      .month-pill small,
+      .month-pill span {
+        display: block;
+        font-size: 11px;
+        font-weight: 850;
+        opacity: 0.76;
+      }
+
+      .month-pill strong {
+        display: block;
+        margin-top: 5px;
+        font-size: 17px;
+        font-weight: 950;
+      }
+
+      .quick-insight {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+        margin-top: 11px;
+      }
+
+      .insight-card {
+        min-height: 70px;
+        padding: 12px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: inset 0 0 0 1px rgba(226, 232, 240, 0.8);
+      }
+
+      .insight-card span {
+        color: #8a93a3;
+        font-size: 11px;
+        font-weight: 850;
+      }
+
+      .insight-card strong {
+        display: block;
+        margin-top: 6px;
+        font-size: 16px;
+        font-weight: 950;
+      }
+
+      .calendar-card {
+        padding: 18px 16px 16px;
+      }
+
+      .calendar-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+      }
+
+      .month-control {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .arrow {
+        width: 30px;
+        height: 30px;
+        border: 0;
+        border-radius: 12px;
+        color: #6b7280;
+        font-size: 20px;
+        font-weight: 950;
+        background: #f8fafc;
+      }
+
+      .calendar-title {
+        font-size: 19px;
+        font-weight: 950;
+      }
+
+      .month-total {
+        padding: 7px 10px;
+        border-radius: 999px;
+        color: var(--brand);
+        font-size: 12px;
+        font-weight: 950;
+        background: #fff0e5;
+      }
+
+      .week,
+      .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 6px;
+      }
+
+      .week {
+        margin-bottom: 8px;
+        color: #9aa3af;
+        font-size: 11px;
+        font-weight: 850;
+        text-align: center;
+      }
+
+      .day {
+        min-height: 49px;
+        padding: 6px 3px;
+        border-radius: 14px;
+        text-align: center;
+        background: transparent;
+      }
+
+      .day.muted { opacity: 0.36; }
+
+      .day.has {
+        background: #fff7f0;
+        box-shadow: inset 0 0 0 1px rgba(255, 122, 0, 0.08);
+      }
+
+      .day.selected {
+        color: #fff;
+        background: linear-gradient(180deg, #ff8a1f 0%, #ff6500 100%);
+        box-shadow: 0 10px 20px rgba(255, 101, 0, 0.2);
+      }
+
+      .day-num {
+        display: block;
+        font-size: 13px;
+        font-weight: 900;
+      }
+
+      .day-money {
+        display: block;
+        margin-top: 3px;
+        overflow: hidden;
+        font-size: 9px;
+        font-weight: 900;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .month-empty-tip {
+        margin-top: 14px;
+        padding: 12px 13px;
+        border-radius: 16px;
+        color: #8a5a38;
+        font-size: 12px;
+        font-weight: 850;
+        background: rgba(255, 243, 232, 0.82);
+      }
+
+      .trend {
+        margin-top: 15px;
+        padding-top: 14px;
+        border-top: 1px solid rgba(226, 232, 240, 0.8);
+      }
+
+      .trend-title {
+        display: flex;
+        justify-content: space-between;
+        color: #6b7280;
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .bars {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 8px;
+        align-items: end;
+        height: 96px;
+        margin-top: 10px;
+      }
+
+      .bar {
+        display: grid;
+        grid-template-rows: 16px 1fr 15px;
+        gap: 5px;
+        min-width: 0;
+        text-align: center;
+      }
+
+      .bar small {
+        color: var(--brand);
+        font-size: 9px;
+        font-weight: 850;
+      }
+
+      .track {
+        position: relative;
+        overflow: hidden;
+        border-radius: 999px;
+        background: #eef2f7;
+      }
+
+      .fill {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        border-radius: inherit;
+        background: linear-gradient(180deg, #ffb24c, var(--brand));
+      }
+
+      .bar label {
+        color: #9aa3af;
+        font-size: 10px;
+        font-weight: 850;
+      }
+
+      .filter-row {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+      }
+
+      .filter-row::-webkit-scrollbar { display: none; }
+
+      .filter {
+        flex: 0 0 auto;
+        height: 34px;
+        padding: 0 13px;
+        border: 0;
+        border-radius: 999px;
+        color: #697386;
+        font-size: 13px;
+        font-weight: 900;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: inset 0 0 0 1px var(--line);
+      }
+
+      .filter.is-active {
+        color: #fff;
+        background: linear-gradient(135deg, #ff9824, var(--brand));
+        box-shadow: 0 8px 16px rgba(255, 101, 0, 0.14);
+      }
+
+      .list-card { padding: 14px; }
+
+      .list-head {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        color: #6b7280;
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .bill {
+        display: grid;
+        grid-template-columns: 42px minmax(0, 1fr) auto;
+        gap: 11px;
+        align-items: center;
+        min-height: 66px;
+        padding: 10px 0;
+      }
+
+      .bill + .bill { border-top: 1px solid rgba(226, 232, 240, 0.78); }
+
+      .icon {
+        display: grid;
+        place-items: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 14px;
+        color: var(--brand);
+        font-size: 12px;
+        font-weight: 950;
+        background: var(--warm);
+      }
+
+      .bill-name {
+        font-size: 15px;
+        font-weight: 950;
+      }
+
+      .bill-meta {
+        margin-top: 4px;
+        color: #8a93a3;
+        font-size: 12px;
+        font-weight: 780;
+      }
+
+      .bill-money {
+        font-size: 16px;
+        font-weight: 950;
+      }
+
+      .more-link {
+        display: grid;
+        place-items: center;
+        height: 42px;
+        margin-top: 8px;
+        border-radius: 15px;
+        color: var(--brand);
+        font-size: 13px;
+        font-weight: 950;
+        text-decoration: none;
+        background: #fff0e5;
+      }
+
+      .category-card { padding: 14px; }
+
+      .cat-top {
+        padding: 13px;
+        border-radius: 17px;
+        background: linear-gradient(135deg, #fff7ef, #fff);
+        box-shadow: inset 0 0 0 1px rgba(255, 122, 0, 0.12);
+      }
+
+      .cat-top strong {
+        display: block;
+        font-size: 18px;
+        font-weight: 950;
+      }
+
+      .cat-top span {
+        display: block;
+        margin-top: 5px;
+        color: #8a5a38;
+        font-size: 12px;
+        font-weight: 850;
+      }
+
+      .cat-row {
+        display: grid;
+        grid-template-columns: 44px minmax(0, 1fr) auto;
+        gap: 10px;
+        align-items: center;
+        padding: 12px 0 0;
+      }
+
+      .progress {
+        height: 7px;
+        margin-top: 7px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: #edf2f7;
+      }
+
+      .progress i {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #ffb24c, var(--brand));
+      }
+
+      .floating {
+        position: sticky;
+        bottom: 12px;
+        display: grid;
+        grid-template-columns: 1fr 112px;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .floating a {
+        text-decoration: none;
+      }
+
+      @media (max-width: 420px) {
+        body { padding: 0; background: #f3f7fc; }
+        .phone { width: 100%; min-height: 100vh; border: 0; border-radius: 0; box-shadow: none; }
+        .screen { height: 100vh; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="phone">
+      <section class="screen">
+        <header class="topbar">
+          <div class="title">消费</div>
+          <div class="plan">成都三日游</div>
+        </header>
+
+        <section class="hero card">
+          <div class="hero-main">
+            <div>
+              <div class="eyebrow">本次花费</div>
+              <div class="amount">¥ 3,680</div>
+              <div class="sub">总预算 ¥10,000 · 剩余 ¥6,320</div>
+            </div>
+            <div class="ring"><div class="ring-inner">37%</div></div>
+          </div>
+          <div class="hint-strip">
+            <div class="hint">
+              <span>当前 7月</span>
+              <strong>¥860</strong>
+              <em>4笔 · 日历中查看</em>
+            </div>
+            <div class="hint is-warm">
+              <span>其他月份</span>
+              <strong>¥2,820</strong>
+              <em>8月、9月也有消费</em>
+            </div>
+          </div>
+        </section>
+
+        <div class="actions">
+          <button class="primary">+ 记一笔</button>
+          <button class="secondary">设置预算</button>
+        </div>
+
+        <section class="section">
+          <div class="section-head">
+            <div class="section-title">月份分布</div>
+            <div class="section-meta">点月份同步日历</div>
+          </div>
+          <div class="month-scroll">
+            <button class="month-pill is-active"><small>7月</small><strong>¥860</strong><span>4笔</span></button>
+            <button class="month-pill"><small>8月</small><strong>¥1,050</strong><span>1笔</span></button>
+            <button class="month-pill"><small>9月</small><strong>¥1,770</strong><span>3笔</span></button>
+            <button class="month-pill"><small>全部</small><strong>¥3,680</strong><span>8笔</span></button>
+          </div>
+          <div class="quick-insight">
+            <div class="insight-card"><span>花费最多</span><strong>9月 · ¥1,770</strong></div>
+            <div class="insight-card"><span>最大分类</span><strong>住宿 · ¥2,100</strong></div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="calendar-card card">
+            <div class="calendar-head">
+              <div class="month-control">
+                <button class="arrow">‹</button>
+                <div class="calendar-title">2026年7月 ▾</div>
+                <button class="arrow">›</button>
+              </div>
+              <div class="month-total">本月 ¥860</div>
+            </div>
+            <div class="week">
+              <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+            </div>
+            <div class="calendar-grid">
+              <div class="day muted"><span class="day-num">28</span></div>
+              <div class="day muted"><span class="day-num">29</span></div>
+              <div class="day muted"><span class="day-num">30</span></div>
+              <div class="day"><span class="day-num">1</span></div>
+              <div class="day"><span class="day-num">2</span></div>
+              <div class="day"><span class="day-num">3</span></div>
+              <div class="day"><span class="day-num">4</span></div>
+              <div class="day"><span class="day-num">5</span></div>
+              <div class="day"><span class="day-num">6</span></div>
+              <div class="day"><span class="day-num">7</span></div>
+              <div class="day has"><span class="day-num">8</span><span class="day-money">¥210</span></div>
+              <div class="day selected"><span class="day-num">9</span><span class="day-money">¥286</span></div>
+              <div class="day"><span class="day-num">10</span></div>
+              <div class="day has"><span class="day-num">11</span><span class="day-money">¥364</span></div>
+              <div class="day"><span class="day-num">12</span></div>
+              <div class="day"><span class="day-num">13</span></div>
+              <div class="day"><span class="day-num">14</span></div>
+              <div class="day"><span class="day-num">15</span></div>
+              <div class="day"><span class="day-num">16</span></div>
+              <div class="day"><span class="day-num">17</span></div>
+              <div class="day"><span class="day-num">18</span></div>
+            </div>
+            <div class="month-empty-tip">提示：本次旅行还有 8月 ¥1,050、9月 ¥1,770，可在上方月份分布快速切换。</div>
+            <div class="trend">
+              <div class="trend-title"><span>本月消费曲线</span><span>7天</span></div>
+              <div class="bars">
+                <div class="bar"><small></small><div class="track"><div class="fill" style="height: 4%"></div></div><label>5日</label></div>
+                <div class="bar"><small></small><div class="track"><div class="fill" style="height: 4%"></div></div><label>6日</label></div>
+                <div class="bar"><small></small><div class="track"><div class="fill" style="height: 4%"></div></div><label>7日</label></div>
+                <div class="bar"><small>210</small><div class="track"><div class="fill" style="height: 58%"></div></div><label>8日</label></div>
+                <div class="bar"><small>286</small><div class="track"><div class="fill" style="height: 78%"></div></div><label>9日</label></div>
+                <div class="bar"><small></small><div class="track"><div class="fill" style="height: 4%"></div></div><label>10日</label></div>
+                <div class="bar"><small>364</small><div class="track"><div class="fill" style="height: 100%"></div></div><label>11日</label></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <div class="section-title">7.9 流水</div>
+            <div class="section-meta">支出 ¥286</div>
+          </div>
+          <div class="list-card card">
+            <div class="bill">
+              <div class="icon">餐饮</div>
+              <div>
+                <div class="bill-name">火锅晚餐</div>
+                <div class="bill-meta">餐饮 · 我记录</div>
+              </div>
+              <div class="bill-money">¥286</div>
+            </div>
+            <a class="more-link" href="./expense-ledger-pages.html#filter">查看全部流水与筛选 ›</a>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <div class="section-title">统计筛选</div>
+            <div class="section-meta">快速定位大头</div>
+          </div>
+          <div class="filter-row">
+            <button class="filter is-active">全部</button>
+            <button class="filter">住宿 ¥2100</button>
+            <button class="filter">交通 ¥920</button>
+            <button class="filter">餐饮 ¥660</button>
+            <button class="filter">小王记录</button>
+          </div>
+          <div class="category-card card" style="margin-top: 10px">
+            <div class="cat-top">
+              <strong>住宿是最大支出</strong>
+              <span>¥2,100 · 2笔 · 分布在8月和9月</span>
+            </div>
+            <div class="cat-row">
+              <div class="icon">住</div>
+              <div>
+                <div class="bill-name">住宿</div>
+                <div class="bill-meta">57%</div>
+                <div class="progress"><i style="width: 57%"></i></div>
+              </div>
+              <div class="bill-money">¥2,100</div>
+            </div>
+            <div class="cat-row">
+              <div class="icon">行</div>
+              <div>
+                <div class="bill-name">交通</div>
+                <div class="bill-meta">25%</div>
+                <div class="progress"><i style="width: 25%"></i></div>
+              </div>
+              <div class="bill-money">¥920</div>
+            </div>
+          </div>
+        </section>
+
+        <div class="floating">
+          <button class="primary">记一笔</button>
+          <a class="secondary" href="./expense-ledger-pages.html#all">全部流水</a>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

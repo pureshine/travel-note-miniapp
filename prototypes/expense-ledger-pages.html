@@ -1,0 +1,798 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>消费流水二级页原型</title>
+    <style>
+      :root {
+        --brand: #ff6500;
+        --brand-2: #ff9a1f;
+        --ink: #101827;
+        --muted: #7d8593;
+        --line: rgba(226, 232, 240, 0.9);
+        --card: rgba(255, 255, 255, 0.96);
+        --warm: #fff3e8;
+        --surface: #f5f8fd;
+        --green: #20a57a;
+        --shadow: 0 10px 30px rgba(15, 23, 42, 0.045), 0 18px 48px rgba(255, 122, 0, 0.065);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        padding: 24px 12px;
+        background:
+          radial-gradient(circle at 72% 4%, rgba(255, 122, 0, 0.11), transparent 270px),
+          linear-gradient(180deg, #fbfdff 0%, #edf4fb 100%);
+        color: var(--ink);
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Microsoft YaHei", sans-serif;
+      }
+
+      .board {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(320px, 390px));
+        gap: 22px;
+        justify-content: center;
+        align-items: start;
+      }
+
+      .phone {
+        min-height: 844px;
+        overflow: hidden;
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        border-radius: 34px;
+        background: linear-gradient(180deg, #fbfdff 0%, #f4f8fd 52%, #eef4fb 100%);
+        box-shadow: 0 24px 70px rgba(15, 23, 42, 0.16);
+      }
+
+      .screen {
+        height: 844px;
+        overflow: auto;
+        padding: 16px 16px 92px;
+      }
+
+      .topbar {
+        display: grid;
+        grid-template-columns: 36px minmax(0, 1fr) 36px;
+        gap: 8px;
+        align-items: center;
+        margin: 2px 0 14px;
+      }
+
+      .back,
+      .icon-btn {
+        display: grid;
+        place-items: center;
+        width: 36px;
+        height: 36px;
+        border: 0;
+        border-radius: 14px;
+        color: var(--ink);
+        text-decoration: none;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: inset 0 0 0 1px var(--line);
+      }
+
+      .page-title {
+        text-align: center;
+        font-size: 18px;
+        font-weight: 950;
+      }
+
+      .card {
+        border-radius: 24px;
+        background: var(--card);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(18px);
+      }
+
+      .summary {
+        position: relative;
+        overflow: hidden;
+        padding: 18px;
+      }
+
+      .summary::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(circle at 88% 0%, rgba(255, 154, 31, 0.16), transparent 112px),
+          linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 250, 246, 0.92));
+      }
+
+      .summary > * { position: relative; z-index: 1; }
+
+      .eyebrow {
+        color: #8a93a3;
+        font-size: 12px;
+        font-weight: 850;
+      }
+
+      .amount-line {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 6px;
+      }
+
+      .amount {
+        font-size: 34px;
+        font-weight: 950;
+        line-height: 1;
+      }
+
+      .count {
+        padding: 7px 10px;
+        border-radius: 999px;
+        color: #8a4b1f;
+        font-size: 12px;
+        font-weight: 900;
+        background: rgba(255, 242, 232, 0.94);
+        box-shadow: inset 0 0 0 1px rgba(255, 122, 0, 0.12);
+      }
+
+      .summary-note {
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 760;
+        line-height: 1.5;
+      }
+
+      .mini-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .mini {
+        display: grid;
+        grid-template-columns: 68px minmax(0, 1fr) auto;
+        gap: 10px;
+        align-items: center;
+        min-width: 0;
+        min-height: 42px;
+        padding: 9px 11px;
+        border-radius: 16px;
+        background: rgba(248, 250, 252, 0.86);
+        box-shadow: inset 0 0 0 1px rgba(226, 232, 240, 0.75);
+      }
+
+      .mini span {
+        display: block;
+        color: #8a93a3;
+        font-size: 11px;
+        font-weight: 850;
+      }
+
+      .mini strong {
+        display: block;
+        margin-top: 0;
+        overflow: hidden;
+        font-size: 15px;
+        font-weight: 950;
+        text-align: right;
+        text-overflow: clip;
+        white-space: nowrap;
+      }
+
+      .mini em {
+        overflow: hidden;
+        color: #8a93a3;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 820;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .section { margin-top: 16px; }
+
+      .section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 9px;
+      }
+
+      .section-title {
+        font-size: 17px;
+        font-weight: 950;
+      }
+
+      .section-meta {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 850;
+      }
+
+      .search-card {
+        display: grid;
+        grid-template-columns: 1fr 42px;
+        gap: 8px;
+        padding: 8px;
+        border-radius: 21px;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: inset 0 0 0 1px var(--line), var(--shadow);
+      }
+
+      .search-input {
+        display: flex;
+        align-items: center;
+        height: 42px;
+        padding: 0 12px;
+        border-radius: 15px;
+        color: #9aa3af;
+        font-size: 13px;
+        font-weight: 830;
+        background: #f6f8fb;
+      }
+
+      .filter-btn {
+        display: grid;
+        place-items: center;
+        height: 42px;
+        border: 0;
+        border-radius: 15px;
+        color: #fff;
+        font-size: 18px;
+        font-weight: 950;
+        background: linear-gradient(135deg, var(--brand-2), var(--brand));
+        box-shadow: 0 10px 20px rgba(255, 101, 0, 0.15);
+      }
+
+      .filter-panel {
+        padding: 14px 14px 12px;
+      }
+
+      .filter-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 42px;
+        gap: 8px;
+      }
+
+      .select-box {
+        min-width: 0;
+        min-height: 50px;
+        padding: 8px 11px;
+        border-radius: 15px;
+        background: #fff;
+        box-shadow: inset 0 0 0 1px var(--line);
+      }
+
+      .select-box span {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: #8a93a3;
+        font-size: 10px;
+        font-weight: 850;
+      }
+
+      .select-box strong {
+        display: block;
+        margin-top: 3px;
+        overflow: hidden;
+        font-size: 14px;
+        font-weight: 950;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .select-box.is-compact {
+        display: grid;
+        place-items: center;
+        padding: 0;
+        color: var(--brand);
+        font-size: 13px;
+        font-weight: 950;
+        background: #fff4eb;
+        box-shadow: inset 0 0 0 1px rgba(255, 122, 0, 0.16);
+      }
+
+      .active-filters {
+        display: flex;
+        gap: 7px;
+        overflow-x: auto;
+        margin-top: 11px;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+      }
+
+      .active-filters::-webkit-scrollbar { display: none; }
+
+      .chip {
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 28px;
+        padding: 0 8px 0 10px;
+        border-radius: 999px;
+        color: #9a4d16;
+        font-size: 11px;
+        font-weight: 900;
+        background: #fff2e7;
+        box-shadow: inset 0 0 0 1px rgba(255, 122, 0, 0.14);
+      }
+
+      .chip i {
+        display: grid;
+        place-items: center;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        color: #fff;
+        font-style: normal;
+        font-size: 10px;
+        background: var(--brand);
+      }
+
+      .month-strip {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+      }
+
+      .month-strip::-webkit-scrollbar { display: none; }
+
+      .month-pill {
+        flex: 0 0 94px;
+        min-height: 72px;
+        padding: 11px 12px;
+        border: 0;
+        border-radius: 18px;
+        text-align: left;
+        color: #7a8596;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: inset 0 0 0 1px var(--line);
+      }
+
+      .month-pill.is-active {
+        color: #fff;
+        background: linear-gradient(135deg, #ff9b25, #ff6500);
+        box-shadow: 0 12px 22px rgba(255, 101, 0, 0.18);
+      }
+
+      .month-pill.is-muted {
+        color: #9aa3af;
+        background: rgba(247, 250, 253, 0.86);
+      }
+
+      .month-pill small,
+      .month-pill span {
+        display: block;
+        font-size: 11px;
+        font-weight: 850;
+        opacity: 0.86;
+      }
+
+      .month-pill strong {
+        display: block;
+        margin: 5px 0 3px;
+        font-size: 17px;
+        font-weight: 950;
+      }
+
+      .tabs {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        padding: 5px;
+        border-radius: 18px;
+        background: rgba(234, 240, 247, 0.8);
+      }
+
+      .tab {
+        display: grid;
+        place-items: center;
+        height: 36px;
+        border-radius: 14px;
+        color: #737d8d;
+        font-size: 13px;
+        font-weight: 950;
+      }
+
+      .tab.is-active {
+        color: var(--brand);
+        background: #fff;
+        box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06);
+      }
+
+      .list-card {
+        padding: 14px;
+      }
+
+      .group-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 4px 0 8px;
+        color: #7d8796;
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .bill {
+        display: grid;
+        grid-template-columns: 42px minmax(0, 1fr) auto;
+        gap: 11px;
+        align-items: center;
+        min-height: 64px;
+        padding: 10px 0;
+      }
+
+      .bill + .bill,
+      .group + .group { border-top: 1px solid rgba(226, 232, 240, 0.78); }
+
+      .icon {
+        display: grid;
+        place-items: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 14px;
+        color: var(--brand);
+        font-size: 12px;
+        font-weight: 950;
+        background: var(--warm);
+      }
+
+      .icon.green {
+        color: var(--green);
+        background: rgba(32, 165, 122, 0.1);
+      }
+
+      .bill-name {
+        overflow: hidden;
+        font-size: 15px;
+        font-weight: 950;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .bill-meta {
+        margin-top: 4px;
+        color: #8a93a3;
+        font-size: 12px;
+        font-weight: 780;
+      }
+
+      .bill-money {
+        font-size: 16px;
+        font-weight: 950;
+      }
+
+      .month-summary {
+        padding: 14px;
+      }
+
+      .all-months-link {
+        display: grid;
+        place-items: center;
+        height: 42px;
+        margin-top: 4px;
+        border-radius: 15px;
+        color: var(--brand);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 950;
+        background: #fff0e5;
+        box-shadow: inset 0 0 0 1px rgba(255, 101, 0, 0.12);
+      }
+
+      .rank-row {
+        display: grid;
+        grid-template-columns: 44px minmax(0, 1fr) auto;
+        gap: 10px;
+        align-items: center;
+        padding: 11px 0;
+      }
+
+      .rank-row + .rank-row { border-top: 1px solid rgba(226, 232, 240, 0.72); }
+
+      .progress {
+        height: 7px;
+        margin-top: 7px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: #edf2f7;
+      }
+
+      .progress i {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #ffb24c, var(--brand));
+      }
+
+      .bottom-actions {
+        position: sticky;
+        bottom: 12px;
+        display: grid;
+        grid-template-columns: 1fr 112px;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .primary,
+      .secondary {
+        display: grid;
+        place-items: center;
+        height: 46px;
+        border: 0;
+        border-radius: 18px;
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 950;
+      }
+
+      .primary {
+        color: #fff;
+        background: linear-gradient(135deg, var(--brand-2), var(--brand));
+        box-shadow: 0 12px 24px rgba(255, 101, 0, 0.19);
+      }
+
+      .secondary {
+        color: var(--brand);
+        background: #fff0e5;
+        box-shadow: inset 0 0 0 1px rgba(255, 101, 0, 0.12);
+      }
+
+      @media (max-width: 840px) {
+        body { padding: 0; background: #f3f7fc; }
+        .board { display: block; }
+        .phone { min-height: 100vh; border: 0; border-radius: 0; box-shadow: none; }
+        .phone + .phone { border-top: 14px solid #e9f0f8; }
+        .screen { height: auto; min-height: 100vh; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="board">
+      <article class="phone" id="filter">
+        <section class="screen">
+          <header class="topbar">
+            <a class="back" href="./expense-page-redesign.html">‹</a>
+            <div class="page-title">流水与筛选</div>
+            <button class="icon-btn">⋯</button>
+          </header>
+
+          <section class="summary card">
+            <div class="eyebrow">当前筛选结果</div>
+            <div class="amount-line">
+              <div class="amount">¥ 3,680</div>
+              <div class="count">8笔</div>
+            </div>
+            <div class="summary-note">费用分布在 7月、8月、9月，筛选后会同步更新下方月份定位和流水列表。</div>
+            <div class="mini-stats">
+              <div class="mini"><span>最大月份</span><em>9月 · 3笔</em><strong>¥1,770</strong></div>
+              <div class="mini"><span>最大分类</span><em>住宿 · 2笔</em><strong>¥2,100</strong></div>
+              <div class="mini"><span>最近记录</span><em>9.12 · 门票</em><strong>¥360</strong></div>
+            </div>
+          </section>
+
+          <section class="section">
+            <div class="search-card">
+              <div class="search-input">搜索名称、备注、分类</div>
+              <button class="filter-btn">⌕</button>
+            </div>
+          </section>
+
+          <section class="section">
+            <div class="filter-panel card">
+              <div class="section-head">
+                <div class="section-title">统计筛选</div>
+                <div class="section-meta">组合筛选</div>
+              </div>
+              <div class="filter-grid">
+                <div class="select-box"><span>月份 <b>⌄</b></span><strong>8月-9月</strong></div>
+                <div class="select-box"><span>分类 <b>⌄</b></span><strong>住宿</strong></div>
+                <div class="select-box is-compact">更多</div>
+              </div>
+              <div class="active-filters">
+                <div class="chip">住宿 <i>×</i></div>
+                <div class="chip">8月-9月 <i>×</i></div>
+                <div class="chip">小王记录 <i>×</i></div>
+                <div class="chip">清空 <i>×</i></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="section">
+            <div class="section-head">
+              <div class="section-title">月份定位</div>
+              <div class="section-meta">点击跳到对应月份</div>
+            </div>
+            <div class="month-strip">
+              <button class="month-pill is-active"><small>全部</small><strong>¥3,680</strong><span>8笔</span></button>
+              <button class="month-pill"><small>7月</small><strong>¥860</strong><span>4笔</span></button>
+              <button class="month-pill"><small>8月</small><strong>¥1,050</strong><span>1笔</span></button>
+              <button class="month-pill"><small>9月</small><strong>¥1,770</strong><span>3笔</span></button>
+            </div>
+          </section>
+
+          <section class="section">
+            <div class="section-head">
+              <div class="section-title">筛选结果</div>
+              <div class="section-meta">按月份分组</div>
+            </div>
+            <div class="list-card card">
+              <div class="group">
+                <div class="group-head"><span>2026年9月</span><strong>¥1,770 · 3笔</strong></div>
+                <div class="bill">
+                  <div class="icon">住</div>
+                  <div><div class="bill-name">酒店续住</div><div class="bill-meta">9.10 · 住宿 · 小王记录</div></div>
+                  <div class="bill-money">¥1,200</div>
+                </div>
+                <div class="bill">
+                  <div class="icon">票</div>
+                  <div><div class="bill-name">博物馆门票</div><div class="bill-meta">9.12 · 门票 · 我记录</div></div>
+                  <div class="bill-money">¥360</div>
+                </div>
+              </div>
+              <div class="group">
+                <div class="group-head"><span>2026年8月</span><strong>¥1,050 · 1笔</strong></div>
+                <div class="bill">
+                  <div class="icon">住</div>
+                  <div><div class="bill-name">民宿定金</div><div class="bill-meta">8.18 · 住宿 · 小王记录</div></div>
+                  <div class="bill-money">¥1,050</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <div class="bottom-actions">
+            <a class="primary" href="./expense-page-redesign.html">回到日历</a>
+            <a class="secondary" href="#all">全部流水</a>
+          </div>
+        </section>
+      </article>
+
+      <article class="phone" id="all">
+        <section class="screen">
+          <header class="topbar">
+            <a class="back" href="./expense-page-redesign.html">‹</a>
+            <div class="page-title">全部流水</div>
+            <button class="icon-btn">筛</button>
+          </header>
+
+          <section class="summary card">
+            <div class="eyebrow">旅行账本总览</div>
+            <div class="amount-line">
+              <div class="amount">¥ 3,680</div>
+              <div class="count">6个月</div>
+            </div>
+            <div class="summary-note">顶部只保留关键结论；具体月份放进下方横向速览，月份再多也不挤占主内容。</div>
+            <div class="mini-stats">
+              <div class="mini"><span>旅行跨度</span><em>7月-12月</em><strong>6个月</strong></div>
+              <div class="mini"><span>最高月份</span><em>9月 · 3笔</em><strong>¥1,770</strong></div>
+              <div class="mini"><span>有消费月份</span><em>共 8 笔</em><strong>6个</strong></div>
+            </div>
+          </section>
+
+          <section class="section">
+            <div class="tabs">
+              <div class="tab is-active">流水</div>
+              <div class="tab">分类</div>
+              <div class="tab">月份</div>
+            </div>
+          </section>
+
+          <section class="section">
+            <div class="section-head">
+              <div class="section-title">月份速览</div>
+              <div class="section-meta">横向滑动查看全部</div>
+            </div>
+            <div class="month-strip">
+              <button class="month-pill is-active"><small>全部</small><strong>¥3,680</strong><span>8笔</span></button>
+              <button class="month-pill"><small>7月</small><strong>¥860</strong><span>4笔</span></button>
+              <button class="month-pill"><small>8月</small><strong>¥1,050</strong><span>1笔</span></button>
+              <button class="month-pill"><small>9月</small><strong>¥1,770</strong><span>3笔</span></button>
+              <button class="month-pill is-muted"><small>10月</small><strong>¥0</strong><span>无记录</span></button>
+              <button class="month-pill is-muted"><small>11月</small><strong>¥0</strong><span>无记录</span></button>
+              <button class="month-pill is-muted"><small>12月</small><strong>¥0</strong><span>无记录</span></button>
+            </div>
+          </section>
+
+          <section class="section">
+            <div class="section-head">
+              <div class="section-title">流水分布</div>
+              <div class="section-meta">按金额 Top 3</div>
+            </div>
+            <div class="month-summary card">
+              <div class="rank-row">
+                <div class="icon">9月</div>
+                <div>
+                  <div class="bill-name">9月消费最高</div>
+                  <div class="bill-meta">3笔 · 住宿和门票为主</div>
+                  <div class="progress"><i style="width: 100%"></i></div>
+                </div>
+                <div class="bill-money">¥1,770</div>
+              </div>
+              <div class="rank-row">
+                <div class="icon">8月</div>
+                <div>
+                  <div class="bill-name">8月只有一笔大额</div>
+                  <div class="bill-meta">民宿定金 · 小王记录</div>
+                  <div class="progress"><i style="width: 59%"></i></div>
+                </div>
+                <div class="bill-money">¥1,050</div>
+              </div>
+              <div class="rank-row">
+                <div class="icon">7月</div>
+                <div>
+                  <div class="bill-name">7月日常消费</div>
+                  <div class="bill-meta">餐饮、交通、咖啡</div>
+                  <div class="progress"><i style="width: 49%"></i></div>
+                </div>
+                <div class="bill-money">¥860</div>
+              </div>
+              <a class="all-months-link" href="#filter">查看全部月份筛选 ›</a>
+            </div>
+          </section>
+
+          <section class="section">
+            <div class="section-head">
+              <div class="section-title">全部记录</div>
+              <div class="section-meta">8笔</div>
+            </div>
+            <div class="list-card card">
+              <div class="group">
+                <div class="group-head"><span>2026年9月</span><strong>¥1,770</strong></div>
+                <div class="bill">
+                  <div class="icon">住</div>
+                  <div><div class="bill-name">酒店续住</div><div class="bill-meta">9.10 · 住宿 · 小王记录</div></div>
+                  <div class="bill-money">¥1,200</div>
+                </div>
+                <div class="bill">
+                  <div class="icon">票</div>
+                  <div><div class="bill-name">博物馆门票</div><div class="bill-meta">9.12 · 门票 · 我记录</div></div>
+                  <div class="bill-money">¥360</div>
+                </div>
+                <div class="bill">
+                  <div class="icon">行</div>
+                  <div><div class="bill-name">市内打车</div><div class="bill-meta">9.12 · 交通 · 我记录</div></div>
+                  <div class="bill-money">¥210</div>
+                </div>
+              </div>
+              <div class="group">
+                <div class="group-head"><span>2026年8月</span><strong>¥1,050</strong></div>
+                <div class="bill">
+                  <div class="icon">住</div>
+                  <div><div class="bill-name">民宿定金</div><div class="bill-meta">8.18 · 住宿 · 小王记录</div></div>
+                  <div class="bill-money">¥1,050</div>
+                </div>
+              </div>
+              <div class="group">
+                <div class="group-head"><span>2026年7月</span><strong>¥860</strong></div>
+                <div class="bill">
+                  <div class="icon">餐</div>
+                  <div><div class="bill-name">火锅晚餐</div><div class="bill-meta">7.9 · 餐饮 · 我记录</div></div>
+                  <div class="bill-money">¥286</div>
+                </div>
+                <div class="bill">
+                  <div class="icon">行</div>
+                  <div><div class="bill-name">高铁票</div><div class="bill-meta">7.11 · 交通 · 小王记录</div></div>
+                  <div class="bill-money">¥364</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <div class="bottom-actions">
+            <a class="primary" href="./expense-page-redesign.html">回到日历</a>
+            <a class="secondary" href="#filter">筛选</a>
+          </div>
+        </section>
+      </article>
+    </main>
+  </body>
+</html>

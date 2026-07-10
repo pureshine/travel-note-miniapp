@@ -6,16 +6,8 @@
     </view>
   </view>-->
 
-  <plan-switch
-    wx:if="{{trip && tripNames.length > 1}}"
-    tripOptions="{{tripNames}}"
-    activeIndex="{{activeTripIndex}}"
-    tripName="{{trip.name}}"
-    bind:change="onTripChange"
-  />
-
   <view class="ledger-hero">
-    <view class="budget-panel">
+    <view class="budget-panel {{budgetStatusClass}}">
       <view class="budget-left">
         <view class="budget-block">
           <view class="budget-tag">
@@ -29,11 +21,11 @@
         <view class="budget-block">
           <view class="budget-tag">
             <view class="tag-dot"></view>
-            <text>预算剩余</text>
+            <text>{{budgetStatusTitle}}</text>
           </view>
           <view class="remain-row">
-            <text class="remain-total">¥ {{remainingText}}</text>
-            <view class="remain-pill">{{remainingPercent}}%</view>
+            <text class="remain-total">¥ {{budgetBalanceText}}</text>
+            <view class="remain-pill">{{budgetStatusPill}}</view>
           </view>
         </view>
       </view>
